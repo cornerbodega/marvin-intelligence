@@ -60,12 +60,12 @@ export default function Home({ title, content }) {
                       matter effortlessly.
                     </p>
                     <div className="hero-cta">
-                      <a
+                      <Link
                         className="button button-primary"
                         href="/account/log-in"
                       >
                         Start your Free Trial
-                      </a>
+                      </Link>
                       <a className="button" href="#">
                         Meet your AI Team
                       </a>
