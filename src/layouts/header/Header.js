@@ -14,8 +14,8 @@ import {
   Dropdown,
   Button,
 } from "reactstrap";
-import LogoWhite from "../../assets/images/logos/xtremelogowhite.svg";
-import user1 from "../../assets/images/users/user1.jpg";
+// import LogoWhite from "../../assets/images/logos/xtremelogowhite.svg";
+import LogoWhite from "../../../public/logo.png";
 
 const Header = ({ showMobmenu }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -30,7 +30,7 @@ const Header = ({ showMobmenu }) => {
     <Navbar color="primary" dark expand="md">
       <div className="d-flex align-items-center">
         <NavbarBrand href="/dashboard" className="d-lg-none">
-          <Image src={LogoWhite} alt="logo" />
+          <Image src={LogoWhite} height="40" alt="logo" />
         </NavbarBrand>
         <Button color="primary" className="d-lg-none" onClick={showMobmenu}>
           <i className="bi bi-list"></i>
@@ -57,7 +57,7 @@ const Header = ({ showMobmenu }) => {
 
           <input
             type="text"
-            style={{ borderRadius: "12px", textIndent: "10px" }}
+            style={{ borderRadius: "12px", margin: "10px", textIndent: "10px" }}
             placeholder="Search"
           />
           <div className="ms-auto marvin">👤</div>

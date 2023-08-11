@@ -4,9 +4,40 @@ import Script from "next/script";
 import HomeAnimations from "../src/js/main";
 import Link from "next/link";
 // export const getServerSideProps = async () => {};
-export default function Home({ title, content }) {
-  // const eggos = "eggos";
+import {
+  Canvas,
+  useFrame,
+  ThreeElements,
+  useThree,
+  useLoader,
+} from "@react-three/fiber";
+import { Environment, OrbitControls } from "@react-three/drei";
+// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import React, { useRef, useState, useEffect, use } from "react";
+
+const Model = () => {
+  // Load the model from glTF 2.0 (.glb or .gltf) file in /public
+  const gltf = useLoader(GLTFLoader, "/3d/m-tree-pink.gltf");
+  const ref = useRef();
+
+  // Set initial camera position
+  useThree(({ camera }) => {
+    camera.position.x = -20;
+    camera.position.y = 20;
+    camera.position.z = 30;
+    camera.lookAt(0, 0, 0);
+  });
+
+  return (
+    <>
+      <primitive scale={0.2} ref={ref} object={gltf.scene} />
+    </>
+  );
+};
+
+export default function Home({ title, content }) {
   return (
     <div>
       <Head>
@@ -17,14 +48,10 @@ export default function Home({ title, content }) {
           <meta charSet="utf-8" />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          {/* <title>Solid Template</title> */}
           <link
             href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,600"
             rel="stylesheet"
           />
-          {/* <Script src="../src/js/main.js"></Script> */}
-          {/* /Users/fromastermarv/Documents/Codeyard/marvinfo/src/js/main.js */}
-          {/* <link rel="stylesheet" href="dist/css/style.css" /> */}
         </>
       </Head>
       <HomeAnimations />
@@ -34,14 +61,19 @@ export default function Home({ title, content }) {
             <div className="container">
               <div className="site-header-inner">
                 <div className="brand header-brand">
-                  <h1 className="m-0">
-                    <img
-                      // className="header-logo-image"
-                      src="logo.png"
-                      alt="Logo"
-                      width={200}
-                    />
-                  </h1>
+                  <div
+                    className="m-0"
+                    style={{ width: "auto", height: "200px" }}
+                  >
+                    <Canvas>
+                      <OrbitControls minDistance={1} maxDistance={2} />
+                      <ambientLight intensity={2} />
+                      <pointLight position={[-30, -30, -30]} intensity={0.5} />
+                      <pointLight position={[20, 20, 20]} intensity={0.5} />
+                      <pointLight position={[10, 10, 10]} intensity={2} />
+                      <Model />
+                    </Canvas>
+                  </div>
                 </div>
               </div>
             </div>
@@ -257,7 +289,7 @@ export default function Home({ title, content }) {
                     <h2 className="section-title mt-0">
                       Free Trial Offer - Explore the World of Knowledge with Us!
                     </h2>
-                    <p className="section-paragraph mb-0 text-white">
+                    <div className="section-paragraph mb-0 text-white">
                       <div>
                         <p>
                           At Intelligence.Marvin.Technology, we believe in the
@@ -302,7 +334,7 @@ export default function Home({ title, content }) {
                           found below.
                         </p>
                       </div>
-                    </p>
+                    </div>
                   </div>
                   <div className="pricing-tables-wrap">
                     <h2>Basic Plan</h2>
@@ -456,7 +488,7 @@ export default function Home({ title, content }) {
               <div className="container">
                 <div className="cta-inner section-inner">
                   <h3 className="section-title mt-0">
-                    Want to talk to a human about it?
+                    Want to talk to Marvin about it?
                   </h3>
                   <div className="cta-cta">
                     <a
@@ -497,53 +529,7 @@ export default function Home({ title, content }) {
                     <a href="#">Support</a>
                   </li>
                 </ul>
-                {/* <ul className="footer-social-links list-reset">
-                  <li>
-                    <a href="#">
-                      <span className="screen-reader-text">Facebook</span>
-                      <svg
-                        width={16}
-                        height={16}
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M6.023 16L6 9H3V6h3V4c0-2.7 1.672-4 4.08-4 1.153 0 2.144.086 2.433.124v2.821h-1.67c-1.31 0-1.563.623-1.563 1.536V6H13l-1 3H9.28v7H6.023z"
-                          fill="#0270D7"
-                        />
-                      </svg>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <span className="screen-reader-text">Twitter</span>
-                      <svg
-                        width={16}
-                        height={16}
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M16 3c-.6.3-1.2.4-1.9.5.7-.4 1.2-1 1.4-1.8-.6.4-1.3.6-2.1.8-.6-.6-1.5-1-2.4-1-1.7 0-3.2 1.5-3.2 3.3 0 .3 0 .5.1.7-2.7-.1-5.2-1.4-6.8-3.4-.3.5-.4 1-.4 1.7 0 1.1.6 2.1 1.5 2.7-.5 0-1-.2-1.5-.4C.7 7.7 1.8 9 3.3 9.3c-.3.1-.6.1-.9.1-.2 0-.4 0-.6-.1.4 1.3 1.6 2.3 3.1 2.3-1.1.9-2.5 1.4-4.1 1.4H0c1.5.9 3.2 1.5 5 1.5 6 0 9.3-5 9.3-9.3v-.4C15 4.3 15.6 3.7 16 3z"
-                          fill="#0270D7"
-                        />
-                      </svg>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <span className="screen-reader-text">Google</span>
-                      <svg
-                        width={16}
-                        height={16}
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M7.9 7v2.4H12c-.2 1-1.2 3-4 3-2.4 0-4.3-2-4.3-4.4 0-2.4 2-4.4 4.3-4.4 1.4 0 2.3.6 2.8 1.1l1.9-1.8C11.5 1.7 9.9 1 8 1 4.1 1 1 4.1 1 8s3.1 7 7 7c4 0 6.7-2.8 6.7-6.8 0-.5 0-.8-.1-1.2H7.9z"
-                          fill="#0270D7"
-                        />
-                      </svg>
-                    </a>
-                  </li>
-                </ul> */}
+
                 <div className="footer-copyright">
                   © 2023 Marvin.Technology, all rights reserved
                 </div>
@@ -551,21 +537,6 @@ export default function Home({ title, content }) {
             </div>
           </footer>
         </div>
-
-        {/* <MyComponent title={title} content={content} /> */}
-        {/* <div>Start My Free Trial</div>
-      <div>Log In</div> */}
-        {/* <div className="brand header-brand">
-        <h1 className="m-0">
-          <a href="#">
-            <Image
-              className="header-logo-image"
-              src="dist/images/logo.svg"
-              alt="Logo"
-            />
-          </a>
-        </h1>
-      </div> */}
       </div>
     </div>
   );

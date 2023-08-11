@@ -5,10 +5,10 @@ import Link from "next/link";
 const Logo = () => {
   return (
     <Link href="/dashboard">
-      <a>
-        Marvin Intelligence Agency
-        {/* <Image src={LogoDark} alt="logo" /> */}
-      </a>
+      {/* <a> */}
+      Marvin Intelligence Agency
+      {/* <Image src={LogoDark} alt="logo" /> */}
+      {/* </a> */}
     </Link>
   );
 };

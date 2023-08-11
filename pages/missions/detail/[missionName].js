@@ -14,24 +14,12 @@ import {
   BreadcrumbItem,
 } from "reactstrap";
 import AgentDetailMissionsTable from "../../../src/components/dashboard/AgentDetailMissionsTable";
-// import TopCards from "../src/components/dashboard/TopCards";
 import TopCards from "../../../src/components/dashboard/TopCards";
 import Link from "next/link";
 import AgentsTable from "../../../src/components/dashboard/AgentsTable";
-// import Blog from "../../../src/components/dashboard/Blog";
-// import bg1 from "../../src/assets/images/bg/bg1.jpg";
-// import bg1 from "../../../public/default-agents/otter.png";
-// import bg2 from "../../../src/assets/images/bg/bg2.jpg";
-// import bg3 from "../../../src/assets/images/bg/bg3.jpg";
-// import bg4 from "../../../src/assets/images/bg/bg4.jpg";
-import Image from "next/image";
-// import user1 from "../../../public/default-agents/pangolin.png";
-// import user2 from "../../../public/default-agents/quokka.png";
-// import user3 from "../../../public/default-agents/axolotl.png";
-// import user4 from "../../../public/default-agents/red panda.png";
-// import user5 from "../../../public/default-agents/pika.png";
 
-// import AgentsTable from "../../../src/components/dashboard/AgentsTable";
+import Image from "next/image";
+
 import { useRouter } from "next/router";
 
 const ViewAgents = () => {
@@ -48,7 +36,9 @@ const ViewAgents = () => {
           <Link href="/mission/view-missions">Missions</Link>
         </BreadcrumbItem>
 
-        <BreadcrumbItem active>{missionName}</BreadcrumbItem>
+        <BreadcrumbItem className="text-white" active>
+          {missionName}
+        </BreadcrumbItem>
       </Breadcrumb>
       <Row>
         <Col>

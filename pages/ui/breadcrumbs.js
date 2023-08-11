@@ -23,13 +23,17 @@ const Breadcrumbs = () => {
           </CardTitle>
           <CardBody className="">
             <Breadcrumb>
-              <BreadcrumbItem active>Home</BreadcrumbItem>
+              <BreadcrumbItem className="text-white" active>
+                Home
+              </BreadcrumbItem>
             </Breadcrumb>
             <Breadcrumb>
               <BreadcrumbItem>
                 <Link href="/">Home</Link>
               </BreadcrumbItem>
-              <BreadcrumbItem active>Library</BreadcrumbItem>
+              <BreadcrumbItem className="text-white" active>
+                Library
+              </BreadcrumbItem>
             </Breadcrumb>
             <Breadcrumb>
               <BreadcrumbItem>
@@ -38,7 +42,9 @@ const Breadcrumbs = () => {
               <BreadcrumbItem>
                 <Link href="/">Library</Link>
               </BreadcrumbItem>
-              <BreadcrumbItem active>Data</BreadcrumbItem>
+              <BreadcrumbItem className="text-white" active>
+                Data
+              </BreadcrumbItem>
             </Breadcrumb>
           </CardBody>
         </Card>

@@ -14,6 +14,7 @@ const FullLayout = ({ children }) => {
       <div className="pageWrapper d-md-block d-lg-flex">
         {/******** Sidebar **********/}
         <aside
+          style={{ zIndex: "100" }}
           className={`sidebarArea shadow bg-white ${
             !open ? "" : "showSidebar"
           }`}

@@ -1,7 +1,10 @@
-import LogInComponent from "../../src/components/auth/LogInComponent";
+import Auth0LoginButtons from "../../components/Auth0LoginButtons";
 
 function LogIn() {
-  return <LogInComponent></LogInComponent>;
+  // return <></>;
+  // return <a href="/api/auth/login">Login</a>;
+  //
+  return <Auth0LoginButtons></Auth0LoginButtons>;
   // if (!session) {
   // } else {
   //   return <div>Logged in! {JSON.stringify(session)}</div>;

@@ -12,7 +12,6 @@ import {
   Col,
 } from "reactstrap";
 import Blog from "../../src/components/dashboard/Blog";
-// import bg1 from "../../src/assets/images/bg/bg1.jpg";
 import bg1 from "../../public/default-agents/Agent Otter.png";
 
 import bg2 from "../../src/assets/images/bg/bg2.jpg";

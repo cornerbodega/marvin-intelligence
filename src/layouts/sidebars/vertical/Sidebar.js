@@ -15,7 +15,7 @@ const navigation = [
     icon: "bi bi-patch-check",
   },
   {
-    title: "Continuum",
+    title: "Continua",
     href: "/ui/badges",
     icon: "bi bi-link",
   },
@@ -89,21 +89,22 @@ const Sidebar = ({ showMobilemenu }) => {
         ></Button>
       </div>
       <div className="pt-4 mt-2">
-        <Nav vertical className="sidebarNav">
+        <Nav vertical className="sidebarNav" style={{ zIndex: "100" }}>
           {navigation.map((navi, index) => (
             <NavItem key={index} className="sidenav-bg">
-              <Link href={navi.href}>
-                <a
-                  className={
-                    location === navi.href
-                      ? "text-primary nav-link py-3"
-                      : "nav-link text-secondary py-3"
-                  }
-                >
-                  <i className={navi.icon}></i>
-                  <span className="ms-3 d-inline-block">{navi.title}</span>
-                </a>
-              </Link>
+              {/* <Link > */}
+              <a
+                href={navi.href}
+                className={
+                  location === navi.href
+                    ? "text-primary nav-link py-3"
+                    : "nav-link text-secondary py-3"
+                }
+              >
+                <i className={navi.icon}></i>
+                <span className="ms-3 d-inline-block">{navi.title}</span>
+              </a>
+              {/* </Link> */}
             </NavItem>
           ))}
           {/* <Button
