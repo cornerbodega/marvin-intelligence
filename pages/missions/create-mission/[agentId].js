@@ -17,15 +17,15 @@ import {
   Breadcrumb,
   BreadcrumbItem,
 } from "reactstrap";
-import { remark } from "remark";
-import html from "remark-html";
+// import { remark } from "remark";
+// import html from "remark-html";
 
 import Link from "next/link";
 
 import Image from "next/image";
 
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { useContext, useRef, useEffect } from "react";
 import { object } from "prop-types";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import IntelliFab from "../../../components/IntelliFab";
@@ -48,7 +48,7 @@ export const getServerSideProps = withPageAuthRequired({
     let { data: agents, error } = await supabase
       .from("agents")
       .select(
-        "agentId, expertise1, expertise2, expertise3, agentName, profilePicUrl, bio"
+        "agentId, expertise1, expertise2, expertise3, agentName, profilePicUrl, bio, specializedTraining"
       )
       .eq("agentId", agentId);
     if (error) {
@@ -145,15 +145,36 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
   // console.log(agent);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [briefing, setBriefing] = useState();
+  const [showSuggestedBriefing, setShowSuggestedBriefing] = useState();
   const [draft, setDraft] = useState();
+  const [feedbackInput, setFeedbackInput] = useState("");
+  const draftRef = useRef();
   async function handleWriteDraftReport(e) {
     console.log("create mission handleSubmit");
+    console.log("draft");
+    console.log(draft);
     // console.log(handleSubmit);
     e.preventDefault();
     setIsSubmitting(true);
+    setFeedbackInput("");
     const expertises = [agent.expertise1, agent.expertise2, agent.expertise3];
 
     const draftData = { briefing, expertises };
+    const specializedTraining = agent.specializedTraining;
+    if (feedbackInput) {
+      let feedback = [
+        { role: "assistant", content: draft },
+        {
+          role: "user",
+          content: `Please write the report again with the following feedback ${feedbackInput}.`,
+        },
+      ];
+      draftData.feedback = feedback;
+    }
+    if (specializedTraining) {
+      draftData.specializedTraining = specializedTraining;
+    }
+
     const res = await fetch("/api/missions/write-draft-endpoint", {
       method: "POST",
       headers: {
@@ -171,13 +192,23 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
     // .process(draftResponseContent.data);
     // const contentHtml = processedContent.toString();
     setDraft(draftResponseContent.data);
+    // if (draftRef.current) {
+    //   draftRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    // }
     setIsSubmitting(false);
     // write a report!
     // this will be a draft report
     // it will be saved in the database as the only draft for this mission, and will be overwritten each time the user saves a new draft
     // Once the user approves the mission, the draft will be saved as the final report
   }
-
+  useEffect(() => {
+    if (!isSubmitting && draft && draftRef.current) {
+      draftRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [isSubmitting, draft]);
   //   const agentName = agent.agentName;
   // const { setSelectedAgentByName, selectedAgent } = useContext(IntelliContext);
   // let agent = selectedAgent;
@@ -187,13 +218,41 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
   //   setSelectedAgentByName(agentName);
   //   console.log("GET AGENT DETAIL FROM DB!");
   // }
-  function handleFabClick(e) {
-    router.push("/missions/create-mission");
+  // function handleFabClick(e) {
+  //   router.push("/missions/create-mission");
+  // }
+  async function handleAcceptReport(e) {
+    e.preventDefault();
+    console.log("handleAcceptReport");
+    // const res = await fetch("/api/missions/save-report-endpoint", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: { draftResponseContent: JSON.stringify(draft) },
+    // });
+
+    const res = await fetch("/api/missions/save-report-endpoint", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ draft }),
+    });
+    // console.log("21343254res");
+    // console.log(res.json());
+    // const draftResponseContent = await res.json();
+    setIsSubmitting(false);
+    // console.log("draftResponseContent");
+    // console.log(draftResponseContent);
   }
+
   return (
     <div>
       <Breadcrumb>
         <BreadcrumbItem>
+          <i className="bi bi-patch-check"></i>
+          &nbsp;
           <Link href="/agents/view-agents">Missions</Link>
         </BreadcrumbItem>
 
@@ -205,13 +264,8 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
       <Row>
         <Col md={{ size: 6, offset: 3 }}>
           <Form onSubmit={handleWriteDraftReport}>
-            <div style={{ marginBottom: "40px" }}>
+            <div>
               <Card>
-                <CardTitle
-                  style={{ display: "flex", justifyContent: "center" }}
-                >
-                  <h3 className="text-primary">Agent {agent.agentName}</h3>
-                </CardTitle>
                 <CardBody>
                   <div
                     style={{
@@ -228,25 +282,44 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
                       alt="agent"
                     />
                   </div>
-
+                  <CardTitle
+                    style={{
+                      display: "flex",
+                      marginTop: "10px",
+                      justifyContent: "center",
+                    }}
+                    className="text-primary"
+                  >
+                    Agent {agent.agentName}
+                  </CardTitle>
                   <CardSubtitle
                     style={{
-                      marginTop: "10px",
                       display: "flex",
                       flexWrap: "wrap",
-                      marginTop: "20px",
                       justifyContent: "center",
                     }}
                     className="mb-2 text-muted"
                     tag="h6"
                   >
-                    <Badge color="info" className="ms-3">
+                    <Badge
+                      style={{ marginTop: "10px" }}
+                      color="info"
+                      className="ms-3"
+                    >
                       {agent.expertise1}
                     </Badge>
-                    <Badge color="info" className="ms-3">
+                    <Badge
+                      color="info"
+                      style={{ marginTop: "10px" }}
+                      className="ms-3"
+                    >
                       {agent.expertise2}
                     </Badge>
-                    <Badge color="info" className="ms-3">
+                    <Badge
+                      color="info"
+                      className="ms-3"
+                      style={{ marginTop: "10px" }}
+                    >
                       {agent.expertise3}
                     </Badge>
                   </CardSubtitle>
@@ -254,108 +327,133 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
               </Card>
             </div>
 
-            <div style={{ marginBottom: "40px" }}>
+            {/* <div>
               <h3>Create Mission</h3>
-            </div>
+            </div> */}
             <FormGroup>
-              <Label for="exampleText" className="text-white">
-                Briefing
-              </Label>
-              <Input
-                id="exampleText"
-                placeholder={briefingSuggestion}
-                name="text"
-                rows="10"
-                type="textarea"
-                value={briefing}
-                onChange={(e) => setBriefing(e.target.value)}
-              />
-            </FormGroup>
-            {/* <FormGroup>
-              <Row>
-                <Label for="expertise1" md={4}>
-                  Expertise
-                </Label>
-                <Col md={8}>
-                  <Input
-                    autoFocus
-                    type="text"
-                    name="expertise1"
-                    id="expertise1"
-                    value={agent.expertise1}
-                    onChange={(e) => setExpertise1(e.target.value)}
-                    placeholder="Enter expertise"
-                  />
-                </Col>
-              </Row>
-            </FormGroup>
-            <FormGroup>
-              <Row>
-                <Label for="expertise2" md={4}>
-                  Expertise 2
-                </Label>
-                <Col md={8}>
-                  <Input
-                    type="text"
-                    name="expertise2"
-                    id="expertise2"
-                    value={agent.expertise2}
-                    onChange={(e) => setExpertise2(e.target.value)}
-                    placeholder="Optional"
-                  />
-                </Col>
-              </Row>
-            </FormGroup>
-            <FormGroup>
-              <Row>
-                <Label for="expertise3" md={4}>
-                  Expertise 3
-                </Label>
-                <Col md={8}>
-                  <Input
-                    value={agent.expertise3}
-                    onChange={(e) => setExpertise3(e.target.value)}
-                    type="text"
-                    name="expertise3"
-                    id="expertise3"
-                    placeholder="Optional"
-                  />
-                </Col>
-              </Row>
-            </FormGroup> */}
+              <div style={{ marginBotton: "10px", textAlign: "left" }}>
+                {!showSuggestedBriefing ? (
+                  <a
+                    onClick={(e) =>
+                      setShowSuggestedBriefing(!showSuggestedBriefing)
+                    }
+                    style={{ textDecoration: "underline" }}
+                  >
+                    Suggested Briefing
+                  </a>
+                ) : (
+                  <>
+                    {" "}
+                    <a
+                      style={{
+                        paddingBottom: "8px",
+                        textDecoration: "underline",
+                      }}
+                      onClick={(e) =>
+                        setShowSuggestedBriefing(!showSuggestedBriefing)
+                      }
+                    >
+                      Hide Suggested Briefing
+                    </a>
+                    <div
+                      style={{
+                        marginBotton: "10px",
+                        textAlign: "center",
+                        fontStyle: "italic",
+                      }}
+                      className="text-white"
+                    >
+                      {briefingSuggestion}
+                    </div>
+                  </>
+                )}
+              </div>
 
-            <div style={{ marginBottom: "40px" }}></div>
-            <div style={{ textAlign: "right" }}>
-              <Button color="primary" disabled={isSubmitting}>
-                Create Draft
-              </Button>{" "}
-            </div>
+              <div>
+                <div style={{ marginTop: "20px" }}></div>
+                <FormGroup>
+                  <Label for="exampleText" className="text-white">
+                    Mission Briefing
+                  </Label>
+                  <Input
+                    id="exampleText"
+                    placeholder="What would you like to know?"
+                    name="text"
+                    rows="5"
+                    type="textarea"
+                    value={briefing}
+                    onChange={(e) => setBriefing(e.target.value)}
+                  />
+                  <div style={{ textAlign: "right", paddingTop: "8px" }}>
+                    <Button
+                      color="primary"
+                      style={{ border: "1px solid green" }}
+                      disabled={isSubmitting}
+                    >
+                      Create Draft
+                    </Button>
+                  </div>
+                </FormGroup>
+              </div>
+            </FormGroup>
           </Form>
-          <h3>Draft</h3>
-          <div dangerouslySetInnerHTML={{ __html: draft }} />
-          {/* {draft} */}
-          {/* {JSON.stringify(draft)} */}
-          {/* {draft && <h3 className="text-white">{draft}</h3>} */}
+          <div style={{ marginTop: "50px" }} ref={draftRef}></div>
+          {draft && (
+            <Card>
+              {/* <div className="text-white">Draft</div> */}
+              <CardBody>
+                <div
+                  // style={{ color: "red" }}
+                  dangerouslySetInnerHTML={{ __html: draft }}
+                />
+              </CardBody>
+            </Card>
+          )}
+          {draft && (
+            <>
+              <Form onSubmit={(e) => handleWriteDraftReport(e)}>
+                <FormGroup>
+                  <div style={{ marginTop: "40px" }}></div>
+                  <Label for="exampleText" className="text-white">
+                    Feedback
+                  </Label>
+                  <Input
+                    id="exampleText"
+                    placeholder="What do you think?"
+                    name="text"
+                    rows="5"
+                    type="textarea"
+                    value={feedbackInput}
+                    onChange={(e) => setFeedbackInput(e.target.value)}
+                  />
+                  <div style={{ textAlign: "left", paddingTop: "8px" }}>
+                    <Button
+                      color="primary"
+                      style={{ border: "1px solid red" }}
+                      disabled={isSubmitting}
+                    >
+                      Regenerate Report
+                    </Button>
+                  </div>
+                </FormGroup>
+              </Form>
+
+              <Form>
+                <div style={{ textAlign: "right" }}>
+                  <Button
+                    color="primary"
+                    style={{ border: "3px solid green" }}
+                    disabled={isSubmitting}
+                    onClick={(e) => handleAcceptReport(e)}
+                  >
+                    Accept Report
+                  </Button>
+                </div>
+              </Form>
+            </>
+          )}
         </Col>
       </Row>
-      {/* <Row>
-        <Col>
-          <h3>Briefing</h3>
-          <textarea />
-          <h3>Draft Report</h3>
-          <textarea />
-          <h3>Feedback</h3>
-          <textarea />
-          <div>
-            <button>Revise Draft</button>
-          </div>
-          <h3>Actions</h3>
-          <div>
-            <button>Approve</button>
-          </div>
-        </Col>
-      </Row> */}
-      {/* <IntelliFab onClick={handleFabClick} icon="+" /> */}
     </div>
   );
 };

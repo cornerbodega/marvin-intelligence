@@ -44,6 +44,10 @@ export default async function handler(req, res) {
       if (req.body.expertises.length > 2) {
         expertiseString += " and " + req.body.expertises[2];
       }
+      let specializedTrainingString = "";
+      if (req.body.specializedTraining) {
+        specializedTrainingString = `Agent is trained to know ${req.body.specializedTraining}.`;
+      }
       const chat_completion = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: [
@@ -69,7 +73,7 @@ export default async function handler(req, res) {
           },
           {
             role: "user",
-            content: `Which animal embodies the characteristics of ${expertiseString}? ${cannotBeAnimalsString}`,
+            content: `Which animal embodies the characteristics of ${expertiseString}? ${specializedTrainingString} ${cannotBeAnimalsString}`,
           },
         ],
       });
@@ -97,6 +101,7 @@ export default async function handler(req, res) {
     const bio = agentNameResponse.bio;
     newAgentModel.agentName = agentName;
     newAgentModel.bio = bio;
+    newAgentModel.specializedTraining = req.body.specializedTraining;
     const aiImageResponse = await openai.createImage({
       prompt: `front facing photograph of a wild ${agentName}`,
       n: 1,

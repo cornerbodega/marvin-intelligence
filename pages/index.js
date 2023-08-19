@@ -3,6 +3,7 @@ import Image from "next/image";
 import Script from "next/script";
 import HomeAnimations from "../src/js/main";
 import Link from "next/link";
+import Mlogo from "../components/Mlogo";
 // export const getServerSideProps = async () => {};
 import {
   Canvas,
@@ -61,7 +62,8 @@ export default function Home({ title, content }) {
             <div className="container">
               <div className="site-header-inner">
                 <div className="brand header-brand">
-                  <div
+                  <Mlogo />
+                  {/* <div
                     className="m-0"
                     style={{ width: "auto", height: "200px" }}
                   >
@@ -73,7 +75,7 @@ export default function Home({ title, content }) {
                       <pointLight position={[10, 10, 10]} intensity={2} />
                       <Model />
                     </Canvas>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -282,7 +284,7 @@ export default function Home({ title, content }) {
                 </div>
               </div>
             </section>
-            <section className="pricing section">
+            {/* <section className="pricing section">
               <div className="container-sm">
                 <div className="pricing-inner section-inner">
                   <div className="pricing-header text-center">
@@ -442,20 +444,12 @@ export default function Home({ title, content }) {
                           <div className="pricing-table-header pb-24">
                             <div className="pricing-table-price">
                               Custom Pricing
-                              {/* <span className="pricing-table-price-currency h2">
-                                $
-                              </span> */}
-                              {/* <span className="pricing-table-price-amount h1">
-                                Custom Pricing
-                              </span> */}
-                              {/* <span className="text-xs">/month</span> */}
                             </div>
                           </div>
                           <div className="pricing-table-features-title text-xs pt-24 pb-24">
                             What you will get
                           </div>
                           <ul className="pricing-table-features list-reset text-xs">
-                            {/* higher level of service, more API calls, priority support, and possible API integrations */}
                             <li>
                               <span>More API calls</span>
                             </li>
@@ -483,7 +477,7 @@ export default function Home({ title, content }) {
                   </div>
                 </div>
               </div>
-            </section>
+            </section> */}
             <section className="cta section">
               <div className="container">
                 <div className="cta-inner section-inner">

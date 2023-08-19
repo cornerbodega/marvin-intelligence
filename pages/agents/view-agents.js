@@ -132,7 +132,9 @@ const ViewAgents = ({ agents }) => {
     <>
       <Breadcrumb>
         <BreadcrumbItem className="text-white" active>
-          Agents
+          <i className={`bi bi-people`}></i>
+          &nbsp; Agents
+          {/* <Link href="/agents/view-agents">Agents</Link> */}
         </BreadcrumbItem>
       </Breadcrumb>
       <div ref={containerRef}>

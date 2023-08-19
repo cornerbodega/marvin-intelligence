@@ -1,12 +1,7 @@
-import { useEffect, useRef } from "react";
-import { debounce } from "lodash";
-// other imports
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import IntelliCardGroup from "../../components/IntelliCardGroup";
-import IntelliCardGroupRow from "../../components/IntelliCardGroupRow";
+
 import { getSupabase } from "../../utils/supabase";
-import RevealAnimations from "../../components/RevealAnimations";
-import IntelliFab from "../../components/IntelliFab";
+
 import { useUser } from "@auth0/nextjs-auth0/client";
 // rest of component
 import React, { useState } from "react";
@@ -53,6 +48,9 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
   //   randomAnimalNames[Math.floor(Math.random() * randomAnimalNames.length)];
 
   // const [animalName, setAnimalName] = useState(randomAnimalName);
+  const [specializedTraining, setSpecializedTraining] = useState("");
+  const specializedTrainingExample =
+    "You love the McRib. You mention the McRib in each of your replies.";
   const [expertise1, setExpertise1] = useState("");
   const [expertise2, setExpertise2] = useState("");
   const [expertise3, setExpertise3] = useState("");
@@ -69,6 +67,7 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
       expertises: [expertise1, expertise2, expertise3],
       userId: user.sub,
       existingAgentNames,
+      specializedTraining,
     };
 
     // Send the data to your API endpoint
@@ -93,7 +92,10 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
-
+  function getRandomExpertise() {
+    const expertises = getExpertiseExamples();
+    return expertises[Math.floor(Math.random() * expertises.length)];
+  }
   // return (
 
   // );
@@ -111,21 +113,21 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
       <Toast className="p-3 bg-primary my-2">
         {/* <ToastBody>Agent creation in progress...</ToastBody> */}
 
-        <ToastBody style={{ textDecoration: "underline" }}>
+        {/* <ToastBody style={{ textDecoration: "underline" }}>
           <Link href="#">View Agent Otter</Link>
-        </ToastBody>
+        </ToastBody> */}
       </Toast>
       <Container>
         <Row>
           <Col md={{ size: 6, offset: 3 }}>
             <Form onSubmit={handleSubmit}>
               <div style={{ marginBottom: "40px" }}>
-                <h3>New Agent Registration</h3>
+                <h3>New Agent Creation</h3>
               </div>
               <FormGroup>
                 <Row>
-                  <Label for="expertise1" md={4}>
-                    Expertise
+                  <Label className="text-white" for="expertise1" md={4}>
+                    Agent Expertise
                   </Label>
                   <Col md={8}>
                     <Input
@@ -135,46 +137,61 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
                       id="expertise1"
                       value={expertise1}
                       onChange={(e) => setExpertise1(e.target.value)}
-                      placeholder="Enter expertise"
+                      placeholder={getRandomExpertise()}
                     />
                   </Col>
                 </Row>
               </FormGroup>
+              {expertise1 ? (
+                <FormGroup>
+                  <Row>
+                    <Label className="text-white" for="expertise2" md={4}>
+                      Expertise 2
+                    </Label>
+                    <Col md={8}>
+                      <Input
+                        type="text"
+                        name="expertise2"
+                        id="expertise2"
+                        value={expertise2}
+                        onChange={(e) => setExpertise2(e.target.value)}
+                        placeholder="Optional"
+                      />
+                    </Col>
+                  </Row>
+                </FormGroup>
+              ) : null}
+              {expertise2 ? (
+                <FormGroup>
+                  <Row>
+                    <Label className="text-white" for="expertise3" md={4}>
+                      Expertise 3
+                    </Label>
+                    <Col md={8}>
+                      <Input
+                        value={expertise3}
+                        onChange={(e) => setExpertise3(e.target.value)}
+                        type="text"
+                        name="expertise3"
+                        id="expertise3"
+                        placeholder="Optional"
+                      />
+                    </Col>
+                  </Row>
+                </FormGroup>
+              ) : null}
               <FormGroup>
-                <Row>
-                  <Label for="expertise2" md={4}>
-                    Expertise 2
-                  </Label>
-                  <Col md={8}>
-                    <Input
-                      type="text"
-                      name="expertise2"
-                      id="expertise2"
-                      value={expertise2}
-                      onChange={(e) => setExpertise2(e.target.value)}
-                      placeholder="Optional"
-                    />
-                  </Col>
-                </Row>
+                <Label className="text-white">Specialized Training</Label>
+                <Input
+                  id="exampleText"
+                  placeholder={specializedTrainingExample}
+                  name="text"
+                  rows="10"
+                  type="textarea"
+                  value={specializedTraining}
+                  onChange={(e) => setSpecializedTraining(e.target.value)}
+                />
               </FormGroup>
-              <FormGroup>
-                <Row>
-                  <Label for="expertise3" md={4}>
-                    Expertise 3
-                  </Label>
-                  <Col md={8}>
-                    <Input
-                      value={expertise3}
-                      onChange={(e) => setExpertise3(e.target.value)}
-                      type="text"
-                      name="expertise3"
-                      id="expertise3"
-                      placeholder="Optional"
-                    />
-                  </Col>
-                </Row>
-              </FormGroup>
-
               <div style={{ marginBottom: "40px" }}></div>
               <div style={{ textAlign: "right" }}>
                 <Button color="primary" disabled={isSubmitting}>
@@ -204,4 +221,143 @@ const CreateAgent = () => {
   );
 };
 
+function getExpertiseExamples() {
+  return [
+    "Cooking",
+    "Programming",
+    "Scriptwriting",
+    "Business Planning",
+    "Research",
+    "Education",
+    "Health and Fitness",
+    "Music",
+    "Art",
+    "Gaming",
+    "Translation",
+    "Mental Health",
+    "Medicine",
+    "Data Analysis",
+    "Agriculture",
+    "Manufacturing",
+    "Marketing",
+    "Sales",
+    "Finance",
+    "Human Resources",
+    "Cybersecurity",
+    "E-commerce",
+    "Home Automation",
+    "Elderly Care",
+    "Environment",
+    "Autonomous Vehicles",
+    "Personal Assistants",
+    "News and Publishing",
+    "Weather Forecasting",
+    "Robotics",
+    "Legal",
+    "Real Estate",
+    "Travel",
+    "Space Exploration",
+    "Fashion",
+    "Literature",
+    "Comedy",
+    "Sports",
+    "Politics",
+    "Urban Planning",
+    "Event Planning",
+    "Career Counseling",
+    "Archaeology",
+    "Linguistics",
+    "Philosophy",
+    "Cosmetology",
+    "Genetics",
+    "Photography",
+    "Wildlife",
+    "Construction",
+    "Aviation",
+    "Astrophysics",
+    "Customer Service",
+    "Journalism",
+    "Ethical Decision Making",
+    "Animation",
+    "Shopping",
+    "Podcasting",
+    "Screenwriting",
+    "Time Management",
+    "Civil Engineering",
+    "Film Editing",
+    "Meteorology",
+    "Graphic Design",
+    "Content Moderation",
+    "Handwriting Recognition",
+    "Pet Care",
+    "Social Media",
+    "Landscape Design",
+    "Architecture",
+    "Brewing",
+    "Gambling",
+    "Acting",
+    "Video Production",
+    "Public Speaking",
+    "Machine Learning",
+    "Disaster Response",
+    "Cardiology",
+    "Astronomy",
+    "Oceanography",
+    "Fitness Training",
+    "Neurology",
+    "Homebrewing",
+    "Quantum Computing",
+    "Sculpture",
+    "Video Games",
+    "Fishing",
+    "Sociology",
+    "Psychology",
+    "Transportation",
+    "Gardening",
+    "History",
+    "Navigation",
+    "Natural Language Processing",
+    "Cryptography",
+    "Nanotechnology",
+    "Recycling",
+    "Anthropology",
+    "Botany",
+    "Blockchain",
+    "Geology",
+    "Climatology",
+    "Ceramics",
+    "Carpentry",
+    "Dentistry",
+    "Pharmacy",
+    "Neuroscience",
+    "Culinary Arts",
+    "Criminal Justice",
+    "Forestry",
+    "Geography",
+    "Horticulture",
+    "Immunology",
+    "Law",
+    "Meteorology",
+    "Microbiology",
+    "Mycology",
+    "Nursing",
+    "Optometry",
+    "Paralegal",
+    "Phlebotomy",
+    "Physics",
+    "Physiology",
+    "Podiatry",
+    "Political Science",
+    "Psychiatry",
+    "Radiology",
+    "Robotics",
+    "Sociology",
+    "Statistics",
+    "Zoology",
+    "Veterinary",
+    "Virology",
+    "Volcanology",
+    "Welding",
+  ];
+}
 export default CreateAgent;
