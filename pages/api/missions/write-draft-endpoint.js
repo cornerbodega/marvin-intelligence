@@ -12,7 +12,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-export default async function (req, res) {
+export default async function writeDraftEndpoint(req, res) {
   console.log("Generate Briefing Suggestions");
   console.log("res");
   //   res.status(200);
