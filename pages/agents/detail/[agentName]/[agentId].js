@@ -16,7 +16,7 @@ import {
 import AgentDetailMissionsTable from "../../../../src/components/dashboard/AgentDetailMissionsTable";
 import TopCards from "../../../../src/components/dashboard/TopCards";
 import Link from "next/link";
-import AgentsTable from "../../../../src/components/dashboard/AgentsTable";
+// import AgentsTable from "../../../../src/components/dashboard/AgentsTable";
 
 import Image from "next/image";
 
@@ -77,7 +77,7 @@ const AgentDetail = ({ agent }) => {
         <CardBody>
           <Breadcrumb>
             <BreadcrumbItem>
-              <i className={`bi bi-people`}></i>
+              <i className={`bi bi-file-earmark-person-fill`}></i>
               &nbsp;
               <Link href="/agents/view-agents">Agents</Link>
             </BreadcrumbItem>
@@ -107,7 +107,7 @@ const AgentDetail = ({ agent }) => {
                   style={{ border: "1px solid white" }}
                   onClick={handleFabClick}
                 >
-                  <i className="bi bi-patch-check"></i> Dispatch New Mission
+                  <i className="bi bi-patch-check"></i>+ Assign Mission
                 </Button>
               </div>
               <h3 className="text-white">Bio</h3>

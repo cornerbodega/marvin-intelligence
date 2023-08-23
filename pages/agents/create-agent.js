@@ -1,5 +1,6 @@
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
+// import { getSupabase } from "../../../utils/supabase";
 import { getSupabase } from "../../utils/supabase";
 
 import { useUser } from "@auth0/nextjs-auth0/client";
@@ -49,6 +50,9 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
 
   // const [animalName, setAnimalName] = useState(randomAnimalName);
   const [specializedTraining, setSpecializedTraining] = useState("");
+  const [showSpecializedTrainingInput, setShowSpecializedTrainingInput] =
+    useState(false);
+
   const specializedTrainingExample =
     "You love the McRib. You mention the McRib in each of your replies.";
   const [expertise1, setExpertise1] = useState("");
@@ -110,13 +114,13 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
         </div>
       )} */}
       <div style={{ marginBottom: "40px" }}></div>
-      <Toast className="p-3 bg-primary my-2">
-        {/* <ToastBody>Agent creation in progress...</ToastBody> */}
+      {/* <Toast className="p-3 bg-primary my-2"> */}
+      {/* <ToastBody>Agent creation in progress...</ToastBody> */}
 
-        {/* <ToastBody style={{ textDecoration: "underline" }}>
+      {/* <ToastBody style={{ textDecoration: "underline" }}>
           <Link href="#">View Agent Otter</Link>
         </ToastBody> */}
-      </Toast>
+      {/* </Toast> */}
       <Container>
         <Row>
           <Col md={{ size: 6, offset: 3 }}>
@@ -127,7 +131,7 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
               <FormGroup>
                 <Row>
                   <Label className="text-white" for="expertise1" md={4}>
-                    Agent Expertise
+                    Expertise
                   </Label>
                   <Col md={8}>
                     <Input
@@ -180,18 +184,37 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
                   </Row>
                 </FormGroup>
               ) : null}
-              <FormGroup>
-                <Label className="text-white">Specialized Training</Label>
-                <Input
-                  id="exampleText"
-                  placeholder={specializedTrainingExample}
-                  name="text"
-                  rows="10"
-                  type="textarea"
-                  value={specializedTraining}
-                  onChange={(e) => setSpecializedTraining(e.target.value)}
-                />
-              </FormGroup>
+              <div style={{ marginBottom: "10px" }}>
+                {!showSpecializedTrainingInput ? (
+                  <a
+                    className="text-white"
+                    style={{ textDecoration: "underline" }}
+                    onClick={() =>
+                      setShowSpecializedTrainingInput(
+                        !showSpecializedTrainingInput
+                      )
+                    }
+                  >
+                    Add Specialized Training
+                  </a>
+                ) : (
+                  <div>
+                    <FormGroup>
+                      <Label className="text-white">Specialized Training</Label>
+                      <Input
+                        id="exampleText"
+                        placeholder={specializedTrainingExample}
+                        name="text"
+                        rows="10"
+                        type="textarea"
+                        value={specializedTraining}
+                        onChange={(e) => setSpecializedTraining(e.target.value)}
+                      />
+                    </FormGroup>
+                  </div>
+                )}
+              </div>
+
               <div style={{ marginBottom: "40px" }}></div>
               <div style={{ textAlign: "right" }}>
                 <Button color="primary" disabled={isSubmitting}>
@@ -210,6 +233,7 @@ const CreateAgent = () => {
     <>
       <Breadcrumb>
         <BreadcrumbItem>
+          <i className={`bi bi-file-earmark-person-fill`}></i>&nbsp;
           <Link href="/agents/view-agents">Agents</Link>
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>

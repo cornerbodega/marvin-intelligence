@@ -7,69 +7,77 @@ const navigation = [
   {
     title: "Agents",
     href: "/agents/view-agents",
-    icon: "bi bi-people",
+    icon: "bi bi-file-earmark-person-fill",
   },
-  {
-    title: "Missions",
-    href: "/missions/view-missions",
-    icon: "bi bi-patch-check",
-  },
-  {
-    title: "Continua",
-    href: "/ui/badges",
-    icon: "bi bi-link",
-  },
+  // {
+  //   title: "Missions",
+  //   href: "/missions/view-missions",
+  //   icon: "bi bi-patch-check",
+  // },
+
   {
     title: "Reports",
     href: "/reports/view-reports",
-    icon: "bi bi-card-text",
+    icon: "bi bi-body-text",
   },
-  // Make Insights part of Reports UI
+
+  {
+    title: "Folders",
+    href: "/reports/view-folders",
+    icon: "bi bi-folder",
+  },
+  // Make Insights part of Missions UI
   // {
   //   title: "Insights",
   //   href: "/ui/cards",
   //   icon: "bi bi-hdd-stack",
   // },
   {
+    title: "Continua",
+    href: "/ui/badges",
+    icon: "bi bi-link",
+  },
+  {
     title: "IntelNet",
     href: "/ui/buttons",
     icon: "bi bi-columns",
   },
-  {
-    title: "Buttons",
-    href: "/ui/buttons",
-    icon: "bi bi-hdd-stack",
-  },
 
+  // {
+  //   title: "Buttons",
+  //   href: "/ui/buttons",
+  //   icon: "bi bi-hdd-stack",
+  // },
+
+  // {
+  //   title: "Table",
+  //   href: "/ui/tables",
+  //   icon: "bi bi-layout-split",
+  // },
+  // {
+  //   title: "Grid",
+  //   href: "/ui/grid",
+  //   icon: "bi bi-patch-check",
+  // },
+  // {
+  //   title: "Forms",
+  //   href: "/ui/forms",
+  //   icon: "bi bi-textarea-resize",
+  // },
+  // {
+  //   title: "Breadcrumbs",
+  //   href: "/ui/breadcrumbs",
+  //   icon: "bi bi-hdd-stack",
+  // },
+  // {
+  //   title: "Welcome",
+  //   href: "/",
+  //   icon: "bi bi-speedometer2",
+  // },
   {
-    title: "Table",
-    href: "/ui/tables",
-    icon: "bi bi-layout-split",
-  },
-  {
-    title: "Grid",
-    href: "/ui/grid",
-    icon: "bi bi-patch-check",
-  },
-  {
-    title: "Forms",
-    href: "/ui/forms",
-    icon: "bi bi-textarea-resize",
-  },
-  {
-    title: "Breadcrumbs",
-    href: "/ui/breadcrumbs",
-    icon: "bi bi-hdd-stack",
-  },
-  {
-    title: "Welcome",
-    href: "/",
-    icon: "bi bi-speedometer2",
-  },
-  {
-    title: "About",
+    title: "Support",
     href: "/about",
-    icon: "bi bi-people",
+    icon: "bi bi-patch-question-fill",
   },
 ];
 
@@ -78,7 +86,7 @@ const Sidebar = ({ showMobilemenu }) => {
   const location = curl.pathname;
 
   return (
-    <div className="p-3">
+    <div className="p-3 ">
       <div className="d-flex align-items-center">
         <Logo />
         <Button
@@ -97,8 +105,13 @@ const Sidebar = ({ showMobilemenu }) => {
                 href={navi.href}
                 className={
                   location === navi.href
-                    ? "text-primary nav-link py-3"
-                    : "nav-link text-secondary py-3"
+                    ? "sidebarSelected bg-text-underline nav-link py-3"
+                    : "nav-link sidebarSelected  py-3"
+                }
+                style={
+                  location === navi.href
+                    ? { textDecoration: "underline", color: "hotpink" }
+                    : { color: "white" }
                 }
               >
                 <i className={navi.icon}></i>

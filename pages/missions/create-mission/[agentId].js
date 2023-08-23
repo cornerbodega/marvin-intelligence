@@ -19,7 +19,7 @@ import {
 } from "reactstrap";
 // import { remark } from "remark";
 // import html from "remark-html";
-
+import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
 
 import Image from "next/image";
@@ -143,11 +143,14 @@ export const getServerSideProps = withPageAuthRequired({
 const CreateMission = ({ agent, briefingSuggestion }) => {
   // console.log("agent");
   // console.log(agent);
+  const { user, error, isLoading } = useUser();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [briefing, setBriefing] = useState();
   const [showSuggestedBriefing, setShowSuggestedBriefing] = useState();
   const [draft, setDraft] = useState();
   const [feedbackInput, setFeedbackInput] = useState("");
+
   const draftRef = useRef();
   async function handleWriteDraftReport(e) {
     console.log("create mission handleSubmit");
@@ -232,12 +235,12 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
     //   body: { draftResponseContent: JSON.stringify(draft) },
     // });
 
-    const res = await fetch("/api/missions/save-report-endpoint", {
+    const res = await fetch("/api/reports/save-report-endpoint", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ draft }),
+      body: JSON.stringify({ draft, briefing, userId: user.sub }),
     });
     // console.log("21343254res");
     // console.log(res.json());
@@ -251,13 +254,17 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
     <div>
       <Breadcrumb>
         <BreadcrumbItem>
-          <i className="bi bi-patch-check"></i>
+          <i className="bi  bi-file-earmark-person-fill"></i>
           &nbsp;
-          <Link href="/agents/view-agents">Missions</Link>
+          <Link href="/agents/view-agents">Agents</Link>
         </BreadcrumbItem>
-
+        <BreadcrumbItem className="">
+          <Link href={`/agents/detail/${agent.agentName}/${agent.agentId}`}>
+            Agent {agent.agentName}
+          </Link>
+        </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
-          Create Mission
+          <i className="bi bi-body-text"></i> Create Report
         </BreadcrumbItem>
       </Breadcrumb>
 
@@ -403,7 +410,7 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
               {/* <div className="text-white">Draft</div> */}
               <CardBody>
                 <div
-                  // style={{ color: "red" }}
+                  className="text-primary"
                   dangerouslySetInnerHTML={{ __html: draft }}
                 />
               </CardBody>
@@ -429,10 +436,11 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
                   <div style={{ textAlign: "left", paddingTop: "8px" }}>
                     <Button
                       color="primary"
-                      style={{ border: "1px solid red" }}
+                      style={{ border: "1px solid yellow" }}
                       disabled={isSubmitting}
                     >
-                      Regenerate Report
+                      <i className="bi bi-arrow-clockwise"></i>
+                      Retry
                     </Button>
                   </div>
                 </FormGroup>
@@ -446,7 +454,7 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
                     disabled={isSubmitting}
                     onClick={(e) => handleAcceptReport(e)}
                   >
-                    Accept Report
+                    <i className="bi bi-body-text"></i> Save Report
                   </Button>
                 </div>
               </Form>

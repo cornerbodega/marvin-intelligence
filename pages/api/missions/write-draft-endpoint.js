@@ -44,7 +44,7 @@ export default async function writeDraftEndpoint(req, res) {
       {
         role: "assistant",
         content: `<div>
-        <h2>Report on Natural Language Processing (NLP) in the Modern Digital Landscape</h2>
+        <h2>Natural Language Processing (NLP) in the Modern Digital Landscape</h2>
         
         <h3>Introduction:</h3>
         <p>Natural Language Processing, a subfield of AI, focuses on enabling machines to understand and interpret human language. Its applications in the digital landscape are vast and transformative.</p>

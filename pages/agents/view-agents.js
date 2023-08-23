@@ -27,10 +27,10 @@ import IntelliFab from "../../components/IntelliFab";
 import IntelliProvider from "../../components/IntelliProvider/IntelliProvider";
 import IntelliContext from "../../components/intelliContext/IntelliContext";
 import { useUser } from "@auth0/nextjs-auth0/client";
-
+const PAGE_COUNT = 6;
+const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
-    const supabase = getSupabase();
     const session = await getSession(context.req, context.res);
     const user = session?.user;
     console.log("session");
@@ -60,7 +60,9 @@ export const getServerSideProps = withPageAuthRequired({
       .select(
         "agentId, expertise1, expertise2, expertise3, agentName, profilePicUrl, bio"
       )
-      .eq("userId", user.sub);
+      .eq("userId", user.sub)
+      .limit(PAGE_COUNT)
+      .order("agentId", { ascending: false });
 
     // other pages will redirect here if they're empty
     // If no agency, go to create agency page
@@ -72,21 +74,20 @@ export const getServerSideProps = withPageAuthRequired({
   },
 });
 const ViewAgents = ({ agents }) => {
-  const { setSelectedAgent } = useContext(IntelliContext);
-  const { user, error, isLoading } = useUser();
-  console.log("ViewAgents user");
-  console.log(user);
-  console.log("Veiw Agents setSelectedAgent");
-  console.log(setSelectedAgent);
+  const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(1);
   const [isInView, setIsInView] = useState(false);
+  const [loadedAgents, setLoadedAgents] = useState(agents);
   // const agentNames = agents.map((agent) => agent.agentName);
   useEffect(() => {
-    const handleDebouncedScroll = debounce(() => handleScroll(), 200);
-    window.addEventListener("scroll", handleDebouncedScroll);
+    const handleDebouncedScroll = debounce(
+      () => !isLast && handleScroll(),
+      200
+    );
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener("scroll", handleDebouncedScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
   useEffect(() => {
@@ -94,6 +95,7 @@ const ViewAgents = ({ agents }) => {
       goToPage("create-agent");
     }
   });
+
   const handleScroll = (container) => {
     if (containerRef.current && typeof window !== "undefined") {
       const container = containerRef.current;
@@ -122,48 +124,58 @@ const ViewAgents = ({ agents }) => {
     router.push(name);
   }
   useEffect(() => {
-    if (isInView) {
-      console.log(`LOAD MORE AGENTS ${offset}`);
-      // loadMoreUsers(offset);
-    }
-  }, [isInView]);
+    if (!isLast) {
+      const loadMoreAgents = async () => {
+        const from = offset * PAGE_COUNT;
+        const to = from + PAGE_COUNT - 1;
+        setOffset((prev) => prev + 1);
 
+        const { data } = await supabase
+          .from("agents")
+          .select("*")
+          .range(from, to)
+          .order("createdAt", { ascending: false });
+        console.log("load more agents data");
+
+        console.log(data);
+        return data;
+      };
+
+      if (isInView) {
+        console.log(`LOAD MORE AGENTS ${offset}`);
+        loadMoreAgents().then((moreAgents) => {
+          console.log("moreAgents");
+          console.log(moreAgents);
+          setLoadedAgents([...loadedAgents, ...moreAgents]);
+          if (moreAgents.length < PAGE_COUNT) {
+            setIsLast(true);
+          }
+          // setLoadedAgents((prev) => [...prev, ...moreAgents]);
+        });
+      }
+    }
+  }, [isInView, isLast]);
+
+  // }
   return (
     <>
       <Breadcrumb>
         <BreadcrumbItem className="text-white" active>
-          <i className={`bi bi-people`}></i>
+          <i className={`bi bi-file-earmark-person-fill`}></i>
           &nbsp; Agents
-          {/* <Link href="/agents/view-agents">Agents</Link> */}
         </BreadcrumbItem>
       </Breadcrumb>
+      <div style={{ marginBottom: "8px", textAlign: "right" }}>
+        <Button style={{ border: "1px solid white" }} onClick={handleFabClick}>
+          <i className="bi bi-file-earmark-person-fill"></i>+ Create Agent
+        </Button>
+      </div>
+      {/* <div>{JSON.stringify(loadedAgents)}</div> */}
       <div ref={containerRef}>
         <Row className="text-primary">
-          {/* <h5 className="mb-3 mt-3">Free Agents</h5>
-
-          <IntelliCardGroupRow></IntelliCardGroupRow>
-          <div
-            style={{
-              paddingRight: "16px",
-              paddingTop: "16px",
-              textAlign: "left",
-            }}
-          >
-            <Button className="btn" color="primary">
-              Regenerate
-            </Button>
-            &nbsp;
-            <Button className="btn" color="primary">
-              Create an Agent
-            </Button>
-          </div> */}
-
-          {/* <h5 className="mb-3 mt-3">Roster</h5> */}
-          {/* <IntelliCardGroupRow></IntelliCardGroupRow>
-          <IntelliCardGroupRow></IntelliCardGroupRow> */}
           <IntelliCardGroup
             handleCardClick={handleCardClick}
-            datums={agents}
+            datums={loadedAgents}
             datumsType={"agents"}
           ></IntelliCardGroup>
           <IntelliFab onClick={handleFabClick} icon="+" />
