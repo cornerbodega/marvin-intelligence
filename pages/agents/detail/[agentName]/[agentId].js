@@ -107,7 +107,7 @@ const AgentDetail = ({ agent }) => {
                   style={{ border: "1px solid white" }}
                   onClick={handleFabClick}
                 >
-                  <i className="bi bi-patch-check"></i>+ Assign Mission
+                  <i className="bi bi-body-text"></i>+ Create Mission
                 </Button>
               </div>
               <h3 className="text-white">Bio</h3>

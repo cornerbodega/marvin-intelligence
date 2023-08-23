@@ -45,23 +45,23 @@ export const getServerSideProps = withPageAuthRequired({
     const supabase = getSupabase();
     console.log("reportId");
     console.log(reportId);
-    let { data: reports, error } = await supabase
+    let { data: missions, error } = await supabase
       .from("reports")
       .select("*")
       .eq("reportId", reportId);
     if (error) {
       console.log(error);
     }
-    if (!reports || reports.length === 0) {
+    if (!missions || missions.length === 0) {
       return {
         redirect: {
           permanent: false,
-          destination: "/reports/view-reports",
+          destination: "/missions/view-missions",
         },
         props: {},
       };
     }
-    const report = reports[0];
+    const report = missions[0];
 
     return {
       props: { report: report || {} },
@@ -75,17 +75,57 @@ const CreateMission = ({ report, briefingSuggestion }) => {
   const [reportContent, setReportContent] = useState(report.reportContent);
 
   const { user, error, isLoading } = useUser();
+  const [highlight, setHighlight] = useState({
+    text: "",
+    range: null,
+    // position: { top: 0, left: 0 },
+  });
+  function handleFabClick() {}
 
+  const handleTextHighlight = (event) => {
+    const selection = window.getSelection();
+
+    // Exit early if no text is selected
+    if (selection.toString().trim().length === 0) {
+      setHighlight({ text: "", range: null });
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+
+    // Check if the start and end nodes are within the same parent
+    if (range.startContainer.parentNode !== range.endContainer.parentNode) {
+      selection.removeAllRanges(); // Remove the current selection
+      setHighlight({ text: "", range: null });
+      return;
+    }
+    // const rect = range.getBoundingClientRect();
+
+    setHighlight({
+      text: selection.toString(),
+      range,
+      // position: { top: rect.top, left: rect.left },
+    });
+  };
   return (
     <div>
       <Breadcrumb>
         <BreadcrumbItem>
           <i className="bi bi-body-text"></i>
           &nbsp;
-          <Link href="/reports/view-reports">Reports</Link>
+          <Link
+            href="/missions/view-missions"
+            style={{ textDecoration: "none" }}
+          >
+            Missions
+          </Link>
         </BreadcrumbItem>
-        <BreadcrumbItem className="">
-          <Link href={`/reports/detail/${report.reportId}`}>
+        <BreadcrumbItem>
+          <Link
+            // className="text-white"
+            href={`/missions/detail/${report.reportId}`}
+            style={{ textDecoration: "none" }}
+          >
             {report.reportTitle}
           </Link>
         </BreadcrumbItem>
@@ -105,9 +145,14 @@ const CreateMission = ({ report, briefingSuggestion }) => {
                     <CardBody>
                       <img src={report.reportPicUrl}></img>
                       <div
+                        onMouseUp={handleTextHighlight}
                         className="text-primary"
                         dangerouslySetInnerHTML={{ __html: reportContent }}
                       />
+                      {highlight.text && (
+                        <IntelliFab onClick={handleFabClick} icon="+" />
+                      )}
+                      {JSON.stringify(highlight)}
                     </CardBody>
                   </Card>
                 )}

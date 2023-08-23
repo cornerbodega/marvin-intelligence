@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 const navigation = [
-  {
-    title: "Agents",
-    href: "/agents/view-agents",
-    icon: "bi bi-file-earmark-person-fill",
-  },
+  // {
+  //   title: "Agents",
+  //   href: "/agents/view-agents",
+  //   icon: "bi bi-file-earmark-person-fill",
+  // },
   // {
   //   title: "Missions",
   //   href: "/missions/view-missions",
@@ -16,14 +16,14 @@ const navigation = [
   // },
 
   {
-    title: "Reports",
-    href: "/reports/view-reports",
+    title: "Missions",
+    href: "/missions/view-missions",
     icon: "bi bi-body-text",
   },
 
   {
     title: "Folders",
-    href: "/reports/view-folders",
+    href: "/missions/view-folders",
     icon: "bi bi-folder",
   },
   // Make Insights part of Missions UI

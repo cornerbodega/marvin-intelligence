@@ -13,6 +13,7 @@ import {
   Col,
   Toast,
 } from "reactstrap";
+import Link from "next/link";
 import useRouter from "next/router";
 import { useEffect, useRef, useState, useContext } from "react";
 import { debounce } from "lodash";
@@ -160,14 +161,33 @@ const ViewAgents = ({ agents }) => {
   return (
     <>
       <Breadcrumb>
+        <BreadcrumbItem className="text-white">
+          <i className={`bi bi-body-text`}></i>
+          &nbsp;
+          <Link
+            href="/missions/view-missions"
+            style={{ textDecoration: "none", color: "white" }}
+          >
+            Missions
+          </Link>
+        </BreadcrumbItem>
+        <BreadcrumbItem className="text-white">
+          <i className={`bi-body-text`}></i>+ Create Mission
+        </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
-          <i className={`bi bi-file-earmark-person-fill`}></i>
-          &nbsp; Agents
+          <i className={`bi-file-earmark-person-fill`}></i>
+          &nbsp;
+          <Link
+            href="/agents/view-agents"
+            style={{ textDecoration: "none", color: "white" }}
+          >
+            Select Agent
+          </Link>
         </BreadcrumbItem>
       </Breadcrumb>
       <div style={{ marginBottom: "8px", textAlign: "right" }}>
         <Button style={{ border: "1px solid white" }} onClick={handleFabClick}>
-          <i className="bi bi-file-earmark-person-fill"></i>+ Create Agent
+          <i className="bi bi-file-earmark-person-fill"></i>+ Add Agent
         </Button>
       </div>
       {/* <div>{JSON.stringify(loadedAgents)}</div> */}

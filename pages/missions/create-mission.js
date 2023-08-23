@@ -28,11 +28,12 @@ import { useRouter } from "next/router";
 import { useContext, useRef, useEffect } from "react";
 import { object } from "prop-types";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import IntelliFab from "../../../components/IntelliFab";
-import { getSupabase } from "../../../utils/supabase";
+import IntelliFab from "../../components/IntelliFab";
+import { getSupabase } from "../../utils/supabase";
 import { useState } from "react";
 import { set } from "lodash";
-// import missingsBriefingHandler from "../../api/missions/generate-briefing-suggestions-endpoint";
+
+// import missingsBriefingHandler from "../api/missions/generate-briefing-suggestions-endpoint";
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -43,7 +44,14 @@ const openai = new OpenAIApi(configuration);
 // bring in content of link from original report
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
-    const agentId = context.params.agentId;
+    // const agentId = context.params.agentId;
+    const {
+      agentId,
+      originalMissionId,
+      highlightStartIndex,
+      highlightEndIndex,
+    } = context.query;
+
     const supabase = getSupabase();
     console.log("agentId");
     console.log(agentId);
@@ -84,8 +92,8 @@ export const getServerSideProps = withPageAuthRequired({
         {
           role: "assistant",
           content: `{
-                "suggestion": "I need a comprehensive report on the applications of Natural Language Processing in the modern digital landscape."
-            }`,
+                  "suggestion": "I need a comprehensive report on the applications of Natural Language Processing in the modern digital landscape."
+              }`,
         },
         {
           role: "user",
@@ -337,8 +345,8 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
             </div>
 
             {/* <div>
-              <h3>Create Mission</h3>
-            </div> */}
+                <h3>Create Mission</h3>
+              </div> */}
             <FormGroup>
               <div style={{ marginBotton: "10px", textAlign: "left" }}>
                 {!showSuggestedBriefing ? (

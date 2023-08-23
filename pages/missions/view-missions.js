@@ -1,168 +1,175 @@
-import {
-  Card,
-  CardImg,
-  CardText,
-  CardBody,
-  CardTitle,
-  CardSubtitle,
-  CardGroup,
-  Button,
-  Row,
-  Col,
-} from "reactstrap";
-import Blog from "../../src/components/dashboard/Blog";
-import bg1 from "../../public/default-agents/Agent Otter.png";
+import { Button, Row, Breadcrumb, BreadcrumbItem } from "reactstrap";
+import useRouter from "next/router";
+import { useEffect, useRef, useState } from "react";
+import { debounce } from "lodash";
+// other imports
+import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
+import IntelliCardGroup from "../../components/IntelliCardGroup";
 
-import bg2 from "../../src/assets/images/bg/bg2.jpg";
-import bg3 from "../../src/assets/images/bg/bg3.jpg";
-import bg4 from "../../src/assets/images/bg/bg4.jpg";
-import Image from "next/image";
-import AgentsTable from "../../src/components/dashboard/AgentsTable";
-const BlogData = [
-  {
-    image: bg1,
-    title: "This is simple blog",
-    subtitle: "2 comments, 1 Like",
-    description:
-      "This is a wider card with supporting text below as a natural lead-in to additional content.",
-    btnbg: "primary",
-  },
-  {
-    image: bg2,
-    title: "Lets be simple blog",
-    subtitle: "2 comments, 1 Like",
-    description:
-      "This is a wider card with supporting text below as a natural lead-in to additional content.",
-    btnbg: "primary",
-  },
-  {
-    image: bg3,
-    title: "Don't Lamp blog",
-    subtitle: "2 comments, 1 Like",
-    description:
-      "This is a wider card with supporting text below as a natural lead-in to additional content.",
-    btnbg: "primary",
-  },
-  {
-    image: bg4,
-    title: "Simple is beautiful",
-    subtitle: "2 comments, 1 Like",
-    description:
-      "This is a wider card with supporting text below as a natural lead-in to additional content.",
-    btnbg: "primary",
-  },
-];
+import { getSupabase } from "../../utils/supabase";
 
-const ViewAgents = () => {
+import IntelliFab from "../../components/IntelliFab";
+// rest of component
+
+const PAGE_COUNT = 6;
+const supabase = getSupabase();
+export const getServerSideProps = withPageAuthRequired({
+  async getServerSideProps(context) {
+    const session = await getSession(context.req, context.res);
+    const user = session?.user;
+    console.log("session");
+    console.log(session);
+
+    let { data: agency, agencyError } = await supabase
+      .from("users")
+      .select("agencyName")
+      .eq("userId", user.sub);
+    if (agencyError) {
+      console.log("agencyError");
+    }
+    console.log("agency");
+    console.log(agency);
+    if (!agency || agency.length === 0) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/agency/create-agency",
+        },
+        props: {},
+      };
+    }
+
+    let { data: missions, error } = await supabase
+      .from("reports")
+      .select("*")
+      .eq("userId", user.sub)
+      .limit(PAGE_COUNT)
+      .order("reportId", { ascending: false });
+
+    // other pages will redirect here if they're empty
+    // If no agency, go to create agency page
+    // If no missions, go to crete report page
+    // let agency;
+    return {
+      props: { missions },
+    };
+  },
+});
+const ViewReports = ({ missions }) => {
+  console.log("missions");
+  console.log(missions);
+  const [isLast, setIsLast] = useState(false);
+  const containerRef = useRef(null);
+  const [offset, setOffset] = useState(1);
+  const [isInView, setIsInView] = useState(false);
+  const [loadedReports, setLoadedReports] = useState(missions);
+  // const reportNames = missions.map((report) => report.reportName);
+  useEffect(() => {
+    const handleDebouncedScroll = debounce(
+      () => !isLast && handleScroll(),
+      200
+    );
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+  // useEffect(() => {
+  //   if (!missions || missions.length === 0) {
+  //     goToPage("/missions/view-missions");
+  //   }
+  // });
+
+  const handleScroll = (container) => {
+    if (containerRef.current && typeof window !== "undefined") {
+      const container = containerRef.current;
+      const { bottom } = container.getBoundingClientRect();
+      const { innerHeight } = window;
+      setIsInView((prev) => bottom <= innerHeight);
+    }
+  };
+  const handleFabClick = () => {
+    console.log("ViewReports HandleClick Clicked!");
+    goToPage("/agents/view-agents");
+  };
+  const handleCardClick = (report) => {
+    // console.log("handleCardClick");
+    // const reportName = event.target.dataset.datums.reportName;
+    const reportName = report.reportName;
+    const reportId = report.reportId;
+
+    console.log("ViewReports HandleCardClick Clicked!");
+    // setSelectedReport(report);
+    goToPage(`/missions/detail/${reportId}`);
+  };
+  const router = useRouter;
+  function goToPage(name) {
+    console.log("go to page");
+    console.log(name);
+    router.push(name);
+  }
+  useEffect(() => {
+    if (!isLast) {
+      const loadMoreReports = async () => {
+        const from = offset * PAGE_COUNT;
+        const to = from + PAGE_COUNT - 1;
+        setOffset((prev) => prev + 1);
+
+        const { data } = await supabase
+          .from("reports")
+          .select("*")
+          .range(from, to)
+          .order("createdAt", { ascending: false });
+        console.log("load more missions data");
+
+        console.log(data);
+        return data;
+      };
+
+      if (isInView) {
+        console.log(`LOAD MORE AGENTS ${offset}`);
+        loadMoreReports().then((moreReports) => {
+          console.log("moreReports");
+          console.log(moreReports);
+          setLoadedReports([...loadedReports, ...moreReports]);
+          if (moreReports.length < PAGE_COUNT) {
+            setIsLast(true);
+          }
+          // setLoadedReports((prev) => [...prev, ...moreReports]);
+        });
+      }
+    }
+  }, [isInView, isLast]);
+
+  // }
   return (
-    <div>
-      Missions
-      {/* --------------------------------------------------------------------------------*/}
-      {/* Card-Group*/}
-      {/* --------------------------------------------------------------------------------*/}
-      <Row className="text-primary">
-        <h5 className="mb-3 mt-3">Free Agents</h5>
-        <Col>
-          <CardGroup>
-            <Card>
-              <img
-                src="../default-agents/Agent Otter.png"
-                style={{
-                  height: "337px",
-                  objectFit: "cover",
-                }}
-                alt="Card image cap"
-              />
-              <CardBody>
-                <CardTitle tag="h5" className="text-primary">
-                  Agent Otter
-                </CardTitle>
-                <CardSubtitle className="mb-2 text-muted" tag="h6">
-                  Expertise: Problem-solving and Creativity
-                </CardSubtitle>
-                <CardText>
-                  Problem-solving expert. Armed with an arsenal of creative
-                  approaches and innovative ideas, Otter specializes in crafting
-                  unique solutions to complex issues. This AI agent is
-                  especially helpful for game developers, as Otter loves
-                  dissecting intricate problems and turning them into simple and
-                  enjoyable games.
-                </CardText>
-                <Button>Hire</Button>
-              </CardBody>
-            </Card>
-            <Card>
-              <img
-                src="../default-agents/Agent Dolphin.png"
-                style={{
-                  height: "337px",
-                  objectFit: "cover",
-                }}
-                alt="Card image cap"
-              />{" "}
-              <CardBody>
-                <CardTitle tag="h5" className="text-primary">
-                  Agent Dolphin
-                </CardTitle>
-                <CardSubtitle className="mb-2 text-muted" tag="h6">
-                  Expertise: Music and Rhythm
-                </CardSubtitle>
-                <CardText>
-                  Agent Dolphin is a maestro of musical rhythm and harmony. If
-                  you're a budding musician, Dolphin can guide you through the
-                  nuances of rhythm, melody, and harmony, and even help you
-                  create your own compositions. Dolphin's expertise lies in
-                  understanding and generating musical patterns, making it an
-                  ideal partner for your musical journey.
-                </CardText>
-                <Button>Hire</Button>
-              </CardBody>
-            </Card>
-            <Card>
-              <img
-                src="../default-agents/Agent Grizzly Bear.png"
-                style={{
-                  height: "337px",
-                  objectFit: "cover",
-                }}
-                alt="Card image cap"
-              />{" "}
-              <CardBody>
-                <CardTitle tag="h5" className="text-primary">
-                  Agent Grizzly
-                </CardTitle>
-                <CardSubtitle className="mb-2 text-muted" tag="h6">
-                  Expertise: Business Strategy and Market Analysis
-                </CardSubtitle>
-                <CardText>
-                  Whether you're just starting out with your first business plan
-                  or looking for insights to help pivot your established
-                  business, Grizzly's got your back. His approach is much like
-                  the Grizzly Bear he's named after – determined, intelligent,
-                  and incredibly perceptive.
-                </CardText>
-                <Button>Hire</Button>
-              </CardBody>
-            </Card>
-          </CardGroup>
-          <div style={{ padding: "16px", textAlign: "right" }}>
-            <Button className="btn" color="primary">
-              Regenerate
-            </Button>
-            &nbsp;
-            <Button className="btn" color="primary">
-              Create an Agent
-            </Button>
-          </div>
-          <div>
-            {" "}
-            <h5 className="mb-3 mt-3">Signed Agent Roster</h5>
-          </div>
-          {/* <AgentsTable></AgentsTable> */}
-        </Col>
-      </Row>
-    </div>
+    <>
+      <Breadcrumb>
+        <BreadcrumbItem className="text-white" active>
+          <i className={`bi bi-body-text`}></i>
+          &nbsp; Missions
+        </BreadcrumbItem>
+      </Breadcrumb>
+      <div style={{ marginBottom: "8px", textAlign: "right" }}>
+        <Button style={{ border: "1px solid white" }} onClick={handleFabClick}>
+          <i className="bi bi-body-text"></i>+ Create Mission
+        </Button>
+      </div>
+      {/* <div>{JSON.stringify(loadedReports)}</div> */}
+      <div ref={containerRef}>
+        <Row className="text-primary">
+          <IntelliCardGroup
+            handleCardClick={handleCardClick}
+            datums={loadedReports}
+            datumsType={"missions"}
+          ></IntelliCardGroup>
+          <IntelliFab onClick={handleFabClick} icon="+" />
+
+          {/* </Col> */}
+        </Row>
+      </div>
+    </>
   );
 };
 
-export default ViewAgents;
+export default ViewReports;

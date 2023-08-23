@@ -223,7 +223,7 @@ export default function Home({ title, content }) {
                       <div className="feature-inner">
                         <div className="feature-icon">
                           <img
-                            src="splash-steps/review-reports.png"
+                            src="splash-steps/review-missions.png"
                             alt="Feature 04"
                             style={{
                               height: "380px",
@@ -235,7 +235,7 @@ export default function Home({ title, content }) {
                           Step 4 - Review Reports:{" "}
                         </h4>
                         <p className="text-sm mb-0">
-                          Receive comprehensive reports from your agents
+                          Receive comprehensive missions from your agents
                         </p>
                       </div>
                     </div>
@@ -256,7 +256,7 @@ export default function Home({ title, content }) {
                         </h4>
                         <p className="text-sm mb-0">
                           Continue the process. Iterate and learn from the
-                          reports
+                          missions
                         </p>
                       </div>
                     </div>
@@ -317,7 +317,7 @@ export default function Home({ title, content }) {
                           During your trial period, you'll have the opportunity
                           to explore and utilize all our platform's
                           capabilities, from managing your own team of agents to
-                          receiving comprehensive and curated reports. With our
+                          receiving comprehensive and curated missions. With our
                           intuitive dashboard and innovative autonomous
                           missions, you'll discover a new, engaging way to learn
                           and process information.

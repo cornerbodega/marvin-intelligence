@@ -231,13 +231,34 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
 const CreateAgent = () => {
   return (
     <>
+      {" "}
       <Breadcrumb>
-        <BreadcrumbItem>
-          <i className={`bi bi-file-earmark-person-fill`}></i>&nbsp;
-          <Link href="/agents/view-agents">Agents</Link>
+        <BreadcrumbItem className="text-white">
+          <i className={`bi bi-body-text`}></i>
+          &nbsp;
+          <Link
+            href="/missions/view-missions"
+            style={{ textDecoration: "none", color: "white" }}
+          >
+            Missions
+          </Link>
+        </BreadcrumbItem>
+        <BreadcrumbItem className="text-white">
+          {" "}
+          <i className={`bi-body-text`}></i>+ Create Mission
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
-          Add Agent
+          <Link
+            href="/agents/view-agents"
+            style={{ textDecoration: "none", color: "white" }}
+          >
+            <i className={`bi-file-earmark-person-fill`}></i>
+            &nbsp;Select Agent
+          </Link>
+        </BreadcrumbItem>
+
+        <BreadcrumbItem className="text-white" active>
+          <i className={`bi-file-earmark-person-fill`}></i>+ Add Agent
         </BreadcrumbItem>
       </Breadcrumb>
       <CreateAgentForm />

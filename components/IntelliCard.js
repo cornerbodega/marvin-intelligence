@@ -28,7 +28,7 @@ const IntelliCard = ({ imageSize, datums, datumsType, handleCardClick }) => {
     displayDatums.title = `Agent ${datums.agentName}`;
     displayDatums.picUrl = datums.profilePicUrl;
   }
-  if (datumsType === "reports") {
+  if (datumsType === "missions") {
     displayDatums.picUrl = datums.reportPicUrl;
     displayDatums.title = datums.reportTitle;
   }
@@ -41,7 +41,12 @@ const IntelliCard = ({ imageSize, datums, datumsType, handleCardClick }) => {
     // console.log("Intellicard handleCardClick");
     // console.log(handleCardClick);
     // handleCardClick(datums);
-    router.push(`/missions/create-mission/${datums.agentId}`);
+    if (datumsType === "agents") {
+      router.push(`/missions/create-mission/${datums.agentId}`);
+    }
+    if (datumsType === "missions") {
+      router.push(`/agents/view-agents`);
+    }
   }
 
   return (
@@ -73,17 +78,19 @@ const IntelliCard = ({ imageSize, datums, datumsType, handleCardClick }) => {
             </CardSubtitle>
           </div>
           {/* <CardText>{datums.bio}</CardText> */}
-          <Button
-            style={{
-              border: "1px solid white",
-              position: "absolute",
-              bottom: "4px",
-              right: "4px",
-            }}
-            onClick={handleHire}
-          >
-            <i className="bi bi-body-text"></i>+
-          </Button>
+          {datumsType === "agents" && (
+            <Button
+              style={{
+                border: "1px solid white",
+                position: "absolute",
+                bottom: "4px",
+                right: "4px",
+              }}
+              onClick={handleHire}
+            >
+              <i className="bi bi-body-text"></i>+
+            </Button>
+          )}
         </CardBody>
       </Card>
     </>

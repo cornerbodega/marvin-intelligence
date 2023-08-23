@@ -93,13 +93,13 @@ export default async function SaveReportEndpoint(req, res) {
       newReportModel.reportContent = draft;
       newReportModel.briefing = briefing;
       newReportModel.userId = userId;
-      // Save to Supabase reports table
+      // Save to Supabase missions table
       // Go to report detail page and see image :D
       console.log("SAVE REPORT TO SUPABASE");
       console.log(newReportModel);
 
       const saveReportData = await saveToSupabase(
-        "reports",
+        "missions",
         newReportModel
       ).catch((error) => console.log(error));
       // console.log("saveReportData");
