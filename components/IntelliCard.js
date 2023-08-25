@@ -37,17 +37,19 @@ const IntelliCard = ({ imageSize, datums, datumsType, handleCardClick }) => {
     // console.log(handleCardClick);
     handleCardClick(datums);
   }
-  function handleHire() {
-    // console.log("Intellicard handleCardClick");
-    // console.log(handleCardClick);
-    // handleCardClick(datums);
-    if (datumsType === "agents") {
-      router.push(`/missions/create-mission/${datums.agentId}`);
-    }
-    if (datumsType === "missions") {
-      router.push(`/agents/view-agents`);
-    }
-  }
+  // function handleHire() {
+  //   // console.log("Intellicard handleCardClick");
+  //   // console.log(handleCardClick);
+  //   // handleCardClick(datums);
+  //   if (datumsType === "agents") {
+  //     router.push(
+  //       `/missions/create-mission/dispatch?agentId=${datums.agentId}`
+  //     );
+  //   }
+  //   if (datumsType === "missions") {
+  //     router.push(`/missions/create-mission/agents/view-agents`);
+  //   }
+  // }
 
   return (
     <>
@@ -78,7 +80,7 @@ const IntelliCard = ({ imageSize, datums, datumsType, handleCardClick }) => {
             </CardSubtitle>
           </div>
           {/* <CardText>{datums.bio}</CardText> */}
-          {datumsType === "agents" && (
+          {/* {datumsType === "agents" && (
             <Button
               style={{
                 border: "1px solid white",
@@ -90,7 +92,7 @@ const IntelliCard = ({ imageSize, datums, datumsType, handleCardClick }) => {
             >
               <i className="bi bi-body-text"></i>+
             </Button>
-          )}
+          )} */}
         </CardBody>
       </Card>
     </>

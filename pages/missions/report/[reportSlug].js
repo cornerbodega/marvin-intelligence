@@ -41,14 +41,16 @@ const openai = new OpenAIApi(configuration);
 
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
-    const reportId = context.params.reportId;
+    const missionId = context.params.reportSlug.split("-")[0];
+    console.log("context.params");
+    console.log(context.params);
     const supabase = getSupabase();
-    console.log("reportId");
-    console.log(reportId);
+    console.log("missionId");
+    console.log(missionId);
     let { data: missions, error } = await supabase
       .from("reports")
       .select("*")
-      .eq("reportId", reportId);
+      .eq("reportId", missionId);
     if (error) {
       console.log(error);
     }
@@ -70,6 +72,7 @@ export const getServerSideProps = withPageAuthRequired({
 });
 
 const CreateMission = ({ report, briefingSuggestion }) => {
+  const router = useRouter();
   console.log("report");
   console.log(report);
   const [reportContent, setReportContent] = useState(report.reportContent);
@@ -77,10 +80,17 @@ const CreateMission = ({ report, briefingSuggestion }) => {
   const { user, error, isLoading } = useUser();
   const [highlight, setHighlight] = useState({
     text: "",
-    range: null,
+    startIndex: undefined,
+    endIndex: undefined,
     // position: { top: 0, left: 0 },
   });
-  function handleFabClick() {}
+  function handleFabClick() {
+    router.push(
+      `/missions/create-mission/agents/view-agents?parentReportId=${
+        report.reportId
+      }&highlight=${JSON.stringify(highlight)}`
+    );
+  }
 
   const handleTextHighlight = (event) => {
     const selection = window.getSelection();
@@ -93,27 +103,31 @@ const CreateMission = ({ report, briefingSuggestion }) => {
 
     const range = selection.getRangeAt(0);
 
+    const startIndex = range.startOffset;
+    const endIndex = range.endOffset;
     // Check if the start and end nodes are within the same parent
     if (range.startContainer.parentNode !== range.endContainer.parentNode) {
       selection.removeAllRanges(); // Remove the current selection
-      setHighlight({ text: "", range: null });
+      setHighlight({ text: "", startIndex, endIndex });
       return;
     }
     // const rect = range.getBoundingClientRect();
 
     setHighlight({
       text: selection.toString(),
-      range,
+      startIndex,
+      endIndex,
       // position: { top: rect.top, left: rect.left },
     });
   };
   return (
     <div>
       <Breadcrumb>
-        <BreadcrumbItem>
+        <BreadcrumbItem className="text-white">
           <i className="bi bi-body-text"></i>
           &nbsp;
           <Link
+            className="text-white"
             href="/missions/view-missions"
             style={{ textDecoration: "none" }}
           >
@@ -122,8 +136,9 @@ const CreateMission = ({ report, briefingSuggestion }) => {
         </BreadcrumbItem>
         <BreadcrumbItem>
           <Link
+            className="text-white"
             // className="text-white"
-            href={`/missions/detail/${report.reportId}`}
+            href={`/missions/report/${report.missionId}`}
             style={{ textDecoration: "none" }}
           >
             {report.reportTitle}

@@ -18,7 +18,7 @@ const IntelliCardGroupRow = ({ cols, handleCardClick, datumsType }) => {
   //   function goToPage(name) {
   //     console.log("go to page");
   //     console.log(name);
-  //     router.push(`/agents/detail/${name}`);
+  //     router.push(`/missions/create-mission/agents/detail/${name}`);
   //   }
   // export default function Home() {
   // console.log("intelli card group row");

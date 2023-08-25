@@ -16,14 +16,15 @@ export default async function SaveReportEndpoint(req, res) {
   const supabase = getSupabase();
   async function saveToSupabase(table, dataToSave) {
     const response = await supabase.from(table).insert(dataToSave).select();
-    console.log("response");
+    console.log("SaveReportEndpoint response trying to save to supabase");
+    console.log(`${table} ${JSON.stringify(dataToSave)}}`);
     console.log(response);
 
     return response;
   }
 
   console.log("Save Report Endpoint");
-  console.log("res");
+  // console.log("res");
 
   //   res.status(200);
   // console.log(res.send(200));
@@ -31,12 +32,13 @@ export default async function SaveReportEndpoint(req, res) {
     const draft = req.body.draft;
     const briefing = req.body.briefing;
     const userId = req.body.userId;
-    console.log("req.body");
-    console.log(req.body);
+    const agentId = req.body.agentId;
+    // console.log("req.body");
+    // console.log(req.body);
     const newReportModel = {};
     if (draft) {
       console.log("save draft endpoint");
-      console.log(draft);
+      // console.log(draft);
       // describe this article as a photograph of place on earth in less than 300 characters: Research Report: Impact of Persistence and Goal-Setting on Project Success and Performance in Different Industries
       const draftTitle = draft.split(`<h2>`)[1].split(`</h2>`)[0];
       // describe this article as a photograph of place on earth in less than 300 characters: Research Report: Impact of Persistence and Goal-Setting on Project Success and Performance in Different Industries
@@ -67,14 +69,117 @@ export default async function SaveReportEndpoint(req, res) {
           content: `describe this article as a ${imageType} of place on earth in less than 300 characters:${draftTitle}`,
         },
       ];
-      const imageDescriptionCompletion = await openai
-        .createChatCompletion({
-          model: "gpt-3.5-turbo",
-          messages: getDraftImageMessages,
-        })
-        .catch((error) => console.log(error));
+      // const getBriefingSummary = [
+      //   {
+      //     role: "system",
+      //     content:
+      //       "You are an expert at summarizing text in less than 300 characters. You never explain your answers. You return answers in the style of a research question.",
+      //   },
+      //   {
+      //     role: "user",
+      //     content: `how can music help peope with parkinsins or dimentia?`,
+      //   },
+      //   {
+      //     role: "assistant",
+      //     content:
+      //       "What is the impact of music therapy on reducing symptoms and improving the quality of life for patients with neurological disorders such as Parkinson's disease or dementia?",
+      //   },
+      //   {
+      //     role: "user",
+      //     content: `${briefing}`,
+      //   },
+      // ];
+      // const getReportSummary = [
+      //   {
+      //     role: "system",
+      //     content:
+      //       "You are an expert at summarizing text in less than 300 characters. You never explain your answers. You will receive html and return plain text.",
+      //   },
+      //   {
+      //     role: "user",
+      //     content: `please summarize this report in less than 300 characters: ${draft}`,
+      //   },
+      // ];
+      // const stringifiedPromptsArray = [
+      //   JSON.stringify(getDraftImageMessages),
+      //   JSON.stringify(getBriefingSummary),
+      //   JSON.stringify(getReportSummary),
+      // ];
+      // let prompts = [
+      //   {
+      //     role: "user",
+      //     content: stringifiedPromptsArray,
+      //   },
+      //   {
+      //     role: "system",
+      //     content:
+      //       "Complete every element of the array. Reply with an array of all completions.",
+      //   },
+      // ];
+      // console.log("prompts");
+      // console.log(prompts);
+
+      // return;
+      const reportSummaryMessages = [
+        {
+          role: "system",
+          content:
+            "You are an expert at summarizing reports. You receive html and return the summary in less than 300 characters in plain text.",
+        },
+        {
+          role: "user",
+          content: `please summarize the following report: ${draft}`,
+        },
+      ];
+      // const briefingSummaryMessages = [
+      //   {
+      //     role: "system",
+      //     content:
+      //       "You are an expert at summarizing mission briefings. You change as little as possible, only correcting for spelling or grammar, never content. You always return less than 300 characters in plain text.",
+      //   },
+      //   {
+      //     role: "user",
+      //     content: `please edit the following briefing for spelling and grammar in the style of an intelligence agency research question: ${briefing}`,
+      //   },
+      // ];
+      const draftImageMessagesResponse = await getFromOpenAI(
+        getDraftImageMessages
+      );
+      const reportSummaryResponse = await getFromOpenAI(reportSummaryMessages);
+
+      // const briefingSummaryResponse = await getFromOpenAI(
+      //   briefingSummaryMessages
+      // );
+      async function getFromOpenAI(messages) {
+        return await openai
+          .createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: messages,
+          })
+          .catch((error) => {
+            console.log("error");
+            console.log(error);
+          });
+      }
+      // console.log("draftImageMessagesResponse");
+      // console.log(draftImageMessagesResponse);
+
+      if (!draftImageMessagesResponse) {
+        console.log("ERROR! NO draftImageMessagesResponse");
+        return;
+      }
       const imageDescriptionResponseContent =
-        imageDescriptionCompletion.data.choices[0].message.content;
+        draftImageMessagesResponse.data.choices[0].message.content;
+      // console.log("draftImageMessagesResponse");
+      // console.log(draftImageMessagesResponsreportSummaryAndBriefingResponse);
+
+      // return;
+
+      // const briefingSummary =
+      //   briefingSummaryResponse.data.choices[0].message.content;
+      const reportSummary =
+        reportSummaryResponse.data.choices[0].message.content;
+
       const aiImageResponse = await openai.createImage({
         prompt: imageDescriptionResponseContent,
         n: 1,
@@ -92,16 +197,34 @@ export default async function SaveReportEndpoint(req, res) {
       newReportModel.reportTitle = draftTitle;
       newReportModel.reportContent = draft;
       newReportModel.briefing = briefing;
+      newReportModel.agentId = agentId;
+      // newReportModel.briefingSummary = briefingSummary;
+      newReportModel.reportSummary = reportSummary;
+      // format briefing?
+
+      // generate report summary
+
       newReportModel.userId = userId;
+      console.log(newReportModel);
+      console.log("newReportModel");
+      // Generate Report Summary and Sanitize Briefing
+      // Batch calls to the API to save requests/min
+
+      // const chat_completion = await openai.createChatCompletion({
+      //   model: "gpt-3.5-turbo",
+      //   messages,
+      // });
+
       // Save to Supabase missions table
       // Go to report detail page and see image :D
       console.log("SAVE REPORT TO SUPABASE");
       console.log(newReportModel);
 
       const saveReportData = await saveToSupabase(
-        "missions",
+        "reports",
         newReportModel
       ).catch((error) => console.log(error));
+
       // console.log("saveReportData");
       // console.log(saveReportData);
 

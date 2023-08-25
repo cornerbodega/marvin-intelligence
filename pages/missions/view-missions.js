@@ -90,17 +90,18 @@ const ViewReports = ({ missions }) => {
   };
   const handleFabClick = () => {
     console.log("ViewReports HandleClick Clicked!");
-    goToPage("/agents/view-agents");
+    goToPage("/missions/create-mission/agents/view-agents");
   };
   const handleCardClick = (report) => {
     // console.log("handleCardClick");
     // const reportName = event.target.dataset.datums.reportName;
-    const reportName = report.reportName;
+    const reportTitle = report.reportTitle;
     const reportId = report.reportId;
 
     console.log("ViewReports HandleCardClick Clicked!");
     // setSelectedReport(report);
-    goToPage(`/missions/detail/${reportId}`);
+    const reportSlug = slugify(`${reportId}-${reportTitle}`);
+    goToPage(`/missions/report/${reportSlug}`);
   };
   const router = useRouter;
   function goToPage(name) {
@@ -171,5 +172,14 @@ const ViewReports = ({ missions }) => {
     </>
   );
 };
-
+function slugify(str) {
+  return String(str)
+    .normalize("NFKD") // split accented characters into their base characters and diacritical marks
+    .replace(/[\u0300-\u036f]/g, "") // remove all the accents, which happen to be all in the \u03xx UNICODE block.
+    .trim() // trim leading or trailing whitespace
+    .toLowerCase() // convert to lowercase
+    .replace(/[^a-z0-9 -]/g, "") // remove non-alphanumeric characters
+    .replace(/\s+/g, "-") // replace spaces with hyphens
+    .replace(/-+/g, "-"); // remove consecutive hyphens
+}
 export default ViewReports;

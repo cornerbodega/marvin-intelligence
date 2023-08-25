@@ -28,8 +28,9 @@ import { useRouter } from "next/router";
 import { useContext, useRef, useEffect } from "react";
 import { object } from "prop-types";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import IntelliFab from "../../components/IntelliFab";
-import { getSupabase } from "../../utils/supabase";
+// import IntelliFab from "../components/IntelliFab";
+import IntelliFab from "../../../components/IntelliFab";
+import { getSupabase } from "../../../utils/supabase";
 import { useState } from "react";
 import { set } from "lodash";
 
@@ -45,13 +46,10 @@ const openai = new OpenAIApi(configuration);
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     // const agentId = context.params.agentId;
-    const {
-      agentId,
-      originalMissionId,
-      highlightStartIndex,
-      highlightEndIndex,
-    } = context.query;
-
+    const { agentId, parentReportId, highlightStartIndex, highlightEndIndex } =
+      context.query;
+    console.log("parentReportId");
+    console.log(parentReportId);
     const supabase = getSupabase();
     console.log("agentId");
     console.log(agentId);
@@ -65,69 +63,69 @@ export const getServerSideProps = withPageAuthRequired({
       console.log(error);
     }
     const agent = agents[0];
-    const expertises = [agent.expertise1, agent.expertise2, agent.expertise3];
-    // const { req, res } = context;
-    // const data = handler(req, res);
-    let expertiseString = expertises[0];
+    // const expertises = [agent.expertise1, agent.expertise2, agent.expertise3];
+    // // const { req, res } = context;
+    // // const data = handler(req, res);
+    // let expertiseString = expertises[0];
 
-    if (expertises.length > 1) {
-      expertiseString += " and " + expertises[1];
-    }
-    if (expertises.length > 2) {
-      expertiseString += " and " + expertises[2];
-    }
-    console.log(expertiseString);
-    const chat_completion = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an expert at generating an interesting research questions for given areas of study.",
-        },
-        {
-          role: "user",
-          content: `Generate AI, Machine Learning, and Natural Language Processing. Return only the results in the following JSON format: {suggestion}`,
-        },
-        {
-          role: "assistant",
-          content: `{
-                  "suggestion": "I need a comprehensive report on the applications of Natural Language Processing in the modern digital landscape."
-              }`,
-        },
-        {
-          role: "user",
-          content: `What is an interesting research question for ${expertiseString}?`,
-        },
-      ],
-    });
-    let briefingSuggestion = "";
-    const suggestionResponseContent =
-      chat_completion.data.choices[0].message.content;
-    if (suggestionResponseContent) {
-      console.log("suggestionResponseContent");
-      console.log(suggestionResponseContent);
-      console.log("typeof suggestionResponseContent");
-      console.log(typeof suggestionResponseContent);
-      if (typeof suggestionResponseContent === "object") {
-        briefingSuggestion = suggestionResponseContent.suggestion;
-      } else if (
-        typeof suggestionResponseContent === "string" &&
-        suggestionResponseContent.includes(`"suggestion":`)
-      ) {
-        const parsedSuggestionContent = JSON.parse(suggestionResponseContent);
-        if (parsedSuggestionContent) {
-          briefingSuggestion = parsedSuggestionContent.suggestion;
-        }
-      } else if (typeof suggestionResponseContent === "string") {
-        briefingSuggestion = suggestionResponseContent;
-      }
+    // if (expertises.length > 1) {
+    //   expertiseString += " and " + expertises[1];
+    // }
+    // if (expertises.length > 2) {
+    //   expertiseString += " and " + expertises[2];
+    // }
+    // console.log(expertiseString);
+    // const chat_completion = await openai.createChatCompletion({
+    //   model: "gpt-3.5-turbo",
+    //   messages: [
+    //     {
+    //       role: "system",
+    //       content:
+    //         "You are an expert at generating an interesting research question for given areas of study. You always return exactly one answer in less than 300 characters.",
+    //     },
+    //     {
+    //       role: "user",
+    //       content: `Generate AI, Machine Learning, and Natural Language Processing. Return only the results in the following JSON format: {suggestion}`,
+    //     },
+    //     {
+    //       role: "assistant",
+    //       content: `{
+    //               "suggestion": "I need a comprehensive report on the applications of Natural Language Processing in the modern digital landscape."
+    //           }`,
+    //     },
+    //     {
+    //       role: "user",
+    //       content: `What is an interesting research question for ${expertiseString}?`,
+    //     },
+    //   ],
+    // });
+    // let briefingSuggestion = "";
+    // const suggestionResponseContent =
+    //   chat_completion.data.choices[0].message.content;
+    // if (suggestionResponseContent) {
+    //   console.log("suggestionResponseContent");
+    //   console.log(suggestionResponseContent);
+    //   console.log("typeof suggestionResponseContent");
+    //   console.log(typeof suggestionResponseContent);
+    //   if (typeof suggestionResponseContent === "object") {
+    //     briefingSuggestion = suggestionResponseContent.suggestion;
+    //   } else if (
+    //     typeof suggestionResponseContent === "string" &&
+    //     suggestionResponseContent.includes(`"suggestion":`)
+    //   ) {
+    //     const parsedSuggestionContent = JSON.parse(suggestionResponseContent);
+    //     if (parsedSuggestionContent) {
+    //       briefingSuggestion = parsedSuggestionContent.suggestion;
+    //     }
+    //   } else if (typeof suggestionResponseContent === "string") {
+    //     briefingSuggestion = suggestionResponseContent;
+    //   }
 
-      // briefingSuggestion = suggestionResponseContent.split("suggestion:")[1];
-    } // Process a POST request
-    // const suggestionResponse = missingsBriefingHandler(req, res);
-    console.log("suggestionResponseContent");
-    console.log(suggestionResponseContent);
+    //   // briefingSuggestion = suggestionResponseContent.split("suggestion:")[1];
+    // } // Process a POST request
+    // // const suggestionResponse = missingsBriefingHandler(req, res);
+    // console.log("suggestionResponseContent");
+    // console.log(suggestionResponseContent);
 
     // Get the briefing suggestion from GPT API (via next /api)
     // const briefingPlaceholder = fetch("POST", "/api/missions/briefing-suggestion/", expertises, missionHistory)
@@ -145,21 +143,23 @@ export const getServerSideProps = withPageAuthRequired({
     // console.log("suggestionResponse");
     // console.log(suggestionResponse);
     return {
-      props: { agent: agent || {}, briefingSuggestion },
+      props: { agent: agent || {} },
     };
   },
 });
 
-const CreateMission = ({ agent, briefingSuggestion }) => {
+const CreateMission = ({ agent }) => {
   // console.log("agent");
   // console.log(agent);
   const { user, error, isLoading } = useUser();
-
+  const [briefingSuggestion, setBriefingSuggestion] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [parentReportSummary, setParentReportSummary] = useState();
   const [briefing, setBriefing] = useState();
   const [showSuggestedBriefing, setShowSuggestedBriefing] = useState();
   const [draft, setDraft] = useState();
   const [feedbackInput, setFeedbackInput] = useState("");
+  const router = useRouter();
 
   const draftRef = useRef();
   async function handleWriteDraftReport(e) {
@@ -237,20 +237,18 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
   async function handleAcceptReport(e) {
     e.preventDefault();
     console.log("handleAcceptReport");
-    // const res = await fetch("/api/missions/save-report-endpoint", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: { draftResponseContent: JSON.stringify(draft) },
-    // });
 
     const res = await fetch("/api/missions/save-report-endpoint", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ draft, briefing, userId: user.sub }),
+      body: JSON.stringify({
+        draft,
+        briefing,
+        userId: user.sub,
+        agentId: agent.agentId,
+      }),
     });
     // console.log("21343254res");
     // console.log(res.json());
@@ -259,30 +257,89 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
     // console.log("draftResponseContent");
     // console.log(draftResponseContent);
   }
+  useEffect(() => {
+    async function fetchBriefingSuggestion() {
+      // Logic to build expertiseString from agent prop
+      const expertises = [agent.expertise1, agent.expertise2, agent.expertise3];
+      let expertiseString = expertises[0];
 
+      if (expertises.length > 1) {
+        expertiseString += " and " + expertises[1];
+      }
+      if (expertises.length > 2) {
+        expertiseString += " and " + expertises[2];
+      }
+      console.log("expertiseString");
+      console.log(expertiseString);
+
+      const getSuggestionParams = { expertiseString };
+      if (router.query.parentReportId) {
+        const parentReportId = router.query.parentReportId;
+        getSuggestionParams.parentReportId = parentReportId;
+      }
+      // try {
+      const briefingResponse = await fetch("/api/missions/get-suggestion", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(getSuggestionParams),
+      });
+
+      if (briefingResponse.ok) {
+        const data = await briefingResponse.json();
+        setBriefingSuggestion(data.briefingSuggestion);
+        setParentReportSummary(data.parentReportSummary);
+      } else {
+        console.error("Failed to fetch briefing suggestion");
+      }
+      //  catch (error) {
+      //   console.error("An error occurred:", expertiseString);
+      // }
+    }
+
+    fetchBriefingSuggestion();
+  }, [agent]);
+  const currentQueryParams = router.query;
   return (
     <div>
-      <Breadcrumb>
+      <Breadcrumb className="text-white">
         <BreadcrumbItem>
-          <i className="bi  bi-file-earmark-person-fill"></i>
+          <i className="bi  bi-body-text"></i>
           &nbsp;
-          <Link href="/agents/view-agents">Agents</Link>
-        </BreadcrumbItem>
-        <BreadcrumbItem className="">
-          <Link href={`/agents/detail/${agent.agentName}/${agent.agentId}`}>
-            Agent {agent.agentName}
+          <Link className="text-white" href="/missions/view-missions">
+            Missions
           </Link>
         </BreadcrumbItem>
-        <BreadcrumbItem className="text-white" active>
-          <i className="bi bi-body-text"></i> Create Report
+
+        <BreadcrumbItem>
+          {/* `/missions/create-mission/agents/view-agents?parentReportId=${
+        report.reportId
+      }&highlight=${JSON.stringify(highlight)}` */}
+          <i className="bi bi-body-text"></i>+ &nbsp;
+          <Link
+            className="text-white"
+            href={{
+              pathname: "/missions/create-mission/agents/view-agents/",
+              query: currentQueryParams,
+            }}
+          >
+            Create Mission
+          </Link>
         </BreadcrumbItem>
+        <BreadcrumbItem className="">
+          {" "}
+          <i className={`bi-file-earmark-person-fill`}></i> Agent{" "}
+          {agent.agentName}
+        </BreadcrumbItem>
+        <BreadcrumbItem className="">Dispatch</BreadcrumbItem>
       </Breadcrumb>
 
       <Row>
         <Col md={{ size: 6, offset: 3 }}>
           <Form onSubmit={handleWriteDraftReport}>
             <div>
-              <Card>
+              <Card className="bg-black text-white">
                 <CardBody>
                   <div
                     style={{
@@ -340,15 +397,34 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
                       {agent.expertise3}
                     </Badge>
                   </CardSubtitle>
+                  <div className="text-white">
+                    <div>
+                      <h4 className="text-white">Bio</h4>
+                    </div>
+                    <div>{agent.bio}</div>
+                    <div>
+                      <h4 className="text-white">Mission History</h4>
+                    </div>
+
+                    {parentReportSummary && (
+                      <div>
+                        <h4 className="text-white">Linked Mission Context</h4>
+                      </div>
+                    )}
+                    <div>{parentReportSummary}</div>
+                    <div>
+                      <h4 className="text-white">Briefing Suggestion</h4>
+                    </div>
+                    <div>{briefingSuggestion}</div>
+                  </div>
                 </CardBody>
               </Card>
             </div>
-
             {/* <div>
                 <h3>Create Mission</h3>
               </div> */}
             <FormGroup>
-              <div style={{ marginBotton: "10px", textAlign: "left" }}>
+              {/* <div style={{ marginBotton: "10px", textAlign: "left" }}>
                 {!showSuggestedBriefing ? (
                   <a
                     onClick={(e) =>
@@ -384,13 +460,13 @@ const CreateMission = ({ agent, briefingSuggestion }) => {
                     </div>
                   </>
                 )}
-              </div>
+              </div> */}
 
               <div>
                 <div style={{ marginTop: "20px" }}></div>
                 <FormGroup>
                   <Label for="exampleText" className="text-white">
-                    Mission Briefing
+                    Mission Prompt
                   </Label>
                   <Input
                     id="exampleText"

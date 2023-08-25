@@ -41,7 +41,7 @@ export const getServerSideProps = withPageAuthRequired({
       return {
         redirect: {
           permanent: false,
-          destination: "/agents/view-agents",
+          destination: "/missions/create-mission/agents/view-agents",
         },
         props: {},
       };
@@ -82,7 +82,7 @@ function CreateAgency() {
 
     if (res.status === 200) {
       // alert("Agent created successfully!");
-      router.push("/agents/view-agents");
+      router.push("/missions/create-mission/agents/view-agents");
       console.log("Agent created successfully!");
     } else {
       console.log(JSON.stringify(res));

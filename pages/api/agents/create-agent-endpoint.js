@@ -68,7 +68,7 @@ export default async function handler(req, res) {
             //   }`,
             content: `{
                   "animal": "Honeybee",
-                  "bio": "When she's not pollinating projects with fresh insights or navigating the intricacies of the digital realm, Agent Honeybee can be found analyzing the patterns of her fellow agents to improve collective efficiency. With a codebase that draws inspiration from one of nature's most impressive architects, she’s here to ensure your tech solutions are nothing short of hive-quality excellence. Approach with curiosity, leave with clarity."
+                  "bio": "With a codebase that draws inspiration from one of nature's most impressive architects, this AI agent is here to ensure your tech solutions are nothing short of hive-quality excellence. Approach with curiosity, leave with clarity."
               }`,
           },
           {

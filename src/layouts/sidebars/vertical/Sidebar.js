@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 const navigation = [
   // {
   //   title: "Agents",
-  //   href: "/agents/view-agents",
+  //   href: "/missions/create-mission/agents/view-agents",
   //   icon: "bi bi-file-earmark-person-fill",
   // },
   // {

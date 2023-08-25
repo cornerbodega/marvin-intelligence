@@ -25,7 +25,7 @@ const ProjectTables = () => {
   function goToPage(name) {
     console.log("go to page");
     console.log(name);
-    router.push(`/missions/detail/${name}`);
+    router.push(`/missions/report/${name}`);
   }
   // export default function Home() {
 

@@ -13,7 +13,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 export default async function writeDraftEndpoint(req, res) {
-  console.log("Generate Briefing Suggestions");
+  console.log("Write Draft Endpoint");
   console.log("res");
   //   res.status(200);
   // console.log(res.send(200));
@@ -32,6 +32,13 @@ export default async function writeDraftEndpoint(req, res) {
     }
     console.log("expertiseString");
     console.log(specializedTrainingString);
+    // agents' areas of expertise
+    // agents' specialized training
+    // parent report summary aka "context"
+    // parent report sanitized briefing
+    // highlighted text
+    // previous reports titles
+
     let messages = [
       {
         role: "system",

@@ -1,8 +1,8 @@
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
 // import { getSupabase } from "../../../utils/supabase";
-import { getSupabase } from "../../utils/supabase";
-
+// import { getSupabase } from "../../../utils/supabase";
+import { getSupabase } from "../../../../utils/supabase";
 import { useUser } from "@auth0/nextjs-auth0/client";
 // rest of component
 import React, { useState } from "react";
@@ -249,7 +249,7 @@ const CreateAgent = () => {
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
           <Link
-            href="/agents/view-agents"
+            href="/missions/create-mission/agents/view-agents"
             style={{ textDecoration: "none", color: "white" }}
           >
             <i className={`bi-file-earmark-person-fill`}></i>

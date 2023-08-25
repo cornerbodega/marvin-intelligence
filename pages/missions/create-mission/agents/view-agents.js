@@ -19,14 +19,14 @@ import { useEffect, useRef, useState, useContext } from "react";
 import { debounce } from "lodash";
 // other imports
 import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
-import IntelliCardGroup from "../../components/IntelliCardGroup";
-import IntelliCardGroupRow from "../../components/IntelliCardGroupRow";
-import { getSupabase } from "../../utils/supabase";
-import RevealAnimations from "../../components/RevealAnimations";
-import IntelliFab from "../../components/IntelliFab";
+import IntelliCardGroup from "../../../../components/IntelliCardGroup";
+import IntelliCardGroupRow from "../../../../components/IntelliCardGroupRow";
+import { getSupabase } from "../../../../utils/supabase";
+import RevealAnimations from "../../../../components/RevealAnimations";
+import IntelliFab from "../../../../components/IntelliFab";
 // rest of component
-import IntelliProvider from "../../components/IntelliProvider/IntelliProvider";
-import IntelliContext from "../../components/intelliContext/IntelliContext";
+import IntelliProvider from "../../../../components/IntelliProvider/IntelliProvider";
+import IntelliContext from "../../../../components/intelliContext/IntelliContext";
 import { useUser } from "@auth0/nextjs-auth0/client";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
@@ -116,7 +116,15 @@ const ViewAgents = ({ agents }) => {
     const agentId = agent.agentId;
     console.log("ViewAgents HandleCardClick Clicked!");
     // setSelectedAgent(agent);
-    goToPage(`/agents/detail/${agentName}/${agentId}`);
+    // goToPage(`/missions/create-mission/agents/detail/${agentName}/${agentId}`);
+    let createMissionPath = `/missions/create-mission/dispatch?agentId=${agent.agentId}`;
+    const parentReportId = router.query.parentReportId;
+    console.log("parentReportId");
+    console.log(parentReportId);
+    if (parentReportId) {
+      createMissionPath += `&parentReportId=${router.query.parentReportId}`;
+    }
+    goToPage(createMissionPath);
   };
   const router = useRouter;
   function goToPage(name) {
@@ -178,7 +186,7 @@ const ViewAgents = ({ agents }) => {
           <i className={`bi-file-earmark-person-fill`}></i>
           &nbsp;
           <Link
-            href="/agents/view-agents"
+            href="/missions/create-mission/agents/view-agents"
             style={{ textDecoration: "none", color: "white" }}
           >
             Select Agent
