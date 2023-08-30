@@ -1,0 +1,55 @@
+a, .Link {  /* The .Link class is just an example, use the actual class applied to your Link components if any */
+    /* text-decoration: underline; */
+    /* font-style: italic; */
+    font-weight: 800;
+    color: #0645ad;
+  }
+  .gradient-background {
+    background: linear-gradient(to bottom, #4176EB, #2654D8);
+  }
+
+  .cardShadow{
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .breadcrumb-item::before {
+    color: white !important;
+  } 
+  .breadcrumb ol {
+    line-height: 30px; /* Match this with the height of the ol tag */
+  }
+  
+  .breadcrumb li {
+    display: flex;
+    align-items: center;
+  }
+
+  .expertiseBadge {
+  background-color: #B52573 !important;
+  border-color: #B52573 !important;
+  color: #fff !important;
+}
+
+.Badge{
+ margin-top: "10px !important";
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-size: larger;
+}
+@font-face {
+    font-family: 'ComputerModern';
+    src: url('cmu.sans-serif-medium.ttf') format('ttf'),
+         
+  }
+  
+.reportFont {
+   font-family: 'ComputerModern', serif;
+ }
+
+  
+  
+  
+  
+  

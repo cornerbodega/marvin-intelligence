@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import IntelliCardGroupRow from "./IntelliCardGroupRow";
 
-const IntelliCardGroup = ({ datums, handleCardClick, datumsType }) => {
+const IntelliCardGroup = ({ datums, handleCardClick, datumsType, offset }) => {
   // const [cardsModel, setCardsModel] = useState(datums);
   const cardsModel = datums;
   // console.log("cardsModel");

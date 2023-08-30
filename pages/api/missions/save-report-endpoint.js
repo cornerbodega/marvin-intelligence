@@ -1,3 +1,6 @@
+// @author Marvin-Rhone
+// This file is the endpoint for saving a report. It is called from the /missions/create-mission/.../dispatch.js page in the handleAcceptReport function.
+import { AuthUnknownError } from "@supabase/supabase-js";
 import { getSupabase } from "../../../utils/supabase";
 import { v2 as cloudinary } from "cloudinary";
 cloudinary.config({
@@ -24,23 +27,25 @@ export default async function SaveReportEndpoint(req, res) {
   }
 
   console.log("Save Report Endpoint");
-  // console.log("res");
 
-  //   res.status(200);
-  // console.log(res.send(200));
   if (req.method === "POST") {
     const draft = req.body.draft;
     const briefing = req.body.briefing;
     const userId = req.body.userId;
     const agentId = req.body.agentId;
-    // console.log("req.body");
-    // console.log(req.body);
+
+    // #####################################
+    // Save Report to Reports Table
+    // #####################################
+
     const newReportModel = {};
     if (draft) {
       console.log("save draft endpoint");
-      // console.log(draft);
+
       // describe this article as a photograph of place on earth in less than 300 characters: Research Report: Impact of Persistence and Goal-Setting on Project Success and Performance in Different Industries
-      const draftTitle = draft.split(`<h2>`)[1].split(`</h2>`)[0];
+      const draftTitle = draft
+        .split(`<h2 id="reportTitle">`)[1]
+        .split(`</h2>`)[0];
       // describe this article as a photograph of place on earth in less than 300 characters: Research Report: Impact of Persistence and Goal-Setting on Project Success and Performance in Different Industries
       const imageTypes = [
         // "photograph",
@@ -69,57 +74,7 @@ export default async function SaveReportEndpoint(req, res) {
           content: `describe this article as a ${imageType} of place on earth in less than 300 characters:${draftTitle}`,
         },
       ];
-      // const getBriefingSummary = [
-      //   {
-      //     role: "system",
-      //     content:
-      //       "You are an expert at summarizing text in less than 300 characters. You never explain your answers. You return answers in the style of a research question.",
-      //   },
-      //   {
-      //     role: "user",
-      //     content: `how can music help peope with parkinsins or dimentia?`,
-      //   },
-      //   {
-      //     role: "assistant",
-      //     content:
-      //       "What is the impact of music therapy on reducing symptoms and improving the quality of life for patients with neurological disorders such as Parkinson's disease or dementia?",
-      //   },
-      //   {
-      //     role: "user",
-      //     content: `${briefing}`,
-      //   },
-      // ];
-      // const getReportSummary = [
-      //   {
-      //     role: "system",
-      //     content:
-      //       "You are an expert at summarizing text in less than 300 characters. You never explain your answers. You will receive html and return plain text.",
-      //   },
-      //   {
-      //     role: "user",
-      //     content: `please summarize this report in less than 300 characters: ${draft}`,
-      //   },
-      // ];
-      // const stringifiedPromptsArray = [
-      //   JSON.stringify(getDraftImageMessages),
-      //   JSON.stringify(getBriefingSummary),
-      //   JSON.stringify(getReportSummary),
-      // ];
-      // let prompts = [
-      //   {
-      //     role: "user",
-      //     content: stringifiedPromptsArray,
-      //   },
-      //   {
-      //     role: "system",
-      //     content:
-      //       "Complete every element of the array. Reply with an array of all completions.",
-      //   },
-      // ];
-      // console.log("prompts");
-      // console.log(prompts);
 
-      // return;
       const reportSummaryMessages = [
         {
           role: "system",
@@ -131,25 +86,11 @@ export default async function SaveReportEndpoint(req, res) {
           content: `please summarize the following report: ${draft}`,
         },
       ];
-      // const briefingSummaryMessages = [
-      //   {
-      //     role: "system",
-      //     content:
-      //       "You are an expert at summarizing mission briefings. You change as little as possible, only correcting for spelling or grammar, never content. You always return less than 300 characters in plain text.",
-      //   },
-      //   {
-      //     role: "user",
-      //     content: `please edit the following briefing for spelling and grammar in the style of an intelligence agency research question: ${briefing}`,
-      //   },
-      // ];
       const draftImageMessagesResponse = await getFromOpenAI(
         getDraftImageMessages
       );
       const reportSummaryResponse = await getFromOpenAI(reportSummaryMessages);
 
-      // const briefingSummaryResponse = await getFromOpenAI(
-      //   briefingSummaryMessages
-      // );
       async function getFromOpenAI(messages) {
         return await openai
           .createChatCompletion({
@@ -161,8 +102,6 @@ export default async function SaveReportEndpoint(req, res) {
             console.log(error);
           });
       }
-      // console.log("draftImageMessagesResponse");
-      // console.log(draftImageMessagesResponse);
 
       if (!draftImageMessagesResponse) {
         console.log("ERROR! NO draftImageMessagesResponse");
@@ -170,13 +109,6 @@ export default async function SaveReportEndpoint(req, res) {
       }
       const imageDescriptionResponseContent =
         draftImageMessagesResponse.data.choices[0].message.content;
-      // console.log("draftImageMessagesResponse");
-      // console.log(draftImageMessagesResponsreportSummaryAndBriefingResponse);
-
-      // return;
-
-      // const briefingSummary =
-      //   briefingSummaryResponse.data.choices[0].message.content;
       const reportSummary =
         reportSummaryResponse.data.choices[0].message.content;
 
@@ -208,12 +140,7 @@ export default async function SaveReportEndpoint(req, res) {
       console.log(newReportModel);
       console.log("newReportModel");
       // Generate Report Summary and Sanitize Briefing
-      // Batch calls to the API to save requests/min
-
-      // const chat_completion = await openai.createChatCompletion({
-      //   model: "gpt-3.5-turbo",
-      //   messages,
-      // });
+      // Tried to Batch calls to the API to save requests/min. Did not work well. The answers were mixed together.
 
       // Save to Supabase missions table
       // Go to report detail page and see image :D
@@ -224,6 +151,39 @@ export default async function SaveReportEndpoint(req, res) {
         "reports",
         newReportModel
       ).catch((error) => console.log(error));
+
+      // #####################################
+      // Save Link to Links Table
+      // #####################################
+      console.log("saveReportData");
+      console.log("req.body");
+      console.log(req.body);
+      console.log(saveReportData.data[0].id);
+      const parentReportId = req.body.parentReportId;
+      if (parentReportId) {
+        const childReportId = saveReportData.data[0].reportId;
+        const highlightedText = req.body.highlightedText;
+        const startIndex = req.body.startIndex;
+        const endIndex = req.body.endIndex;
+        const range = JSON.stringify({ startIndex, endIndex });
+        const elementId = req.body.elementId;
+        const newLinkModel = {
+          childReportId,
+          parentReportId,
+          range,
+          highlightedText,
+          elementId,
+        };
+        // if (parentReportId) {
+        //   newLinkModel.parentReportId = parentReportId;
+        // }
+        const saveLinkData = await saveToSupabase("links", newLinkModel).catch(
+          (error) => console.log(error)
+        );
+      }
+      // #####################################
+      // Folders
+      // #####################################
 
       // console.log("saveReportData");
       // console.log(saveReportData);

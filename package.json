@@ -21,6 +21,7 @@
     "cloudinary": "^1.40.0",
     "framer-motion": "^10.16.0",
     "isomorphic-dompurify": "^1.8.0",
+    "jsdom": "^22.1.0",
     "lodash": "^4.17.21",
     "next": "^13.4.12",
     "openai": "^3.3.0",

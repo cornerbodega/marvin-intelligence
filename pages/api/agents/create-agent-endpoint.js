@@ -1,3 +1,4 @@
+import { log } from "../../../utils/log";
 import { getSupabase } from "../../../utils/supabase";
 import { v2 as cloudinary } from "cloudinary";
 cloudinary.config({
@@ -14,20 +15,22 @@ const openai = new OpenAIApi(configuration);
 
 export default async function handler(req, res) {
   console.log("CREATE AN AGENT");
+  const expertises = req.body.expertises.filter((str) => str !== "");
+
   const supabase = getSupabase();
   if (req.method === "POST") {
     console.log("POST");
-
+    let cannotBeAnimalsString = "";
     let newAgentModel = {
       //   agentName: req.body.animalName,
       userId: req.body.userId,
-      expertise1: req.body.expertises[0],
+      expertise1: expertises[0],
     };
-    if (req.body.expertises.length > 1) {
-      newAgentModel.expertise2 = req.body.expertises[1];
+    if (expertises.length > 1) {
+      newAgentModel.expertise2 = expertises[1];
     }
-    if (req.body.expertises.length > 2) {
-      newAgentModel.expertise3 = req.body.expertises[2];
+    if (expertises.length > 2) {
+      newAgentModel.expertise3 = expertises[2];
     }
 
     async function generateAnimalName() {
@@ -36,13 +39,22 @@ export default async function handler(req, res) {
         animalName: "API Erorr 1: Generate Animal Name",
         bio: "API Error 2: Unable to Generate Animal Bio",
       };
-      const cannotBeAnimalsString = "Cannot be: Otter, Fox";
-      let expertiseString = req.body.expertises[0];
-      if (req.body.expertises.length > 1) {
-        expertiseString += " and " + req.body.expertises[1];
+      const existingAgentsString = req.body.existingAgentNames;
+      log("existingAgentsString");
+      log(req.body);
+      if (existingAgentsString) {
+        if (existingAgentsString.length > 0) {
+          cannotBeAnimalsString = `Cannot be ${existingAgentsString.join(
+            ", "
+          )}`;
+        }
       }
-      if (req.body.expertises.length > 2) {
-        expertiseString += " and " + req.body.expertises[2];
+      let expertiseString = expertises[0];
+      if (expertises.length > 1) {
+        expertiseString += " and " + expertises[1];
+      }
+      if (expertises.length > 2) {
+        expertiseString += " and " + expertises[2];
       }
       let specializedTrainingString = "";
       if (req.body.specializedTraining) {
@@ -73,7 +85,7 @@ export default async function handler(req, res) {
           },
           {
             role: "user",
-            content: `Which animal embodies the characteristics of ${expertiseString}? ${specializedTrainingString} ${cannotBeAnimalsString}`,
+            content: `Which animal embodies the characteristics of ${expertiseString}? ${specializedTrainingString} ${cannotBeAnimalsString}. Return your answer in the following JSON format: {animal: "Animal Name", bio: "Animal Bio"}`,
           },
         ],
       });

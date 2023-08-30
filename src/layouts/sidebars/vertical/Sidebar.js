@@ -23,7 +23,7 @@ const navigation = [
 
   {
     title: "Folders",
-    href: "/missions/view-folders",
+    href: "/folders/view-folders",
     icon: "bi bi-folder",
   },
   // Make Insights part of Missions UI
@@ -96,20 +96,26 @@ const Sidebar = ({ showMobilemenu }) => {
           onClick={showMobilemenu}
         ></Button>
       </div>
+
       <div className="pt-4 mt-2">
-        <Nav vertical className="sidebarNav" style={{ zIndex: "100" }}>
+        <Nav
+          vertical
+          className="sidebarNav"
+          style={{ zIndex: "100", fontStyle: "italic" }}
+        >
           {navigation.map((navi, index) => (
             <NavItem key={index} className="sidenav-bg">
               {/* <Link > */}
+              {/* {navi.href} */}
               <a
                 href={navi.href}
                 className={
-                  location === navi.href
+                  location.includes(navi.href.split("/")[1])
                     ? "sidebarSelected bg-text-underline nav-link py-3"
                     : "nav-link sidebarSelected  py-3"
                 }
                 style={
-                  location === navi.href
+                  location.includes(navi.href.split("/")[1])
                     ? { textDecoration: "underline", color: "hotpink" }
                     : { color: "white" }
                 }

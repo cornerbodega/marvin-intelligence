@@ -53,15 +53,17 @@ const Header = ({ showMobmenu }) => {
 
       <Collapse navbar isOpen={isOpen}>
         <Nav className="container-fluid" navbar>
-          {/* <div className="marvin">123</div> */}
-
           <input
             type="text"
-            style={{ borderRadius: "12px", margin: "10px", textIndent: "10px" }}
+            style={{
+              borderRadius: "3px",
+              margin: "10px",
+              width: "400px",
+              textIndent: "10px",
+            }}
             placeholder="Search"
           />
-          <div className="ms-auto marvin">👤</div>
-          {/* <input type="text" className="ms-auto" placeholder="Search" /> */}
+          <div className="ms-auto d-flex align-items-center">👤</div>
         </Nav>
         {/* <Nav className="me-auto" navbar>
           <NavItem>

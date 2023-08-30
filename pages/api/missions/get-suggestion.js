@@ -8,10 +8,46 @@ export default async function getSuggestion(req, res) {
   if (req.method !== "POST") {
     return res.status(405).end();
   }
-  const { expertiseString, parentReportId } = req.body;
+  const { expertiseString, parentReportId, agentId, highlightedText } =
+    req.body;
+  const supabase = getSupabase();
+  const responseObj = {};
+
+  // #######################
+  // # Get agent reports
+  // #######################
+  let { data: agentMissionHistory, error } = await supabase
+    .from("reports")
+    .select("reportTitle, reportSummary, reportId")
+    .eq("agentId", agentId)
+    .limit(3);
+  // let { data: agentReports, agentReportsError } = await supabase
+  //   .from("reports")
+  //   .select("reportTitle, reportSummary, reportId")
+  //   .eq("agentId", agentId);
+  // if (!agentReports)
+  //   return res.status(500).json({
+  //     error: `Internal Server Error. No reports for agent ${agentId} returned in get-suggestions`,
+  //   });
+  // if (reports.length > 0) {
+  //   if (reports[0].reportSummary) {
+  //     parentReportSummary = reports[0].reportSummary;
+  //   }
+  // }
+  console.log("agentMissionHistory");
+  console.log(agentMissionHistory);
+  if (agentMissionHistory.length > 0) {
+    responseObj.agentMissionHistory = agentMissionHistory;
+  }
+  const agentReportTitles = agentMissionHistory.map(
+    (mission) => mission.reportTitle
+  );
+
+  // #######################
+  // # Get parent report summary
+  // #######################
   let parentReportSummary = undefined;
   if (parentReportId) {
-    const supabase = getSupabase();
     let { data: reports, error } = await supabase
       .from("reports")
       .select("reportSummary")
@@ -26,7 +62,16 @@ export default async function getSuggestion(req, res) {
       }
     }
   }
-
+  let getSuggestionQuestionText = `You are an expert in ${expertiseString}.  `;
+  if (agentReportTitles.length > 0) {
+    getSuggestionQuestionText += `We've already written reports on ${agentReportTitles.join(
+      ", "
+    )}.`;
+  }
+  if (parentReportSummary) {
+    getSuggestionQuestionText += `We need a new research question that will be linked to from this report: ${parentReportSummary}. The text of the link will be ${highlightedText}. Bring an inspirational, creative, and interesting angle from your expertise in ${expertiseString} whenever possible.`;
+  }
+  getSuggestionQuestionText += `What is an interesting research question for further research?`;
   try {
     const chat_completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
@@ -48,7 +93,7 @@ export default async function getSuggestion(req, res) {
         },
         {
           role: "user",
-          content: `What is an interesting research question for ${expertiseString}?`,
+          content: getSuggestionQuestionText,
         },
       ],
     });
@@ -76,15 +121,17 @@ export default async function getSuggestion(req, res) {
 
       // briefingSuggestion = suggestionResponseContent.split("suggestion:")[1];
     }
-
+    if (briefingSuggestion) {
+      responseObj.briefingSuggestion = briefingSuggestion;
+    }
     // Extract and process the suggestion as you were doing before...
-    const responseObj = { briefingSuggestion };
     if (parentReportSummary) {
       responseObj.parentReportSummary = parentReportSummary;
     }
     res.status(200).json(responseObj);
   } catch (error) {
     console.error("getSuggestion error");
+    console.log(error);
     if (error.response) {
       const errorObject = error.response.data.error;
       console.log(errorObject); // this will log the error object

@@ -28,6 +28,7 @@ import IntelliFab from "../../../../components/IntelliFab";
 import IntelliProvider from "../../../../components/IntelliProvider/IntelliProvider";
 import IntelliContext from "../../../../components/intelliContext/IntelliContext";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { slugify } from "../../../../utils/slugify";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
@@ -81,6 +82,22 @@ const ViewAgents = ({ agents }) => {
   const [isInView, setIsInView] = useState(false);
   const [loadedAgents, setLoadedAgents] = useState(agents);
   // const agentNames = agents.map((agent) => agent.agentName);
+  const [parentReportTitle, setParentReportTitle] = useState("");
+  const [parentReportId, setParentReportId] = useState("");
+  const [parentReportSlug, setParentReportSlug] = useState("");
+  const router = useRouter;
+  useEffect(() => {
+    if (router.query.parentReportTitle) {
+      setParentReportTitle(JSON.parse(router.query.parentReportTitle));
+    }
+    if (router.query.parentReportId) {
+      setParentReportId(router.query.parentReportId);
+    }
+    if (router.query.parentReportTitle) {
+      setParentReportSlug(slugify(router.query.parentReportTitle));
+    }
+  });
+
   useEffect(() => {
     const handleDebouncedScroll = debounce(
       () => !isLast && handleScroll(),
@@ -107,7 +124,11 @@ const ViewAgents = ({ agents }) => {
   };
   const handleFabClick = () => {
     console.log("ViewAgents HandleClick Clicked!");
-    goToPage("create-agent");
+    // goToPage("/missions/create-agent");sss
+    router.push({
+      pathname: "/missions/create-mission/agents/create-agent",
+      query: router.query,
+    });
   };
   const handleCardClick = (agent) => {
     // console.log("handleCardClick");
@@ -117,16 +138,20 @@ const ViewAgents = ({ agents }) => {
     console.log("ViewAgents HandleCardClick Clicked!");
     // setSelectedAgent(agent);
     // goToPage(`/missions/create-mission/agents/detail/${agentName}/${agentId}`);
-    let createMissionPath = `/missions/create-mission/dispatch?agentId=${agent.agentId}`;
-    const parentReportId = router.query.parentReportId;
-    console.log("parentReportId");
-    console.log(parentReportId);
-    if (parentReportId) {
-      createMissionPath += `&parentReportId=${router.query.parentReportId}`;
-    }
-    goToPage(createMissionPath);
+    // let createMissionPath = `agentId=${agent.agentId}&${router.query.}`;
+    router.push({
+      pathname: "/missions/create-mission/dispatch",
+      query: { ...router.query, agentId: agent.agentId },
+    });
+    // const parentReportId = router.query.parentReportId;
+
+    // console.log("parentReportId");
+    // console.log(parentReportId);
+    // if (parentReportId) {
+    //   createMissionPath += `&parentReportId=${router.query.parentReportId}`;
+    // }
+    // goToPage(createMissionPath);
   };
-  const router = useRouter;
   function goToPage(name) {
     console.log("go to page");
     console.log(name);
@@ -168,7 +193,7 @@ const ViewAgents = ({ agents }) => {
   // }
   return (
     <>
-      <Breadcrumb>
+      <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white">
           <i className={`bi bi-body-text`}></i>
           &nbsp;
@@ -179,6 +204,17 @@ const ViewAgents = ({ agents }) => {
             Missions
           </Link>
         </BreadcrumbItem>
+        {parentReportTitle && (
+          <BreadcrumbItem className="text-white">
+            <Link
+              className="text-white"
+              style={{ textDecoration: "none" }}
+              href={`/missions/report/${parentReportId}-${parentReportSlug}`}
+            >
+              {parentReportTitle}
+            </Link>
+          </BreadcrumbItem>
+        )}
         <BreadcrumbItem className="text-white">
           <i className={`bi-body-text`}></i>+ Create Mission
         </BreadcrumbItem>
@@ -193,7 +229,7 @@ const ViewAgents = ({ agents }) => {
           </Link>
         </BreadcrumbItem>
       </Breadcrumb>
-      <div style={{ marginBottom: "8px", textAlign: "right" }}>
+      <div style={{ marginBottom: "32px", textAlign: "right" }}>
         <Button style={{ border: "1px solid white" }} onClick={handleFabClick}>
           <i className="bi bi-file-earmark-person-fill"></i>+ Add Agent
         </Button>
@@ -202,11 +238,12 @@ const ViewAgents = ({ agents }) => {
       <div ref={containerRef}>
         <Row className="text-primary">
           <IntelliCardGroup
+            offset={offset}
             handleCardClick={handleCardClick}
             datums={loadedAgents}
             datumsType={"agents"}
           ></IntelliCardGroup>
-          <IntelliFab onClick={handleFabClick} icon="+" />
+          <IntelliFab onClick={handleFabClick} icon="+" fabType="agent" />
 
           {/* </Col> */}
         </Row>

@@ -1,3 +1,7 @@
+// @author Marvin-Rhone
+// dispatch.js is the page where the user can create a mission for an
+// agent to complete.
+
 import {
   Card,
   CardImg,
@@ -17,30 +21,21 @@ import {
   Breadcrumb,
   BreadcrumbItem,
 } from "reactstrap";
-// import { remark } from "remark";
-// import html from "remark-html";
+
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
 
-import Image from "next/image";
-
 import { useRouter } from "next/router";
-import { useContext, useRef, useEffect } from "react";
-import { object } from "prop-types";
+
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 // import IntelliFab from "../components/IntelliFab";
-import IntelliFab from "../../../components/IntelliFab";
-import { getSupabase } from "../../../utils/supabase";
-import { useState } from "react";
-import { set } from "lodash";
 
-// import missingsBriefingHandler from "../api/missions/generate-briefing-suggestions-endpoint";
-const { Configuration, OpenAIApi } = require("openai");
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
-// todo: bring in original report's summary
+import { getSupabase } from "../../../utils/supabase";
+import { useState, useRef, useEffect } from "react";
+
+import { slugify } from "../../../utils/slugify";
+
+// bring in original report's summary
 // bring in agent's memory of previous reports
 // bring in content of link from original report
 export const getServerSideProps = withPageAuthRequired({
@@ -63,85 +58,7 @@ export const getServerSideProps = withPageAuthRequired({
       console.log(error);
     }
     const agent = agents[0];
-    // const expertises = [agent.expertise1, agent.expertise2, agent.expertise3];
-    // // const { req, res } = context;
-    // // const data = handler(req, res);
-    // let expertiseString = expertises[0];
 
-    // if (expertises.length > 1) {
-    //   expertiseString += " and " + expertises[1];
-    // }
-    // if (expertises.length > 2) {
-    //   expertiseString += " and " + expertises[2];
-    // }
-    // console.log(expertiseString);
-    // const chat_completion = await openai.createChatCompletion({
-    //   model: "gpt-3.5-turbo",
-    //   messages: [
-    //     {
-    //       role: "system",
-    //       content:
-    //         "You are an expert at generating an interesting research question for given areas of study. You always return exactly one answer in less than 300 characters.",
-    //     },
-    //     {
-    //       role: "user",
-    //       content: `Generate AI, Machine Learning, and Natural Language Processing. Return only the results in the following JSON format: {suggestion}`,
-    //     },
-    //     {
-    //       role: "assistant",
-    //       content: `{
-    //               "suggestion": "I need a comprehensive report on the applications of Natural Language Processing in the modern digital landscape."
-    //           }`,
-    //     },
-    //     {
-    //       role: "user",
-    //       content: `What is an interesting research question for ${expertiseString}?`,
-    //     },
-    //   ],
-    // });
-    // let briefingSuggestion = "";
-    // const suggestionResponseContent =
-    //   chat_completion.data.choices[0].message.content;
-    // if (suggestionResponseContent) {
-    //   console.log("suggestionResponseContent");
-    //   console.log(suggestionResponseContent);
-    //   console.log("typeof suggestionResponseContent");
-    //   console.log(typeof suggestionResponseContent);
-    //   if (typeof suggestionResponseContent === "object") {
-    //     briefingSuggestion = suggestionResponseContent.suggestion;
-    //   } else if (
-    //     typeof suggestionResponseContent === "string" &&
-    //     suggestionResponseContent.includes(`"suggestion":`)
-    //   ) {
-    //     const parsedSuggestionContent = JSON.parse(suggestionResponseContent);
-    //     if (parsedSuggestionContent) {
-    //       briefingSuggestion = parsedSuggestionContent.suggestion;
-    //     }
-    //   } else if (typeof suggestionResponseContent === "string") {
-    //     briefingSuggestion = suggestionResponseContent;
-    //   }
-
-    //   // briefingSuggestion = suggestionResponseContent.split("suggestion:")[1];
-    // } // Process a POST request
-    // // const suggestionResponse = missingsBriefingHandler(req, res);
-    // console.log("suggestionResponseContent");
-    // console.log(suggestionResponseContent);
-
-    // Get the briefing suggestion from GPT API (via next /api)
-    // const briefingPlaceholder = fetch("POST", "/api/missions/briefing-suggestion/", expertises, missionHistory)
-    // const suggestionResponse = await fetch(
-    //   "/api/agents/create-agent-endpoint",
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ expertises }),
-    //   }
-    // );
-
-    // console.log("suggestionResponse");
-    // console.log(suggestionResponse);
     return {
       props: { agent: agent || {} },
     };
@@ -155,6 +72,7 @@ const CreateMission = ({ agent }) => {
   const [briefingSuggestion, setBriefingSuggestion] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [parentReportSummary, setParentReportSummary] = useState();
+  const [agentMissionHistory, setAgentMissionHistory] = useState();
   const [briefing, setBriefing] = useState();
   const [showSuggestedBriefing, setShowSuggestedBriefing] = useState();
   const [draft, setDraft] = useState();
@@ -162,11 +80,25 @@ const CreateMission = ({ agent }) => {
   const router = useRouter();
 
   const draftRef = useRef();
+  const [parentReportTitle, setParentReportTitle] = useState("");
+  const [parentReportId, setParentReportId] = useState("");
+  const [parentReportSlug, setParentReportSlug] = useState("");
+
+  useEffect(() => {
+    if (router.query.parentReportTitle) {
+      setParentReportTitle(JSON.parse(router.query.parentReportTitle));
+    }
+    if (router.query.parentReportId) {
+      setParentReportId(router.query.parentReportId);
+    }
+    if (router.query.parentReportTitle) {
+      setParentReportSlug(slugify(router.query.parentReportTitle));
+    }
+  });
   async function handleWriteDraftReport(e) {
     console.log("create mission handleSubmit");
     console.log("draft");
     console.log(draft);
-    // console.log(handleSubmit);
     e.preventDefault();
     setIsSubmitting(true);
     setFeedbackInput("");
@@ -195,19 +127,13 @@ const CreateMission = ({ agent }) => {
       },
       body: JSON.stringify(draftData),
     });
-    // console.log("21343254res");
-    // console.log(res.json());
+
     const draftResponseContent = await res.json();
     console.log("draftResponseContent");
     console.log(draftResponseContent.data);
-    // const processedContent = await remark()
-    // .use(html)
-    // .process(draftResponseContent.data);
-    // const contentHtml = processedContent.toString();
+
     setDraft(draftResponseContent.data);
-    // if (draftRef.current) {
-    //   draftRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    // }
+
     setIsSubmitting(false);
     // write a report!
     // this will be a draft report
@@ -222,18 +148,7 @@ const CreateMission = ({ agent }) => {
       });
     }
   }, [isSubmitting, draft]);
-  //   const agentName = agent.agentName;
-  // const { setSelectedAgentByName, selectedAgent } = useContext(IntelliContext);
-  // let agent = selectedAgent;
-  // console.log("agent");
-  // console.log(agent);
-  // if (Object.keys(agent).length === 0) {
-  //   setSelectedAgentByName(agentName);
-  //   console.log("GET AGENT DETAIL FROM DB!");
-  // }
-  // function handleFabClick(e) {
-  //   router.push("/missions/create-mission");
-  // }
+
   async function handleAcceptReport(e) {
     e.preventDefault();
     console.log("handleAcceptReport");
@@ -248,14 +163,15 @@ const CreateMission = ({ agent }) => {
         briefing,
         userId: user.sub,
         agentId: agent.agentId,
+        parentReportId: router.query.parentReportId,
+        highlightedText: router.query.highlightedText,
+        startIndex: router.query.startIndex,
+        endIndex: router.query.endIndex,
+        elementId: router.query.elementId,
       }),
     });
-    // console.log("21343254res");
-    // console.log(res.json());
-    // const draftResponseContent = await res.json();
+
     setIsSubmitting(false);
-    // console.log("draftResponseContent");
-    // console.log(draftResponseContent);
   }
   useEffect(() => {
     async function fetchBriefingSuggestion() {
@@ -272,10 +188,11 @@ const CreateMission = ({ agent }) => {
       console.log("expertiseString");
       console.log(expertiseString);
 
-      const getSuggestionParams = { expertiseString };
+      const getSuggestionParams = { expertiseString, agentId: agent.agentId };
       if (router.query.parentReportId) {
         const parentReportId = router.query.parentReportId;
         getSuggestionParams.parentReportId = parentReportId;
+        getSuggestionParams.highlightedText = router.query.highlightedText;
       }
       // try {
       const briefingResponse = await fetch("/api/missions/get-suggestion", {
@@ -288,14 +205,21 @@ const CreateMission = ({ agent }) => {
 
       if (briefingResponse.ok) {
         const data = await briefingResponse.json();
-        setBriefingSuggestion(data.briefingSuggestion);
-        setParentReportSummary(data.parentReportSummary);
+        console.log("briefing response data");
+        console.log(data);
+        if (data.briefingSuggestion) {
+          setBriefingSuggestion(data.briefingSuggestion);
+        }
+
+        if (data.parentReportSummary) {
+          setParentReportSummary(data.parentReportSummary);
+        }
+        if (data.agentMissionHistory) {
+          setAgentMissionHistory(data.agentMissionHistory);
+        }
       } else {
         console.error("Failed to fetch briefing suggestion");
       }
-      //  catch (error) {
-      //   console.error("An error occurred:", expertiseString);
-      // }
     }
 
     fetchBriefingSuggestion();
@@ -303,22 +227,34 @@ const CreateMission = ({ agent }) => {
   const currentQueryParams = router.query;
   return (
     <div>
-      <Breadcrumb className="text-white">
+      <Breadcrumb style={{ fontFamily: "monospace" }} className="text-white">
         <BreadcrumbItem>
           <i className="bi  bi-body-text"></i>
-          &nbsp;
-          <Link className="text-white" href="/missions/view-missions">
+          &nbsp;&nbsp;
+          <Link
+            style={{ textDecoration: "none" }}
+            className="text-white"
+            href="/missions/view-missions"
+          >
             Missions
           </Link>
         </BreadcrumbItem>
-
+        {parentReportTitle && (
+          <BreadcrumbItem className="text-white">
+            <Link
+              className="text-white"
+              style={{ textDecoration: "none" }}
+              href={`/missions/report/${parentReportId}-${parentReportSlug}`}
+            >
+              {parentReportTitle}
+            </Link>
+          </BreadcrumbItem>
+        )}
         <BreadcrumbItem>
-          {/* `/missions/create-mission/agents/view-agents?parentReportId=${
-        report.reportId
-      }&highlight=${JSON.stringify(highlight)}` */}
           <i className="bi bi-body-text"></i>+ &nbsp;
           <Link
             className="text-white"
+            style={{ textDecoration: "none" }}
             href={{
               pathname: "/missions/create-mission/agents/view-agents/",
               query: currentQueryParams,
@@ -329,7 +265,7 @@ const CreateMission = ({ agent }) => {
         </BreadcrumbItem>
         <BreadcrumbItem className="">
           {" "}
-          <i className={`bi-file-earmark-person-fill`}></i> Agent{" "}
+          <i className={`bi-file-earmark-person-fill`}></i>&nbsp; Agent{" "}
           {agent.agentName}
         </BreadcrumbItem>
         <BreadcrumbItem className="">Dispatch</BreadcrumbItem>
@@ -339,7 +275,7 @@ const CreateMission = ({ agent }) => {
         <Col md={{ size: 6, offset: 3 }}>
           <Form onSubmit={handleWriteDraftReport}>
             <div>
-              <Card className="bg-black text-white">
+              <Card className="text-primary">
                 <CardBody>
                   <div
                     style={{
@@ -350,9 +286,8 @@ const CreateMission = ({ agent }) => {
                     }}
                   >
                     <img
-                      style={{}}
-                      // src={`/default-agents/${agentName}.png`}
                       src={`${agent.profilePicUrl}`}
+                      style={{ borderRadius: "50%" }}
                       alt="agent"
                     />
                   </div>
@@ -361,6 +296,8 @@ const CreateMission = ({ agent }) => {
                       display: "flex",
                       marginTop: "10px",
                       justifyContent: "center",
+                      fontWeight: 800,
+                      fontSize: "1.2rem",
                     }}
                     className="text-primary"
                   >
@@ -376,92 +313,80 @@ const CreateMission = ({ agent }) => {
                     tag="h6"
                   >
                     <Badge
-                      style={{ marginTop: "10px" }}
+                      // style={{ marginTop: "10px" }}
                       color="info"
-                      className="ms-3"
+                      className="ms-3 expertiseBadge"
                     >
                       {agent.expertise1}
                     </Badge>
                     <Badge
                       color="info"
-                      style={{ marginTop: "10px" }}
-                      className="ms-3"
+                      // style={{ marginTop: "10px" }}
+                      className="ms-3 expertiseBadge"
                     >
                       {agent.expertise2}
                     </Badge>
                     <Badge
                       color="info"
-                      className="ms-3"
-                      style={{ marginTop: "10px" }}
+                      className="ms-3 expertiseBadge"
+                      // style={{ marginTop: "10px" }}
                     >
                       {agent.expertise3}
                     </Badge>
                   </CardSubtitle>
-                  <div className="text-white">
+                  <div>
                     <div>
-                      <h4 className="text-white">Bio</h4>
+                      <h4>Bio</h4>
                     </div>
                     <div>{agent.bio}</div>
-                    <div>
-                      <h4 className="text-white">Mission History</h4>
-                    </div>
+                    {agentMissionHistory && (
+                      <>
+                        <div>
+                          <h4>Mission History</h4>
+                        </div>
+                        <ul>
+                          {agentMissionHistory.map((mission, index) => {
+                            return (
+                              <li key={index}>
+                                <Link
+                                  // style={{ }}
+                                  className="reportFont"
+                                  style={{
+                                    textDecoration: "none",
+                                    fontStyle: "italic",
+                                    fontWeight: 300,
+                                    color: "#0645ad",
+                                  }}
+                                  // className="text-white"
+                                  href={`/missions/report/${
+                                    mission.reportId
+                                  }-${slugify(mission.reportTitle)}`}
+                                >
+                                  {mission.reportTitle}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </>
+                    )}
 
                     {parentReportSummary && (
                       <div>
-                        <h4 className="text-white">Linked Mission Context</h4>
+                        <h4>Linked Mission Context</h4>
                       </div>
                     )}
                     <div>{parentReportSummary}</div>
                     <div>
-                      <h4 className="text-white">Briefing Suggestion</h4>
+                      <h4>Briefing Suggestion</h4>
                     </div>
                     <div>{briefingSuggestion}</div>
                   </div>
                 </CardBody>
               </Card>
             </div>
-            {/* <div>
-                <h3>Create Mission</h3>
-              </div> */}
-            <FormGroup>
-              {/* <div style={{ marginBotton: "10px", textAlign: "left" }}>
-                {!showSuggestedBriefing ? (
-                  <a
-                    onClick={(e) =>
-                      setShowSuggestedBriefing(!showSuggestedBriefing)
-                    }
-                    style={{ textDecoration: "underline" }}
-                  >
-                    Suggested Briefing
-                  </a>
-                ) : (
-                  <>
-                    {" "}
-                    <a
-                      style={{
-                        paddingBottom: "8px",
-                        textDecoration: "underline",
-                      }}
-                      onClick={(e) =>
-                        setShowSuggestedBriefing(!showSuggestedBriefing)
-                      }
-                    >
-                      Hide Suggested Briefing
-                    </a>
-                    <div
-                      style={{
-                        marginBotton: "10px",
-                        textAlign: "center",
-                        fontStyle: "italic",
-                      }}
-                      className="text-white"
-                    >
-                      {briefingSuggestion}
-                    </div>
-                  </>
-                )}
-              </div> */}
 
+            <FormGroup>
               <div>
                 <div style={{ marginTop: "20px" }}></div>
                 <FormGroup>

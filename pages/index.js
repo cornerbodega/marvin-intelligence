@@ -3,40 +3,40 @@ import Image from "next/image";
 import Script from "next/script";
 import HomeAnimations from "../src/js/main";
 import Link from "next/link";
-import Mlogo from "../components/Mlogo";
-// export const getServerSideProps = async () => {};
-import {
-  Canvas,
-  useFrame,
-  ThreeElements,
-  useThree,
-  useLoader,
-} from "@react-three/fiber";
-import { Environment, OrbitControls } from "@react-three/drei";
-// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+// import Mlogo from "../components/Mlogo";
+// // export const getServerSideProps = async () => {};
+// import {
+//   Canvas,
+//   useFrame,
+//   ThreeElements,
+//   useThree,
+//   useLoader,
+// } from "@react-three/fiber";
+// import { Environment, OrbitControls } from "@react-three/drei";
+// // import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import React, { useRef, useState, useEffect, use } from "react";
+// import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+// import React, { useRef, useState, useEffect, use } from "react";
 
-const Model = () => {
-  // Load the model from glTF 2.0 (.glb or .gltf) file in /public
-  const gltf = useLoader(GLTFLoader, "/3d/m-tree-pink.gltf");
-  const ref = useRef();
+// const Model = () => {
+//   // Load the model from glTF 2.0 (.glb or .gltf) file in /public
+//   const gltf = useLoader(GLTFLoader, "/3d/m-tree-pink.gltf");
+//   const ref = useRef();
 
-  // Set initial camera position
-  useThree(({ camera }) => {
-    camera.position.x = -20;
-    camera.position.y = 20;
-    camera.position.z = 30;
-    camera.lookAt(0, 0, 0);
-  });
+//   // Set initial camera position
+//   useThree(({ camera }) => {
+//     camera.position.x = -20;
+//     camera.position.y = 20;
+//     camera.position.z = 30;
+//     camera.lookAt(0, 0, 0);
+//   });
 
-  return (
-    <>
-      <primitive scale={0.2} ref={ref} object={gltf.scene} />
-    </>
-  );
-};
+//   return (
+//     <>
+//       <primitive scale={0.2} ref={ref} object={gltf.scene} />
+//     </>
+//   );
+// };
 
 export default function Home({ title, content }) {
   return (
@@ -62,7 +62,7 @@ export default function Home({ title, content }) {
             <div className="container">
               <div className="site-header-inner">
                 <div className="brand header-brand">
-                  <Mlogo />
+                  {/* <Mlogo /> */}
                   {/* <div
                     className="m-0"
                     style={{ width: "auto", height: "200px" }}

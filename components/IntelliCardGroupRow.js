@@ -23,9 +23,16 @@ const IntelliCardGroupRow = ({ cols, handleCardClick, datumsType }) => {
   // export default function Home() {
   // console.log("intelli card group row");
   // console.log(cols);
+  // style={{ padding: "10px" }}
   const colLenth = cols.length;
   return (
-    <CardGroup className="intelliReveal">
+    <CardGroup
+      className="intelliReveal cardShadow"
+      style={{
+        borderBottomLeftRadius: "7px",
+        borderBottomRightRadius: "7px",
+      }}
+    >
       {Array.apply(null, { length: colLenth }).map((e, i) =>
         colLenth > 2 ? (
           <IntelliCard
@@ -33,6 +40,7 @@ const IntelliCardGroupRow = ({ cols, handleCardClick, datumsType }) => {
             handleCardClick={handleCardClick}
             datums={cols[i]}
             key={i}
+            index={i}
             datumsType={datumsType}
           ></IntelliCard>
         ) : (
@@ -42,6 +50,7 @@ const IntelliCardGroupRow = ({ cols, handleCardClick, datumsType }) => {
             datums={cols[i]}
             datumsType={datumsType}
             key={i}
+            index={i}
           ></IntelliCard>
         )
       )}

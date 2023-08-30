@@ -5,9 +5,10 @@ import "../styles/layout/_header.scss";
 import "../styles/landing/scss/style.scss";
 // import "../styles/fab/fab.css";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
-import IntelliProvider from "../components/IntelliProvider/IntelliProvider";
+// import IntelliProvider from "../components/IntelliProvider/IntelliProvider";
+import "../styles/globals.css";
 // import IntelliContext from "../components/intelliContext/IntelliContext";
-IntelliProvider;
+// IntelliProvider;
 function MyApp({ Component, pageProps }) {
   return (
     <>
@@ -18,11 +19,11 @@ function MyApp({ Component, pageProps }) {
       </Head>
 
       <FullLayout>
-        <IntelliProvider>
-          <UserProvider>
-            <Component {...pageProps} />
-          </UserProvider>
-        </IntelliProvider>
+        {/* <IntelliProvider> */}
+        <UserProvider>
+          <Component {...pageProps} />
+        </UserProvider>
+        {/* </IntelliProvider> */}
       </FullLayout>
     </>
   );

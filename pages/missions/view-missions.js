@@ -10,7 +10,7 @@ import { getSupabase } from "../../utils/supabase";
 
 import IntelliFab from "../../components/IntelliFab";
 // rest of component
-
+import { slugify } from "../../utils/slugify";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
@@ -56,8 +56,6 @@ export const getServerSideProps = withPageAuthRequired({
   },
 });
 const ViewReports = ({ missions }) => {
-  console.log("missions");
-  console.log(missions);
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(1);
@@ -145,26 +143,28 @@ const ViewReports = ({ missions }) => {
   // }
   return (
     <>
-      <Breadcrumb>
+      <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white" active>
           <i className={`bi bi-body-text`}></i>
           &nbsp; Missions
         </BreadcrumbItem>
       </Breadcrumb>
-      <div style={{ marginBottom: "8px", textAlign: "right" }}>
+      <div style={{ marginBottom: "32px", textAlign: "right" }}>
         <Button style={{ border: "1px solid white" }} onClick={handleFabClick}>
           <i className="bi bi-body-text"></i>+ Create Mission
         </Button>
       </div>
+
       {/* <div>{JSON.stringify(loadedReports)}</div> */}
       <div ref={containerRef}>
         <Row className="text-primary">
           <IntelliCardGroup
+            offset={offset}
             handleCardClick={handleCardClick}
             datums={loadedReports}
             datumsType={"missions"}
           ></IntelliCardGroup>
-          <IntelliFab onClick={handleFabClick} icon="+" />
+          <IntelliFab onClick={handleFabClick} icon="+" fabType="report" />
 
           {/* </Col> */}
         </Row>
@@ -172,14 +172,5 @@ const ViewReports = ({ missions }) => {
     </>
   );
 };
-function slugify(str) {
-  return String(str)
-    .normalize("NFKD") // split accented characters into their base characters and diacritical marks
-    .replace(/[\u0300-\u036f]/g, "") // remove all the accents, which happen to be all in the \u03xx UNICODE block.
-    .trim() // trim leading or trailing whitespace
-    .toLowerCase() // convert to lowercase
-    .replace(/[^a-z0-9 -]/g, "") // remove non-alphanumeric characters
-    .replace(/\s+/g, "-") // replace spaces with hyphens
-    .replace(/-+/g, "-"); // remove consecutive hyphens
-}
+
 export default ViewReports;

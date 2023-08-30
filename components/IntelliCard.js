@@ -11,18 +11,34 @@ import {
   CardSubtitle,
   Table,
 } from "reactstrap";
-
+import getCloudinaryImageUrlForHeight from "../utils/getCloudinaryImageUrlForHeight";
 import styles from "./IntelliCard.module.css";
-const IntelliCard = ({ imageSize, datums, datumsType, handleCardClick }) => {
+import { log } from "../utils/log";
+const IntelliCard = ({
+  imageSize,
+  datums,
+  datumsType,
+  handleCardClick,
+  index,
+}) => {
   // console.log("intelli card group row");
   // console.log("Intellicard handleCardClick");
   // console.log(handleCardClick);
-  const router = useRouter();
+  // const router = useRouter();
+  console.log("key");
+  console.log(index);
   const imageStyle = {};
-  if (imageSize === "small") {
-    imageStyle.height = "337px";
-    imageStyle.objectFit = "cover";
+  if (index === 0) {
+    imageStyle.borderTopLeftRadius = "7px";
   }
+  if (index === 2) {
+    imageStyle.borderTopRightRadius = "7px";
+  }
+  // const imageStyle = {
+  //   borderTopLeftRadius: "7px",
+  //   borderTopRightRadius: "7px",
+  // };
+  let titleClassName = "";
   const displayDatums = { ...datums };
   if (datumsType === "agents") {
     displayDatums.title = `Agent ${datums.agentName}`;
@@ -31,7 +47,19 @@ const IntelliCard = ({ imageSize, datums, datumsType, handleCardClick }) => {
   if (datumsType === "missions") {
     displayDatums.picUrl = datums.reportPicUrl;
     displayDatums.title = datums.reportTitle;
+    titleClassName = "reportFont";
   }
+  if (imageSize === "small") {
+    imageStyle.height = "337px";
+    imageStyle.objectFit = "cover";
+    displayDatums.picUrl = getCloudinaryImageUrlForHeight(
+      displayDatums.picUrl,
+      337
+    );
+  }
+
+  log("IntelliCard datums");
+  log(displayDatums.picUrl);
   function handleClick() {
     // console.log("Intellicard handleCardClick");
     // console.log(handleCardClick);
@@ -61,20 +89,37 @@ const IntelliCard = ({ imageSize, datums, datumsType, handleCardClick }) => {
           alt="Card image cap"
         />
 
-        <CardBody>
+        <CardBody
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
           <div onClick={handleClick}>
-            <CardTitle tag="h5" className="text-primary">
-              {/* Agent {datums.agentName} */}
+            {/* <CardTitle tag="h5" className="text-primary"> */}
+            {/* Agent {datums.agentName} */}
+            <div
+              style={{
+                // fontStyle: "italic",
+                fontWeight: "800",
+                color: "#0645ad",
+                marginBottom: "16px",
+                fontSize: "1.3rem",
+              }}
+              className={titleClassName}
+            >
               {displayDatums.title}
-            </CardTitle>
+            </div>
+            {/* </CardTitle> */}
             <CardSubtitle className="mb-2 text-muted" tag="h6">
-              <Badge color="info" className="ms-3">
+              <Badge color="info" className="ms-3 expertiseBadge">
                 {datums.expertise1}
               </Badge>
-              <Badge color="info" className="ms-3">
+              <Badge color="info" className="ms-3 expertiseBadge">
                 {datums.expertise2}
               </Badge>
-              <Badge color="info" className="ms-3">
+              <Badge color="info" className="ms-3 expertiseBadge">
                 {datums.expertise3}
               </Badge>
             </CardSubtitle>

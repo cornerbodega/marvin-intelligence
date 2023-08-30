@@ -4,8 +4,10 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 // import { getSupabase } from "../../../utils/supabase";
 import { getSupabase } from "../../../../utils/supabase";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { useRouter } from "next/router";
 // rest of component
-import React, { useState } from "react";
+import { slugify } from "../../../../utils/slugify";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Form,
@@ -20,8 +22,10 @@ import {
   Toast,
   ToastBody,
 } from "reactstrap";
+
 import Link from "next/link";
 import { getSession } from "@auth0/nextjs-auth0";
+import { log } from "../../../../utils/log";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     const supabase = getSupabase();
@@ -33,6 +37,8 @@ export const getServerSideProps = withPageAuthRequired({
       .select("agentName")
       .eq("userId", user.sub);
     const existingAgentNames = agents.map((agent) => agent.agentName);
+    console.log("existingAgentNames");
+    console.log(existingAgentNames);
     // other pages will redirect here if they're empty
     // If no agency, go to create agency page
     // If no agents, go to crete agent page
@@ -43,6 +49,8 @@ export const getServerSideProps = withPageAuthRequired({
   },
 });
 export const CreateAgentForm = ({ existingAgentNames }) => {
+  console.log("existingAgentNames");
+  console.log(existingAgentNames);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // const randomAnimalNames = ["Tiger", "Elephant", "Hawk", "Frog"];
   // const randomAnimalName =
@@ -73,7 +81,8 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
       existingAgentNames,
       specializedTraining,
     };
-
+    log("agentData");
+    log(agentData);
     // Send the data to your API endpoint
     const res = await fetch("/api/agents/create-agent-endpoint", {
       method: "POST",
@@ -228,11 +237,26 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
     </>
   );
 };
-const CreateAgent = () => {
+const CreateAgent = ({ existingAgentNames }) => {
+  const [parentReportTitle, setParentReportTitle] = useState("");
+  const [parentReportId, setParentReportId] = useState("");
+  const [parentReportSlug, setParentReportSlug] = useState("");
+  const router = useRouter();
+  useEffect(() => {
+    if (router.query.parentReportTitle) {
+      setParentReportTitle(JSON.parse(router.query.parentReportTitle));
+    }
+    if (router.query.parentReportId) {
+      setParentReportId(router.query.parentReportId);
+    }
+    if (router.query.parentReportTitle) {
+      setParentReportSlug(slugify(router.query.parentReportTitle));
+    }
+  });
   return (
     <>
       {" "}
-      <Breadcrumb>
+      <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white">
           <i className={`bi bi-body-text`}></i>
           &nbsp;
@@ -243,6 +267,17 @@ const CreateAgent = () => {
             Missions
           </Link>
         </BreadcrumbItem>
+        {parentReportTitle && (
+          <BreadcrumbItem className="text-white">
+            <Link
+              className="text-white"
+              style={{ textDecoration: "none" }}
+              href={`/missions/report/${parentReportId}-${parentReportSlug}`}
+            >
+              {parentReportTitle}
+            </Link>
+          </BreadcrumbItem>
+        )}
         <BreadcrumbItem className="text-white">
           {" "}
           <i className={`bi-body-text`}></i>+ Create Mission
@@ -261,7 +296,7 @@ const CreateAgent = () => {
           <i className={`bi-file-earmark-person-fill`}></i>+ Add Agent
         </BreadcrumbItem>
       </Breadcrumb>
-      <CreateAgentForm />
+      <CreateAgentForm existingAgentNames={existingAgentNames} />
     </>
   );
 };
