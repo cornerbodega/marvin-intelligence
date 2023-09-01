@@ -37,6 +37,7 @@ import { getSupabase } from "../../../utils/supabase";
 import { useState } from "react";
 import { set } from "lodash";
 import { log } from "../../../utils/log";
+import getCloudinaryImageUrlForHeight from "../../../utils/getCloudinaryImageUrlForHeight";
 // import missingsBriefingHandler from "../../api/missions/generate-briefing-suggestions-endpoint";
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
@@ -327,7 +328,12 @@ const ReportDetailPage = ({ report }) => {
                             href={`http://localhost:3000/missions/create-mission/dispatch?agentId=${report.agentId}`}
                           >
                             <img
-                              src={report.profilePicUrl}
+                              src={
+                                (getCloudinaryImageUrlForHeight(
+                                  report.profilePicUrl
+                                ),
+                                250)
+                              }
                               style={{
                                 borderRadius: "50%",
                                 height: "250px",
