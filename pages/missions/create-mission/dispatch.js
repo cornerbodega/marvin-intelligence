@@ -1,7 +1,7 @@
 // @author Marvin-Rhone
 // dispatch.js is the page where the user can create a mission for an
 // agent to complete.
-
+import { log } from "../../../utils/log";
 import {
   Card,
   CardImg,
@@ -21,6 +21,7 @@ import {
   Breadcrumb,
   BreadcrumbItem,
 } from "reactstrap";
+import toast, { Toaster } from "react-hot-toast";
 
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
@@ -84,6 +85,10 @@ const CreateMission = ({ agent }) => {
   const [parentReportId, setParentReportId] = useState("");
   const [parentReportSlug, setParentReportSlug] = useState("");
 
+  const [notificationIntervalId, setNotificationIntervalId] = useState();
+  const [notificationMessages, setNotificationMessages] = useState([]);
+
+  const [isSaving, setIsSaving] = useState(false);
   useEffect(() => {
     if (router.query.parentReportTitle) {
       setParentReportTitle(JSON.parse(router.query.parentReportTitle));
@@ -102,6 +107,20 @@ const CreateMission = ({ agent }) => {
     e.preventDefault();
     setIsSubmitting(true);
     setFeedbackInput("");
+    const notificationMessagesResponse = await fetch(
+      "/api/missions/write-draft-notification-endpoint",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ briefing, agentName: agent.agentName }),
+      }
+    );
+    console.log("await notificationMessagesResponse.json()");
+    const notificationJson = await notificationMessagesResponse.json();
+
+    setNotificationMessages(notificationJson);
     const expertises = [agent.expertise1, agent.expertise2, agent.expertise3];
 
     const draftData = { briefing, expertises };
@@ -135,25 +154,44 @@ const CreateMission = ({ agent }) => {
     setDraft(draftResponseContent.data);
 
     setIsSubmitting(false);
+    clearInterval(notificationIntervalId); // Clear the interval properly
+    setNotificationMessages([]);
     // write a report!
     // this will be a draft report
     // it will be saved in the database as the only draft for this mission, and will be overwritten each time the user saves a new draft
     // Once the user approves the mission, the draft will be saved as the final report
   }
   useEffect(() => {
-    if (!isSubmitting && draft && draftRef.current) {
+    if (!isSubmitting && draft && draftRef.current && !isSaving) {
       draftRef.current.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
     }
   }, [isSubmitting, draft]);
-
   async function handleAcceptReport(e) {
     e.preventDefault();
     console.log("handleAcceptReport");
-
-    const res = await fetch("/api/missions/save-report-endpoint", {
+    setIsSaving(true);
+    setIsSubmitting(true);
+    const notificationMessagesResponse = await fetch(
+      "/api/missions/save-report-notification-endpoint",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ briefing, agentName: agent.agentName }),
+      }
+    );
+    // console.log(notificationMessagesResponse.js);
+    const notificationJson = await notificationMessagesResponse.json();
+    console.log("notificationJson");
+    console.log(notificationJson);
+    setNotificationMessages(notificationJson);
+    console.log("notificationMessages");
+    console.log(notificationMessages);
+    const reportResponse = await fetch("/api/missions/save-report-endpoint", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -171,8 +209,61 @@ const CreateMission = ({ agent }) => {
       }),
     });
 
-    setIsSubmitting(false);
+    // setIsSubmitting(false);
+    const reportJson = await reportResponse.json();
+    console.log("reportJson");
+    console.log(reportJson);
+    const reportId = reportJson.reportId;
+    // setIsSubmitting(false);
+    router.push(`/missions/report/${reportId}`);
+    clearInterval(notificationIntervalId); // Clear the interval properly
+    // setNotificationMessages([]);
   }
+  // async function handleAcceptReport(e) {
+  //   e.preventDefault();
+  //   console.log("handleAcceptReport");
+  //   setIsSubmitting(true);
+  //   setIsSaving(true);
+  //   const notificationMessagesResponse = await fetch(
+  //     "/api/missions/save-report-notification-endpoint",
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ briefing, agentName: agent.agentName }),
+  //     }
+  //   );
+  //   // console.log(notificationMessagesResponse.js);
+  //   const notificationJson = await notificationMessagesResponse.json();
+  //   console.log("notificationJson");
+  //   console.log(notificationJson);
+  //   setNotificationMessages(notificationJson);
+  //   console.log("notificationMessages");
+  //   console.log(notificationMessages);
+
+  //   const reportResponse = await fetch("/api/missions/save-report-endpoint", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       briefing,
+  //       draft,
+  //       agentName: agent.agentName,
+  //       agentId: agent.agentId,
+  //       userId: user.sub,
+  //     }),
+  //   });
+  //   const reportJson = await reportResponse.json();
+  //   console.log("reportJson");
+  //   console.log(reportJson);
+  //   const reportId = reportJson.data[0].reportId;
+  //   // setIsSubmitting(false);
+  //   router.push(`/missions/report/${reportId}`);
+  //   // clearInterval(notificationIntervalId); // Clear the interval properly
+  //   // setNotificationMessages([]);
+  // }
   useEffect(() => {
     async function fetchBriefingSuggestion() {
       // Logic to build expertiseString from agent prop
@@ -224,9 +315,35 @@ const CreateMission = ({ agent }) => {
 
     fetchBriefingSuggestion();
   }, [agent]);
+
+  useEffect(() => {
+    let index = 0; // Move index outside of the setInterval
+    if (notificationMessages.length === 0) return;
+    console.log("notificationMessages");
+    console.log(notificationMessages);
+    const intervalId = setInterval(() => {
+      // Store the interval ID
+      if (index < notificationMessages.length && isSubmitting) {
+        const notificationMessage = notificationMessages[index];
+        toast.success(notificationMessage);
+        const newNotificationMessages = [...notificationMessages];
+        newNotificationMessages.splice(index, 1);
+        setNotificationMessages(newNotificationMessages);
+        index++;
+      } else {
+        setNotificationMessages([]);
+        clearInterval(intervalId); // Clear the interval properly
+      }
+    }, 2000);
+    setNotificationIntervalId(intervalId);
+
+    return () => clearInterval(intervalId); // Clear interval on component unmount
+  }, [notificationMessages]);
   const currentQueryParams = router.query;
   return (
     <div>
+      <Toaster position="bottom-center" />
+
       <Breadcrumb style={{ fontFamily: "monospace" }} className="text-white">
         <BreadcrumbItem>
           <i className="bi  bi-body-text"></i>
@@ -313,7 +430,7 @@ const CreateMission = ({ agent }) => {
                     tag="h6"
                   >
                     <Badge
-                      // style={{ marginTop: "10px" }}
+                      style={{ marginBottom: "5px" }}
                       color="info"
                       className="ms-3 expertiseBadge"
                     >
@@ -321,7 +438,7 @@ const CreateMission = ({ agent }) => {
                     </Badge>
                     <Badge
                       color="info"
-                      // style={{ marginTop: "10px" }}
+                      style={{ marginBottom: "5px" }}
                       className="ms-3 expertiseBadge"
                     >
                       {agent.expertise2}
@@ -406,7 +523,7 @@ const CreateMission = ({ agent }) => {
                     <Button
                       color="primary"
                       style={{ border: "1px solid green" }}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !briefing}
                     >
                       Create Draft
                     </Button>
@@ -478,3 +595,7 @@ const CreateMission = ({ agent }) => {
 };
 
 export default CreateMission;
+
+// Dispatch Notifications
+// Describe the 5 steps needed to create a research report draft on the following topic. The 5th step should be writing draft report. The first step should be analyzing research objective: How can deep learning techniques be used to enhance idea generation processes and optimize monetization strategies in computer science? Return your answer as a JSON array of strings. Do not explain your answer. Use present tense -ing language. Maximum 5 words per step.
+// What are 5 humorous status updates for Agent Haida Gwaii Black Bear, an expert in Totem Poles, doing a mission with the following briefing: What are the effects of different blending and layering techniques with oil pastels on depth perception and emotional response in abstract artwork?

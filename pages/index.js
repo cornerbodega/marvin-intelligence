@@ -223,7 +223,7 @@ export default function Home({ title, content }) {
                       <div className="feature-inner">
                         <div className="feature-icon">
                           <img
-                            src="splash-steps/review-missions.png"
+                            src="splash-steps/review-reports.png"
                             alt="Feature 04"
                             style={{
                               height: "380px",

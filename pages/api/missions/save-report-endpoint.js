@@ -27,7 +27,7 @@ export default async function SaveReportEndpoint(req, res) {
   }
 
   console.log("Save Report Endpoint");
-
+  console.log(req.body.draft);
   if (req.method === "POST") {
     const draft = req.body.draft;
     const briefing = req.body.briefing;
@@ -158,7 +158,7 @@ export default async function SaveReportEndpoint(req, res) {
       console.log("saveReportData");
       console.log("req.body");
       console.log(req.body);
-      console.log(saveReportData.data[0].id);
+      const reportId = saveReportData.data[0].reportId;
       const parentReportId = req.body.parentReportId;
       if (parentReportId) {
         const childReportId = saveReportData.data[0].reportId;
@@ -217,7 +217,7 @@ export default async function SaveReportEndpoint(req, res) {
       //   newFolderReportModel
       // ).catch((error) => console.log(error));
 
-      res.status(200).json({ message: "Success" });
+      res.status(200).json({ reportId });
     } // Process a POST request
   } else {
     return res.send(500).json({ error: "Something went wrong." });

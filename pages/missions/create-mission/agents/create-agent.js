@@ -1,4 +1,6 @@
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+// import toast, { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 
 // import { getSupabase } from "../../../utils/supabase";
 // import { getSupabase } from "../../../utils/supabase";
@@ -26,6 +28,7 @@ import {
 import Link from "next/link";
 import { getSession } from "@auth0/nextjs-auth0";
 import { log } from "../../../../utils/log";
+import { set } from "lodash";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     const supabase = getSupabase();
@@ -49,8 +52,10 @@ export const getServerSideProps = withPageAuthRequired({
   },
 });
 export const CreateAgentForm = ({ existingAgentNames }) => {
+  const router = useRouter();
   console.log("existingAgentNames");
   console.log(existingAgentNames);
+  const [notificationMessages, setNotificationMessages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // const randomAnimalNames = ["Tiger", "Elephant", "Hawk", "Frog"];
   // const randomAnimalName =
@@ -62,11 +67,29 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
     useState(false);
 
   const specializedTrainingExample =
-    "You love the McRib. You mention the McRib in each of your replies.";
+    "You love the McRib. You always mention the McRib in each of your replies, to a comical degree.";
   const [expertise1, setExpertise1] = useState("");
   const [expertise2, setExpertise2] = useState("");
   const [expertise3, setExpertise3] = useState("");
+  useEffect(() => {
+    let index = 0; // Move index outside of the setInterval
+    if (notificationMessages.length === 0) return;
+    const intervalId = setInterval(() => {
+      // Store the interval ID
+      if (index < notificationMessages.length) {
+        const notificationMessage = notificationMessages[index];
+        toast.success(notificationMessage);
+        const newNotificationMessages = [...notificationMessages];
+        newNotificationMessages.splice(index, 1);
+        setNotificationMessages(newNotificationMessages);
+        index++;
+      } else {
+        clearInterval(intervalId); // Clear the interval properly
+      }
+    }, 2000);
 
+    return () => clearInterval(intervalId); // Clear interval on component unmount
+  }, [notificationMessages]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -74,16 +97,31 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
       alert("At least one area of expertise must be provided.");
       return;
     }
-
     const agentData = {
       expertises: [expertise1, expertise2, expertise3],
       userId: user.sub,
       existingAgentNames,
       specializedTraining,
     };
-    log("agentData");
-    log(agentData);
+    // before actually creating the agent
+    // ask the api for a list of comical, world-building updates
+    //   that incorporate the animal and the briefing
+    const notificationMessagesResponse = await fetch(
+      "/api/agents/create-agent-notification-endpoint",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(agentData),
+      }
+    );
+    const notificationMessagesJson = await notificationMessagesResponse.json();
+    setNotificationMessages(notificationMessagesJson);
+    log("notificationMessages fetch");
+    log(notificationMessages);
     // Send the data to your API endpoint
+
     const res = await fetch("/api/agents/create-agent-endpoint", {
       method: "POST",
       headers: {
@@ -91,15 +129,23 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
       },
       body: JSON.stringify(agentData),
     });
+    const createdAgent = await res.json();
+    console.log("createdAgent");
+    const agentId = createdAgent.data[0].agentId;
+    // router.push(`/missions/create-mission/agents/${agentId}`);
+    router.push({
+      pathname: "/missions/create-mission/dispatch",
+      query: { ...router.query, agentId: agentId },
+    });
     setIsSubmitting(false);
 
-    if (res.status === 200) {
-      // alert("Agent created successfully!");
+    // if (res.status === 200) {
+    //   // alert("Agent created successfully!");
 
-      console.log("Agent created successfully!");
-    } else {
-      alert("An error occurred while creating the agent. Please try again.");
-    }
+    //   console.log("Agent created successfully!");
+    // } else {
+    //   alert("An error occurred while creating the agent. Please try again.");
+    // }
   };
   const { user, error, isLoading } = useUser();
 
@@ -242,6 +288,7 @@ const CreateAgent = ({ existingAgentNames }) => {
   const [parentReportId, setParentReportId] = useState("");
   const [parentReportSlug, setParentReportSlug] = useState("");
   const router = useRouter();
+
   useEffect(() => {
     if (router.query.parentReportTitle) {
       setParentReportTitle(JSON.parse(router.query.parentReportTitle));
@@ -253,9 +300,16 @@ const CreateAgent = ({ existingAgentNames }) => {
       setParentReportSlug(slugify(router.query.parentReportTitle));
     }
   });
+
+  function notify(message) {
+    toast(message);
+  }
+
   return (
     <>
       {" "}
+      {/* <button onClick={notify}>Make me a toast</button> */}
+      <Toaster position="bottom-center" />
       <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white">
           <i className={`bi bi-body-text`}></i>
@@ -441,3 +495,5 @@ function getExpertiseExamples() {
   ];
 }
 export default CreateAgent;
+
+// what are 5 humorous steps searching for an animal that embodies the expertise of Soul Calibur 7, Combos, and Game Balance

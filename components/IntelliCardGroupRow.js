@@ -27,10 +27,11 @@ const IntelliCardGroupRow = ({ cols, handleCardClick, datumsType }) => {
   const colLenth = cols.length;
   return (
     <CardGroup
-      className="intelliReveal cardShadow"
+      className="intelliReveal"
       style={{
-        borderBottomLeftRadius: "7px",
-        borderBottomRightRadius: "7px",
+        // borderBottomLeftRadius: "25px",
+        // borderBottomRightRadius: "25px",
+        borderRadius: "25px",
       }}
     >
       {Array.apply(null, { length: colLenth }).map((e, i) =>

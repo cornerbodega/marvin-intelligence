@@ -28,12 +28,12 @@ const IntelliCard = ({
   console.log("key");
   console.log(index);
   const imageStyle = {};
-  if (index === 0) {
-    imageStyle.borderTopLeftRadius = "7px";
-  }
-  if (index === 2) {
-    imageStyle.borderTopRightRadius = "7px";
-  }
+  // if (index === 0) {
+  imageStyle.borderTopLeftRadius = "25px";
+  // }
+  // if (index === 2) {
+  imageStyle.borderTopRightRadius = "25px";
+  // }
   // const imageStyle = {
   //   borderTopLeftRadius: "7px",
   //   borderTopRightRadius: "7px",
@@ -81,7 +81,7 @@ const IntelliCard = ({
 
   return (
     <>
-      <Card>
+      <Card style={{ borderRadius: "25px" }} className="cardShadow">
         <img
           onClick={handleClick}
           src={displayDatums.picUrl} // insert image transformations based on imageSize here

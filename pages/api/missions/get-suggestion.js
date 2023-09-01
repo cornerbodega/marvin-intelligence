@@ -83,16 +83,6 @@ export default async function getSuggestion(req, res) {
         },
         {
           role: "user",
-          content: `Generate AI, Machine Learning, and Natural Language Processing. Return only the results in the following JSON format: {suggestion}`,
-        },
-        {
-          role: "assistant",
-          content: `{
-                  "suggestion": "I need a comprehensive report on the applications of Natural Language Processing in the modern digital landscape."
-              }`,
-        },
-        {
-          role: "user",
           content: getSuggestionQuestionText,
         },
       ],

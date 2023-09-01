@@ -124,7 +124,6 @@ export default async function handler(req, res) {
     const cloudinaryImageUploadResult = await cloudinary.uploader
       .upload(imageUrl)
       .catch((error) => console.log(error));
-    //   .then((result) => console.log(result))
     console.log("cloudinaryImageUploadResult");
     const profilePicUrl = cloudinaryImageUploadResult.url;
     newAgentModel.profilePicUrl = profilePicUrl;
@@ -139,63 +138,14 @@ export default async function handler(req, res) {
     } else {
       res.send(500);
     }
-    // const { saveAgentData, saveAgentError } = await supabase
-    //   .from("agents")
-    //   .insert(newAgentModel);
-    // console.log("saveAgentError");
-    // console.log(saveAgentError);
-    // // if (saveAgentError) {
-    // //   console.error(saveAgentError);
-    // //   return res.sendStatus(500);
-    // // }
-    // if (saveAgentError) {
-    //   console.error("Error inserting record:", error);
-    //   return res.sendStatus(500);
-    // } else {
-    //   console.log("saveAgentData");
-    //   console.log(saveAgentData);
-    //   // console.log("Inserted record with ID:", saveAgentData[0].id);
-    //   res.send(200);
-    // }
+
     async function saveToSupabase(table, dataToSave) {
       const response = await supabase.from(table).insert(dataToSave).select();
       console.log("response");
       console.log(response);
-      // if (error) {
-      //   console.log("error");
-      //   console.log(error);
-      //   return;
-      // }
-      // console.log("savedData");
-      // console.log(savedData);
-      return response;
-      // return new Promise((resolve, reject) => {
-      // supabase
-      //   .from(table)
-      //   .insert(data)
-      //   .then((response) => {
-      //     const { data, error } = response;
-      //     if (error) {
-      //       console.error("Error:", error.message);
-      //       reject(error);
-      //     } else {
-      //       console.log("Inserted record:", data);
-      //       resolve(data);
-      //     }
-      //   })
-      //   .catch((e) => {
-      //     console.error("Unexpected error:", e);
-      //     reject(e);
-      //   });
-      // });
-    }
 
-    // return res.sendStatus(200);
-    // const response = await fetch(
-    //   "https://jsonplaceholder.typicode.com/todos/1"
-    // );
-    // res.send(response);
-    // Process a POST request
+      return response;
+    }
   } else {
     return res.sendStatus(500);
     // Handle any other HTTP method
