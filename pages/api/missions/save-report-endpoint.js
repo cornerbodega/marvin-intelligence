@@ -3,6 +3,7 @@
 import { AuthUnknownError } from "@supabase/supabase-js";
 import { getSupabase } from "../../../utils/supabase";
 import { v2 as cloudinary } from "cloudinary";
+// import getFromSupabase from "../../../utils/supabase/getFromSupabase";
 cloudinary.config({
   cloud_name: "dcf11wsow",
   api_key: "525679258926845",
@@ -47,12 +48,13 @@ export default async function SaveReportEndpoint(req, res) {
         .split(`<h2 id="reportTitle">`)[1]
         .split(`</h2>`)[0];
       // describe this article as a photograph of place on earth in less than 300 characters: Research Report: Impact of Persistence and Goal-Setting on Project Success and Performance in Different Industries
-      const imageTypes = [
-        // "photograph",
-        "realist painting",
-        "impressionist painting",
-      ];
-      const imageType = getRandomInt(0, imageTypes.length - 1);
+      // const imageTypes = [
+      //   "photograph",
+      //   "realist painting",
+      //   "impressionist painting",
+      // ];
+      // const imageType = imageTypes[getRandomInt(0, imageTypes.length - 1)];
+      const imageType = "photograph";
       const getDraftImageMessages = [
         {
           role: "system",
@@ -61,7 +63,7 @@ export default async function SaveReportEndpoint(req, res) {
         },
         {
           role: "user",
-          content: `describe the physical location on earth that corresponds to this title in less than 300 characters: ${draftTitle}.`,
+          content: `describe a ${imageType} of the place in nature that corresponds to this title in less than 300 characters: ${draftTitle}. The location will be the subject of a landscape photographer.`,
         },
       ];
 
@@ -103,7 +105,7 @@ export default async function SaveReportEndpoint(req, res) {
         reportSummaryResponse.data.choices[0].message.content;
 
       const aiImageResponse = await openai.createImage({
-        prompt: `a ${imageType} of ${imageDescriptionResponseContent}`,
+        prompt: `${imageDescriptionResponseContent}`,
         n: 1,
         size: "1024x1024",
       });
@@ -174,16 +176,154 @@ export default async function SaveReportEndpoint(req, res) {
       // #####################################
       // Folders
       // #####################################
+      async function regenerateFolderNameAndImage(folderId) {
+        let folderName = "";
+        let folderPicUrl = "";
+        let folderDescription = "";
+        // get all reports in folder
+        let { data: reportFolders, reportFolderError } = await supabase
+          .from("reportFolders")
+          .select(
+            `
+          *,
+          reports:reportId (reportTitle)
+        `
+          )
+          .eq("folderId", folderId);
+        if (reportFolderError) {
+          console.log("reportFolderError");
+        }
+        console.log("reportFolders");
+        console.log(reportFolders);
+        // let folderName = "";
+        // let folderPicUrl = "";
+        if (reportFolders && reportFolders.length > 0) {
+          // generate folder name and image based on report contents
+          // this function will be called when
+          //  1. the child report is saved into new report is saved into a folder
+          //  2. a new child report is saved into the folder
+          // get all report titles
+
+          // Get all the reports titles in this folder
+          const reportTitles = reportFolders.map((reportFolder) => {
+            return reportFolder.reports.reportTitle;
+          });
+          console.log("regenerateFolderNameAndImage reportTitles");
+          console.log(reportTitles);
+          // Make a call to the AI to generate a folder name and image
+          try {
+            const chat_completion = await openai.createChatCompletion({
+              model: "gpt-3.5-turbo",
+              messages: [
+                {
+                  role: "system",
+                  content:
+                    "You are an expert at generating a name and description for a folder based on titles of the reports it contains. You never explain your answer. You return results in the following JSON format: {folderName, folderDescription}",
+                },
+                {
+                  role: "user",
+                  content: reportTitles.join("\n"),
+                },
+              ],
+            });
+            // let folderName = "";
+
+            const folderAssetResponseContent =
+              chat_completion.data.choices[0].message.content;
+            if (folderAssetResponseContent) {
+              console.log("folderAssetResponseContent");
+              console.log(folderAssetResponseContent);
+              console.log("folderName");
+              console.log(folderName);
+              console.log("typeof folderAssetResponseContent");
+              console.log(typeof folderAssetResponseContent);
+              if (typeof folderAssetResponseContent === "object") {
+                folderName = folderAssetResponseContent.folderName;
+                folderDescription =
+                  folderAssetResponseContent.folderDescription;
+              } else if (
+                typeof folderAssetResponseContent === "string" &&
+                folderAssetResponseContent.includes(`"folderName":`)
+              ) {
+                const parsedFolderAssetContent = JSON.parse(
+                  folderAssetResponseContent
+                );
+                if (parsedFolderAssetContent) {
+                  folderName = parsedFolderAssetContent.folderName;
+                  folderDescription =
+                    parsedFolderAssetContent.folderDescription;
+                }
+              } else if (typeof folderAssetResponseContent === "string") {
+                folderName = folderAssetResponseContent;
+                folderDescription = folderAssetResponseContent;
+              }
+            }
+            console.log("folderName2");
+            console.log(folderName);
+            console.log("folderDescription");
+            console.log(folderDescription);
+            const imageType = "realist painting";
+            // "realist painting",
+            // "impressionist painting",
+            try {
+              const chat_completion = await openai.createChatCompletion({
+                model: "gpt-3.5-turbo",
+                messages: [
+                  {
+                    role: "system",
+                    content:
+                      "You are an expert at describing visually captivating artworks based on a report title. The artwork will performed by a realist painter.You never explain your answer. All your answers are less than 300 characters.",
+                  },
+                  {
+                    role: "user",
+                    content: `reportTitle: ${folderDescription}, imageType: ${imageType}`,
+                  },
+                ],
+              });
+
+              const folderImageResponse =
+                chat_completion.data.choices[0].message.content;
+              console.log("folderImageResponse");
+              console.log(folderImageResponse);
+              const aiImageResponse = await openai.createImage({
+                prompt: folderImageResponse,
+                n: 1,
+                size: "1024x1024",
+              });
+              const imageUrl = aiImageResponse.data.data[0].url;
+              //   Upload Image to Cloudinary and receive Url
+              const cloudinaryImageUploadResult = await cloudinary.uploader
+                .upload(imageUrl)
+                .catch((error) => console.log(error));
+              console.log("cloudinaryImageUploadResult");
+              console.log(cloudinaryImageUploadResult);
+              folderPicUrl = cloudinaryImageUploadResult.url;
+              return { folderName, folderPicUrl, folderDescription };
+            } catch (error) {
+              console.error("generateFolderName error");
+              console.log(error);
+            }
+          } catch (error) {
+            console.error("generateFolderName error");
+            console.log(error);
+          }
+          // Get the image from Dall-E
+          // Folder title x animal name
+        }
+      }
 
       if (parentReportId) {
         if (!existingFolderId) {
           // create a folder id
           const newFolderModel = { userId };
-          // generate folder name based on briefing and report title
-          newFolderModel.folderName = "Test folder Name";
+          // generate folder name based on constituent report titles
+          // const folderNameAndImage = generateFolderNameAndImage({
+          //   reportTitles,
+          // });
+          // newFolderModel.folderName = folderNameAndImage.folderName;
           // generate a folder pic url based on the agent hunting and the briefing
-          let reportPicUrl = "Test Url";
-          newFolderModel.folderPicUrl = reportPicUrl;
+
+          // newFolderModel.folderPicUrl = folderNameAndImage.folderPicUrl;
           const saveFolderData = await saveToSupabase(
             "folders",
             newFolderModel
@@ -201,12 +341,14 @@ export default async function SaveReportEndpoint(req, res) {
           .eq("reportId", parentReportId);
         console.log("reportFolder");
         console.log(reportFolderResponse);
-        let reportFolderId;
         if (reportFolderResponse && reportFolderResponse.length > 0) {
-          reportFolderId = reportFolderResponse[0].folderId;
+          existingFolderId = reportFolderResponse[0].folderId;
         }
+        // reportFolder[{ folderId: 12 }];
+        console.log("existingFolderId");
+        console.log(existingFolderId);
         let newReportFolderModel = {};
-        if (!reportFolderId) {
+        if (!existingFolderId) {
           // add the parent report to the folder
           newReportFolderModel = {
             reportId: parentReportId,
@@ -235,6 +377,45 @@ export default async function SaveReportEndpoint(req, res) {
             newReportFolderModel
           ).catch((error) => console.log(error));
         }
+
+        // Now that the folder has been created
+        // and the reportFolder relationship has been created
+        // we need to regenerate the folder name and image
+        const folderNameAndImage = await regenerateFolderNameAndImage(
+          existingFolderId
+        );
+        console.log("folderNameAndImage");
+        console.log(folderNameAndImage);
+        // const updateFolderData = await updateSupabase("folders", {
+        //   folderId: existingFolderId,
+        //   folderName: folderNameAndImage.folderName,
+        //   folderPicUrl: folderNameAndImage.folderPicUrl,
+        // }).catch((error) => console.log(error));
+        const updateFolderData = async () => {
+          try {
+            const { data, error } = await supabase
+              .from("folders")
+              .update({
+                folderName: folderNameAndImage.folderName,
+                folderPicUrl: folderNameAndImage.folderPicUrl,
+                folderDescription: folderNameAndImage.folderDescription,
+              })
+              .eq("folderId", existingFolderId);
+
+            if (error) {
+              console.log(error);
+            }
+
+            return data;
+          } catch (error) {
+            console.log(error);
+          }
+        };
+
+        const updatedFolderData = updateFolderData();
+        console.log("updatedFolderData");
+        console.log(updatedFolderData);
+        //
         // .limit(3);
         // add the child report to the folder
       }

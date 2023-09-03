@@ -1,4 +1,5 @@
 export default function getCloudinaryImageUrlForHeight(url, height) {
+  if (!url) return console.log("error! trying to resize a null image");
   // Split the URL into parts
   const urlParts = url.split("/");
 

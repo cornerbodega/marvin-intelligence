@@ -23,7 +23,10 @@ const FullLayout = ({ children }) => {
         </aside>
         {/********Content Area**********/}
 
-        <div className="contentArea gradient-background">
+        <div
+          className="contentArea gradient-background"
+          style={{ maxWidth: "100%", overflowX: "hidden" }}
+        >
           {/********header**********/}
           <Header showMobmenu={() => showMobilemenu()} />
 

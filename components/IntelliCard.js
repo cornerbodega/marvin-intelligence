@@ -53,10 +53,10 @@ const IntelliCard = ({
     icon = "bi bi-body-text";
   }
   if (datumsType === "folders") {
-    displayDatums.picUrl = datums.reportPicUrl;
-    displayDatums.title = datums.reportTitle;
+    displayDatums.picUrl = datums.folderPicUrl;
+    displayDatums.title = datums.folderName;
     titleClassName = "reportFont";
-    icon = "bi bi-file-earmark-text";
+    icon = "bi bi-folder";
   }
   if (imageSize === "small") {
     imageStyle.height = "337px";
@@ -67,8 +67,8 @@ const IntelliCard = ({
     );
   }
 
-  log("IntelliCard datums");
-  log(displayDatums.picUrl);
+  console.log("IntelliCard datums");
+  console.log(displayDatums);
   function handleClick() {
     // console.log("Intellicard handleCardClick");
     // console.log(handleCardClick);
@@ -121,6 +121,7 @@ const IntelliCard = ({
               {icon && <i className={icon}></i>} {displayDatums.title}
             </div>
             {/* </CardTitle> */}
+            {/* {displayDatums.folderDescription} */}
             <CardSubtitle className="mb-2 text-muted" tag="h6">
               <Badge color="info" className="ms-3 expertiseBadge">
                 {datums.expertise1}

@@ -128,6 +128,9 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(agentData),
+    }).catch((error) => {
+      console.log("error creating agent");
+      console.log(error);
     });
     const createdAgent = await res.json();
     console.log("createdAgent");
