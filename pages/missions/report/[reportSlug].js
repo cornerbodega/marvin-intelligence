@@ -252,7 +252,7 @@ const ReportDetailPage = ({ report }) => {
           <Link
             className="text-white"
             href="/missions/view-missions"
-            style={{ textDecoration: "none" }}
+            style={{ textDecoration: "none", fontWeight: "200" }}
           >
             Missions
           </Link>
@@ -292,14 +292,16 @@ const ReportDetailPage = ({ report }) => {
         <Col md={{ size: 6, offset: 3 }}>
           <div>
             <Card className="cardShadow">
-              <img
-                ref={reportRef}
-                style={{
-                  borderTopLeftRadius: "7px",
-                  borderTopRightRadius: "7px",
-                }}
-                src={report.reportPicUrl}
-              ></img>
+              <div style={{ minHeight: "364px" }}>
+                <img
+                  ref={reportRef}
+                  style={{
+                    borderTopLeftRadius: "7px",
+                    borderTopRightRadius: "7px",
+                  }}
+                  src={report.reportPicUrl}
+                ></img>
+              </div>
               <CardBody>
                 {reportContent && (
                   <Card>
@@ -328,12 +330,11 @@ const ReportDetailPage = ({ report }) => {
                             href={`http://localhost:3000/missions/create-mission/dispatch?agentId=${report.agentId}`}
                           >
                             <img
-                              src={
-                                (getCloudinaryImageUrlForHeight(
-                                  report.profilePicUrl
-                                ),
-                                250)
-                              }
+                              src={getCloudinaryImageUrlForHeight(
+                                report.profilePicUrl,
+
+                                250
+                              )}
                               style={{
                                 borderRadius: "50%",
                                 height: "250px",
@@ -343,6 +344,7 @@ const ReportDetailPage = ({ report }) => {
                             <div
                               style={{
                                 marginTop: "16px",
+                                textAlign: "center",
                               }}
                             >
                               Agent {report.agentName}

@@ -193,13 +193,17 @@ const ViewAgents = ({ agents }) => {
   // }
   return (
     <>
-      <Breadcrumb style={{ fontFamily: "monospace" }}>
+      <Breadcrumb style={{ fontWeight: "200", fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white">
           <i className={`bi bi-body-text`}></i>
           &nbsp;
           <Link
             href="/missions/view-missions"
-            style={{ textDecoration: "none", color: "white" }}
+            style={{
+              fontWeight: "200",
+              textDecoration: "none",
+              color: "white",
+            }}
           >
             Missions
           </Link>
@@ -208,7 +212,7 @@ const ViewAgents = ({ agents }) => {
           <BreadcrumbItem className="text-white">
             <Link
               className="text-white"
-              style={{ textDecoration: "none" }}
+              style={{ fontWeight: "200", textDecoration: "none" }}
               href={`/missions/report/${parentReportId}-${parentReportSlug}`}
             >
               {parentReportTitle}
@@ -219,7 +223,7 @@ const ViewAgents = ({ agents }) => {
           <i className={`bi-body-text`}></i>+ Create Mission
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
-          <i className={`bi-file-earmark-person-fill`}></i>
+          <i className={`bi bi-person-badge`}></i>
           &nbsp;
           <Link
             href="/missions/create-mission/agents/view-agents"
@@ -231,7 +235,7 @@ const ViewAgents = ({ agents }) => {
       </Breadcrumb>
       <div style={{ marginBottom: "32px", textAlign: "right" }}>
         <Button style={{ border: "1px solid white" }} onClick={handleFabClick}>
-          <i className="bi bi-file-earmark-person-fill"></i>+ Add Agent
+          <i className="bi bi-person-badge"></i>+ Add Agent
         </Button>
       </div>
       {/* <div>{JSON.stringify(loadedAgents)}</div> */}

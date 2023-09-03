@@ -39,15 +39,24 @@ const IntelliCard = ({
   //   borderTopRightRadius: "7px",
   // };
   let titleClassName = "";
+  let icon;
   const displayDatums = { ...datums };
   if (datumsType === "agents") {
     displayDatums.title = `Agent ${datums.agentName}`;
     displayDatums.picUrl = datums.profilePicUrl;
+    icon = "bi bi-person-badge";
   }
   if (datumsType === "missions") {
     displayDatums.picUrl = datums.reportPicUrl;
     displayDatums.title = datums.reportTitle;
     titleClassName = "reportFont";
+    icon = "bi bi-body-text";
+  }
+  if (datumsType === "folders") {
+    displayDatums.picUrl = datums.reportPicUrl;
+    displayDatums.title = datums.reportTitle;
+    titleClassName = "reportFont";
+    icon = "bi bi-file-earmark-text";
   }
   if (imageSize === "small") {
     imageStyle.height = "337px";
@@ -109,7 +118,7 @@ const IntelliCard = ({
               }}
               className={titleClassName}
             >
-              {displayDatums.title}
+              {icon && <i className={icon}></i>} {displayDatums.title}
             </div>
             {/* </CardTitle> */}
             <CardSubtitle className="mb-2 text-muted" tag="h6">

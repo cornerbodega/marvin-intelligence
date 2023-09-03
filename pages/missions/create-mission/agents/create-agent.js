@@ -310,13 +310,17 @@ const CreateAgent = ({ existingAgentNames }) => {
       {" "}
       {/* <button onClick={notify}>Make me a toast</button> */}
       <Toaster position="bottom-center" />
-      <Breadcrumb style={{ fontFamily: "monospace" }}>
+      <Breadcrumb style={{ fontWeight: "200", fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white">
           <i className={`bi bi-body-text`}></i>
           &nbsp;
           <Link
             href="/missions/view-missions"
-            style={{ textDecoration: "none", color: "white" }}
+            style={{
+              fontWeight: "200",
+              textDecoration: "none",
+              color: "white",
+            }}
           >
             Missions
           </Link>
@@ -325,29 +329,37 @@ const CreateAgent = ({ existingAgentNames }) => {
           <BreadcrumbItem className="text-white">
             <Link
               className="text-white"
-              style={{ textDecoration: "none" }}
+              style={{ fontWeight: "200", textDecoration: "none" }}
               href={`/missions/report/${parentReportId}-${parentReportSlug}`}
             >
               {parentReportTitle}
             </Link>
           </BreadcrumbItem>
         )}
-        <BreadcrumbItem className="text-white">
+        <BreadcrumbItem style={{ fontWeight: "200" }} className="text-white">
           {" "}
           <i className={`bi-body-text`}></i>+ Create Mission
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
           <Link
             href="/missions/create-mission/agents/view-agents"
-            style={{ textDecoration: "none", color: "white" }}
+            style={{
+              fontWeight: "200",
+              textDecoration: "none",
+              color: "white",
+            }}
           >
-            <i className={`bi-file-earmark-person-fill`}></i>
+            <i className={`bi bi-person-badge`}></i>
             &nbsp;Select Agent
           </Link>
         </BreadcrumbItem>
 
-        <BreadcrumbItem className="text-white" active>
-          <i className={`bi-file-earmark-person-fill`}></i>+ Add Agent
+        <BreadcrumbItem
+          className="text-white"
+          style={{ fontWeight: "800" }}
+          active
+        >
+          <i className={`bi bi-person-badge`}></i>+ Add Agent
         </BreadcrumbItem>
       </Breadcrumb>
       <CreateAgentForm existingAgentNames={existingAgentNames} />

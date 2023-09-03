@@ -25,7 +25,7 @@ const IntelliFab = ({ onClick, icon, fabType }) => {
       setLogo(`bi bi-body-text`);
     }
     if (fabType === "agent") {
-      setLogo(`bi bi-file-earmark-person-fill`);
+      setLogo(`bi bi-person-badge`);
     }
   }
 

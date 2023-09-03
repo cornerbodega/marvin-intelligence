@@ -344,12 +344,15 @@ const CreateMission = ({ agent }) => {
     <div>
       <Toaster position="bottom-center" />
 
-      <Breadcrumb style={{ fontFamily: "monospace" }} className="text-white">
+      <Breadcrumb
+        style={{ fontWeight: "200", fontFamily: "monospace" }}
+        className="text-white"
+      >
         <BreadcrumbItem>
           <i className="bi  bi-body-text"></i>
           &nbsp;&nbsp;
           <Link
-            style={{ textDecoration: "none" }}
+            style={{ fontWeight: "200", textDecoration: "none" }}
             className="text-white"
             href="/missions/view-missions"
           >
@@ -360,7 +363,7 @@ const CreateMission = ({ agent }) => {
           <BreadcrumbItem className="text-white">
             <Link
               className="text-white"
-              style={{ textDecoration: "none" }}
+              style={{ fontWeight: "200", textDecoration: "none" }}
               href={`/missions/report/${parentReportId}-${parentReportSlug}`}
             >
               {parentReportTitle}
@@ -371,7 +374,7 @@ const CreateMission = ({ agent }) => {
           <i className="bi bi-body-text"></i>+ &nbsp;
           <Link
             className="text-white"
-            style={{ textDecoration: "none" }}
+            style={{ fontWeight: "200", textDecoration: "none" }}
             href={{
               pathname: "/missions/create-mission/agents/view-agents/",
               query: currentQueryParams,
@@ -380,12 +383,13 @@ const CreateMission = ({ agent }) => {
             Create Mission
           </Link>
         </BreadcrumbItem>
-        <BreadcrumbItem className="">
+        <BreadcrumbItem style={{ fontWeight: "200" }} className="">
           {" "}
-          <i className={`bi-file-earmark-person-fill`}></i>&nbsp; Agent{" "}
-          {agent.agentName}
+          <i className={`bi bi-person-badge`}></i>&nbsp; Agent {agent.agentName}
         </BreadcrumbItem>
-        <BreadcrumbItem className="">Dispatch</BreadcrumbItem>
+        <BreadcrumbItem className="">
+          <div style={{ fontWeight: "800" }}>Dispatch</div>
+        </BreadcrumbItem>
       </Breadcrumb>
 
       <Row>

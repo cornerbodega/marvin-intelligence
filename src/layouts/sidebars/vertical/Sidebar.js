@@ -7,7 +7,7 @@ const navigation = [
   // {
   //   title: "Agents",
   //   href: "/missions/create-mission/agents/view-agents",
-  //   icon: "bi bi-file-earmark-person-fill",
+  //   icon: "bi bi-person-badge",
   // },
   // {
   //   title: "Missions",

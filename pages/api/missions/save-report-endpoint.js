@@ -33,7 +33,7 @@ export default async function SaveReportEndpoint(req, res) {
     const briefing = req.body.briefing;
     const userId = req.body.userId;
     const agentId = req.body.agentId;
-
+    let existingFolderId = req.body.existingFolderId;
     // #####################################
     // Save Report to Reports Table
     // #####################################
@@ -185,6 +185,69 @@ export default async function SaveReportEndpoint(req, res) {
       // Folders
       // #####################################
 
+      if (parentReportId) {
+        if (!existingFolderId) {
+          // create a folder id
+          const newFolderModel = { userId };
+          // generate folder name based on briefing and report title
+          newFolderModel.folderName = "Test folder Name";
+          // generate a folder pic url based on the agent hunting and the briefing
+          let reportPicUrl = "Test Url";
+          newFolderModel.folderPicUrl = reportPicUrl;
+          const saveFolderData = await saveToSupabase(
+            "folders",
+            newFolderModel
+          ).catch((error) => console.log(error));
+          console.log("saveFolderData");
+          console.log(saveFolderData);
+          existingFolderId = saveFolderData.data[0].folderId;
+        }
+        // check whether the parent report has a folder
+        // if it doesn't, add the parent report to the folder
+        // getFromSupabase("reports", { userId, reportId: parentReportId }).then();
+        let { data: reportFolderResponse, error } = await supabase
+          .from("reportFolders")
+          .select("folderId")
+          .eq("reportId", parentReportId);
+        console.log("reportFolder");
+        console.log(reportFolderResponse);
+        let reportFolderId;
+        if (reportFolderResponse && reportFolderResponse.length > 0) {
+          reportFolderId = reportFolderResponse[0].folderId;
+        }
+        let newReportFolderModel = {};
+        if (!reportFolderId) {
+          // add the parent report to the folder
+          newReportFolderModel = {
+            reportId: parentReportId,
+            folderId: existingFolderId,
+          };
+          const saveReportFolderData = await saveNewFolderModel(
+            newReportFolderModel
+          );
+          console.log("saveReportFolderData");
+          console.log(saveReportFolderData);
+        }
+
+        // add the child report to the folder
+        newReportFolderModel = {
+          reportId,
+          folderId: existingFolderId,
+        };
+        const saveReportFolderData = await saveNewFolderModel(
+          newReportFolderModel
+        );
+        console.log("saveReportFolderData");
+        console.log(saveReportFolderData);
+        async function saveNewFolderModel(newReportFolderModel) {
+          return await saveToSupabase(
+            "reportFolders",
+            newReportFolderModel
+          ).catch((error) => console.log(error));
+        }
+        // .limit(3);
+        // add the child report to the folder
+      }
       // console.log("saveReportData");
       // console.log(saveReportData);
 
