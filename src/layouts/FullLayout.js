@@ -24,7 +24,7 @@ const FullLayout = ({ children }) => {
         {/********Content Area**********/}
 
         <div
-          style={{ width: "70%" }}
+          // style={{ width: "70%" }}
           className="contentArea gradient-background"
         >
           {/********header**********/}
