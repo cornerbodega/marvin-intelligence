@@ -11,7 +11,7 @@ const FullLayout = ({ children }) => {
 
   return (
     <main>
-      <div className="pageWrapper d-md-block d-lg-flex ">
+      <div className="pageWrapper d-md-block d-lg-flex text-white">
         {/******** Sidebar **********/}
         <aside
           style={{ zIndex: "100" }}

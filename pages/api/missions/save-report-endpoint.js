@@ -61,17 +61,7 @@ export default async function SaveReportEndpoint(req, res) {
         },
         {
           role: "user",
-          content:
-            "describe this article as a photograph of place on earth in less than 300 characters: Research Report: Impact of Persistence and Goal-Setting on Project Success and Performance in Different Industries",
-        },
-        {
-          role: "assistant",
-          content:
-            "A photograph of a bustling crossroads in a city, where diverse pathways converge symbolizing various industries. At its center stands a towering goal, surrounded by people navigating the paths, depicting the impact of persistence and goal-setting on project success.",
-        },
-        {
-          role: "user",
-          content: `describe this article as a ${imageType} of place on earth in less than 300 characters:${draftTitle}`,
+          content: `describe the physical location on earth that corresponds to this title in less than 300 characters: ${draftTitle}.`,
         },
       ];
 
@@ -113,7 +103,7 @@ export default async function SaveReportEndpoint(req, res) {
         reportSummaryResponse.data.choices[0].message.content;
 
       const aiImageResponse = await openai.createImage({
-        prompt: imageDescriptionResponseContent,
+        prompt: `a ${imageType} of ${imageDescriptionResponseContent}`,
         n: 1,
         size: "1024x1024",
       });

@@ -32,7 +32,7 @@ export default async function handler(req, res) {
         },
         {
           role: "user",
-          content: `what are 6 humorous steps describing ${agentName} finalizing a research report with the following briefing: ${briefing}`,
+          content: `what are 20 humorous steps describing ${agentName} finalizing a research report with the following briefing: ${briefing}`,
         },
       ],
     });
