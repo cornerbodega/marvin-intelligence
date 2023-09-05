@@ -95,12 +95,12 @@ export default function Home({ title, content }) {
                     </p>
                     <div className="hero-cta">
                       <Link
-                        className="button button-primary"
+                        className="button button-primary white-text"
                         href="/account/log-in"
                       >
                         Start your Free Trial
                       </Link>
-                      <a className="button" href="#">
+                      <a className="button white-text" href="#">
                         Meet your AI Team
                       </a>
                     </div>
