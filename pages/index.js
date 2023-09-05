@@ -202,7 +202,7 @@ export default function Home({ title, content }) {
                             alt="Feature 01"
                           />
                         </div>
-                        <h4 className="feature-title mt-24">
+                        <h4 className="feature-title mt-24 white-text">
                           Step 1 - Sign Up
                         </h4>
                         <p className="text-md mb-0">
@@ -224,7 +224,7 @@ export default function Home({ title, content }) {
                             alt="Feature 02"
                           />
                         </div>
-                        <h4 className="feature-title mt-24">
+                        <h4 className="feature-title mt-24 white-text">
                           Step 2 - Hire Your Agents
                         </h4>
                         <p className="text-md mb-0">
@@ -247,7 +247,7 @@ export default function Home({ title, content }) {
                             className="cardShadow"
                           />
                         </div>
-                        <h4 className="feature-title mt-24">
+                        <h4 className="feature-title mt-24 white-text">
                           Step 3 - Assign Missions
                         </h4>
                         <p className="text-md mb-0">
@@ -270,7 +270,7 @@ export default function Home({ title, content }) {
                             className="cardShadow"
                           />
                         </div>
-                        <h4 className="feature-title mt-24">
+                        <h4 className="feature-title mt-24 white-text">
                           Step 4 - Review Reports:{" "}
                         </h4>
                         <p className="text-md mb-0">
@@ -292,7 +292,7 @@ export default function Home({ title, content }) {
                             className="cardShadow"
                           />
                         </div>
-                        <h4 className="feature-title mt-24">
+                        <h4 className="feature-title mt-24 white-text">
                           Step 5 - Iterative Learning:
                         </h4>
                         <p className="text-md mb-0">
@@ -315,7 +315,9 @@ export default function Home({ title, content }) {
                             className="cardShadow"
                           />
                         </div>
-                        <h4 className="feature-title mt-24">Get Started</h4>
+                        <h4 className="feature-title mt-24 white-text">
+                          Get Started
+                        </h4>
                         <p className="text-md mb-0">
                           <Link
                             className="button"
