@@ -85,7 +85,7 @@ export default function Home({ title, content }) {
               <div className="container">
                 <div className="hero-inner">
                   <div className="hero-copy">
-                    <h1 className="hero-title mt-0">
+                    <h1 className="hero-title mt-0 text-white">
                       Unlock the Power of Automated Learning
                     </h1>
                     <p className="text-white hero-paragraph">

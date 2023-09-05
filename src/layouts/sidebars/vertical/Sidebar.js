@@ -32,11 +32,11 @@ const navigation = [
   //   href: "/ui/cards",
   //   icon: "bi bi-hdd-stack",
   // },
-  {
-    title: "Continua",
-    href: "/ui/badges",
-    icon: "bi bi-link",
-  },
+  // {
+  //   title: "Continua",
+  //   href: "/ui/badges",
+  //   icon: "bi bi-link",
+  // },
   {
     title: "IntelNet",
     href: "/ui/buttons",

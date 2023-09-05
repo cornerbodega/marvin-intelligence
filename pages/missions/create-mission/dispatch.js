@@ -577,7 +577,7 @@ const CreateMission = ({ agent }) => {
                   </div>
                 </FormGroup>
               </Form>
-
+              Continua
               <Form>
                 <div style={{ textAlign: "right" }}>
                   <Button

@@ -4,17 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
 // other imports
 import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
-import IntelliCardGroup from "../../components/IntelliCardGroup";
 
-import { getSupabase } from "../../utils/supabase";
-
-import IntelliFab from "../../components/IntelliFab";
+import IntelliCardGroup from "../../../components/IntelliCardGroup";
+import { getSupabase } from "../../../utils/supabase";
+import Link from "next/link";
+import IntelliFab from "../../../components/IntelliFab";
 // rest of component
-import { slugify } from "../../utils/slugify";
+import { slugify } from "../../../utils/slugify";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
+    const folderId = context.params.folderSlug.split("-")[0];
     const session = await getSession(context.req, context.res);
     const user = session?.user;
     console.log("session");
@@ -38,34 +39,101 @@ export const getServerSideProps = withPageAuthRequired({
         props: {},
       };
     }
+    //   let { data: missions, error } = await supabase
+    //     .from("reportFolders")
+    //     .select(
+    //       `
+    //   folderId,
+    //   reports:*
+    // `
+    //     )
+    //     .eq("folderId", folderId)
+    //     .limit(PAGE_COUNT)
+    //     .order("reportId", { ascending: false });
 
-    let { data: folders, error } = await supabase
-      .from("folders")
-      .select("*")
-      .eq("userId", user.sub)
-      .filter("folderName", "neq", null)
-      .filter("folderPicUrl", "neq", null)
-      .limit(PAGE_COUNT)
-      .order("folderId", { ascending: false });
-    console.log("folders");
-    console.log(folders);
+    //   if (error) {
+    //     console.error(error);
+    //   }
+    // let { data: missions, error } = await supabase
+    // .from('reportFolders')
+    // .select('reports:*')
+    // .eq('folderId', folderId);
+    let { data: missionsResponse, error } = await supabase
+      .from("reportFolders")
+      .select(
+        `
+      folders (folderName),
+      reports (reportTitle, reportPicUrl, reportId)
+    `
+      )
+      .eq("folderId", folderId);
+
+    if (error) {
+      console.error(error);
+    }
+
+    const missions = [];
+    let folderName = "";
+    missionsResponse.forEach((mission) => {
+      missions.push(mission.reports);
+      folderName = mission.folders.folderName;
+    });
+    console.log("missions");
+    console.log(missions);
+    // let { data: missions, error } = await supabase
+    //   .from("reports")
+    //   .select("*")
+    //   .eq("userId", user.sub)
+    //   .eq("reportFolders.folderId", folderId)
+    //   // .join("reportFolders", { foreignKey: "reportId" })
+    //   .limit(PAGE_COUNT)
+    //   .order("reportId", { ascending: false });
+    // console.log("supabase.join");
+    // console.log(supabase.join);
+    // let { data: missions, error } = await supabase
+    //   .from("reports")
+    //   .select("*")
+    //   .eq("userId", user.sub)
+    //   .eq("reportFolders.folderId", folderId)
+    //   .join("reportFolders", { foreignKey: "reportId" })
+    //   .limit(PAGE_COUNT)
+    //   .order("reportId", { ascending: false });
+    // let { data: missions, error } = await supabase
+    //   .from("reports")
+    //   .select("*")
+    //   .eq("userId", user.sub)
+    //   .join("reportFolders", { foreignKey: "reportId" })
+    //   // .eq("folderId", folderId)
+    //   .limit(PAGE_COUNT)
+    //   .order("reportId", { ascending: false });
+
+    // let { data: missions, error } = await supabase
+    //   .from("reports")
+    //   .select("reports.*")
+    //   .eq("reports.userId", user.sub)
+    //   .eq("reportFolders.folderId", folderId)
+    //   .join("reportFolders", "reportId", {
+    //     foreignTable: "reports",
+    //     foreignColumn: "reportId",
+    //   })
+    //   .limit(PAGE_COUNT)
+    //   .order("reports.reportId", { ascending: false });
+
     // other pages will redirect here if they're empty
     // If no agency, go to create agency page
     // If no missions, go to crete report page
     // let agency;
     return {
-      props: { folders },
+      props: { missions, folderName, folderId },
     };
   },
 });
-const ViewReports = ({ folders }) => {
+const ViewReports = ({ missions, folderName, folderId }) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(1);
   const [isInView, setIsInView] = useState(false);
-  const [loadedReports, setLoadedReports] = useState(folders);
-  console.log("loadedReports");
-  console.log(loadedReports);
+  const [loadedReports, setLoadedReports] = useState(missions);
   // const reportNames = missions.map((report) => report.reportName);
   useEffect(() => {
     const handleDebouncedScroll = debounce(
@@ -95,17 +163,17 @@ const ViewReports = ({ folders }) => {
     console.log("ViewReports HandleClick Clicked!");
     goToPage("/missions/create-mission/agents/view-agents");
   };
-  const handleCardClick = (folder) => {
-    console.log(folder);
+  const handleCardClick = (report) => {
     // console.log("handleCardClick");
-    // const reportName = event.target.dataset.datums.reportName;
-    const folderName = folder.folderName;
-    const folderId = folder.folderId;
+    const reportTitle = report.reportTitle;
+    const reportId = report.reportId;
 
+    console.log("report");
+    console.log(report);
     console.log("ViewReports HandleCardClick Clicked!");
-    // setSelectedReport(report);
-    const folderSlug = slugify(`${folderId}-${folderName}`);
-    goToPage(`/folders/detail/${folderSlug}`);
+
+    const reportSlug = slugify(`${reportId}-${reportTitle}`);
+    goToPage(`/missions/report/${reportSlug}`);
   };
   const router = useRouter;
   function goToPage(name) {
@@ -121,8 +189,11 @@ const ViewReports = ({ folders }) => {
         setOffset((prev) => prev + 1);
 
         const { data } = await supabase
-          .from("folders")
-          .select("*")
+          // .from("reports")
+          // .select("*")
+          .from("reportFolders")
+          .select("reports (reportTitle, reportPicUrl, reportId)")
+          .eq("folderId", folderId)
           .range(from, to)
           .order("createdAt", { ascending: false });
         console.log("load more missions data");
@@ -136,6 +207,9 @@ const ViewReports = ({ folders }) => {
         loadMoreReports().then((moreReports) => {
           console.log("moreReports");
           console.log(moreReports);
+          if (!moreReports) {
+            return setIsLast(true);
+          }
           setLoadedReports([...loadedReports, ...moreReports]);
           if (moreReports.length < PAGE_COUNT) {
             setIsLast(true);
@@ -152,7 +226,23 @@ const ViewReports = ({ folders }) => {
       <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white" active>
           <i className={`bi bi-folder`}></i>
-          &nbsp; Folders
+          &nbsp;
+          <Link
+            style={{ textDecoration: "none", fontWeight: "300" }}
+            className="text-white"
+            href="/folders/view-folders"
+          >
+            {" "}
+            Folders
+          </Link>
+        </BreadcrumbItem>
+
+        <BreadcrumbItem
+          className="text-white"
+          style={{ fontWeight: "800" }}
+          active
+        >
+          {folderName}
         </BreadcrumbItem>
       </Breadcrumb>
 
@@ -163,9 +253,10 @@ const ViewReports = ({ folders }) => {
             offset={offset}
             handleCardClick={handleCardClick}
             datums={loadedReports}
-            datumsType={"folders"}
+            datumsType={"missions"}
           ></IntelliCardGroup>
-          {/* <IntelliFab onClick={handleFabClick} icon="+" fabType="folders" /> */}
+
+          {/* <IntelliFab onClick={handleFabClick} icon="+" fabType="report" /> */}
 
           {/* </Col> */}
         </Row>

@@ -159,7 +159,7 @@ const ReportDetailPage = ({ report }) => {
         reportRef.current.getBoundingClientRect().top + window.scrollY;
 
       window.scrollTo({
-        top: reportPosition - 5, // 10px offset from the top
+        top: reportPosition + 200, // 10px offset from the top
         behavior: "smooth",
       });
     }
@@ -289,7 +289,7 @@ const ReportDetailPage = ({ report }) => {
       </Breadcrumb>
 
       <Row>
-        <Col md={{ size: 6, offset: 3 }}>
+        <Col md={{ size: 8, offset: 1 }}>
           <div>
             <Card className="cardShadow">
               <div style={{ minHeight: "364px" }}>
