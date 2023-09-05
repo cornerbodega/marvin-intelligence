@@ -535,15 +535,15 @@ export default function Home({ title, content }) {
             <section className="cta section">
               <div className="container">
                 <div
-                  className="cta-inner section-inner"
+                  className="cta-inner section-inner text-white"
                   style={{ borderRadius: "20px" }}
                 >
-                  <h3 className="section-title mt-0">
+                  <h3 className="section-title mt-0 text-white">
                     Talk to Marvin about it:
                   </h3>
                   <div className="cta-cta">
                     <a
-                      className="button button-primary button-wide-mobile"
+                      className="button button-primary button-wide-mobile text-white"
                       href="#"
                     >
                       Get in touch
@@ -594,7 +594,10 @@ export default function Home({ title, content }) {
               </div>
             </div>
           </footer>
-          <div style={{ fontSize: "0.75em" }} className="footer-copyright">
+          <div
+            style={{ fontSize: "0.75em" }}
+            className="footer-copyright white-text"
+          >
             © 2023 Marvin.Technology
           </div>
         </div>
