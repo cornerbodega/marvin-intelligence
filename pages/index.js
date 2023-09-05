@@ -95,12 +95,12 @@ export default function Home({ title, content }) {
                     </p>
                     <div className="hero-cta">
                       <Link
-                        className="button button-primary white-text"
+                        className="button button-primary text-white"
                         href="/account/log-in"
                       >
                         Start your Free Trial
                       </Link>
-                      <a className="button white-text" href="#">
+                      <a className="button text-white" href="#">
                         Meet your AI Team
                       </a>
                     </div>
@@ -202,7 +202,7 @@ export default function Home({ title, content }) {
                             alt="Feature 01"
                           />
                         </div>
-                        <h4 className="feature-title mt-24 white-text">
+                        <h4 className="feature-title mt-24 text-white">
                           Step 1 - Sign Up
                         </h4>
                         <p className="text-md mb-0">
@@ -224,7 +224,7 @@ export default function Home({ title, content }) {
                             alt="Feature 02"
                           />
                         </div>
-                        <h4 className="feature-title mt-24 white-text">
+                        <h4 className="feature-title mt-24 text-white">
                           Step 2 - Hire Your Agents
                         </h4>
                         <p className="text-md mb-0">
@@ -247,7 +247,7 @@ export default function Home({ title, content }) {
                             className="cardShadow"
                           />
                         </div>
-                        <h4 className="feature-title mt-24 white-text">
+                        <h4 className="feature-title mt-24 text-white">
                           Step 3 - Assign Missions
                         </h4>
                         <p className="text-md mb-0">
@@ -270,7 +270,7 @@ export default function Home({ title, content }) {
                             className="cardShadow"
                           />
                         </div>
-                        <h4 className="feature-title mt-24 white-text">
+                        <h4 className="feature-title mt-24 text-white">
                           Step 4 - Review Reports:{" "}
                         </h4>
                         <p className="text-md mb-0">
@@ -292,7 +292,7 @@ export default function Home({ title, content }) {
                             className="cardShadow"
                           />
                         </div>
-                        <h4 className="feature-title mt-24 white-text">
+                        <h4 className="feature-title mt-24 text-white">
                           Step 5 - Iterative Learning:
                         </h4>
                         <p className="text-md mb-0">
@@ -315,7 +315,7 @@ export default function Home({ title, content }) {
                             className="cardShadow"
                           />
                         </div>
-                        <h4 className="feature-title mt-24 white-text">
+                        <h4 className="feature-title mt-24 text-white">
                           Get Started
                         </h4>
                         <p className="text-md mb-0">
@@ -596,7 +596,7 @@ export default function Home({ title, content }) {
           </footer>
           <div
             style={{ fontSize: "0.75em" }}
-            className="footer-copyright white-text"
+            className="footer-copyright text-white"
           >
             © 2023 Marvin.Technology
           </div>
