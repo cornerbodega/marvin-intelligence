@@ -97,10 +97,15 @@ export default function Home({ title, content }) {
                       <Link
                         className="button button-primary text-white"
                         href="/account/log-in"
+                        style={{ color: "white" }}
                       >
                         Start your Free Trial
                       </Link>
-                      <a className="button text-white" href="#">
+                      <a
+                        className="button text-white"
+                        style={{ color: "white" }}
+                        href="#"
+                      >
                         Meet your AI Team
                       </a>
                     </div>
