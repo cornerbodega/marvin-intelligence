@@ -320,13 +320,12 @@ export default function Home({ title, content }) {
                         </h4>
                         <p className="text-md mb-0">
                           <Link
-                            className="button"
-                            style={
-                              {
-                                // textDecoration: "none",
-                                // fontSize: "1.5em",
-                              }
-                            }
+                            className="button text-white"
+                            style={{
+                              color: "white",
+                              // textDecoration: "none",
+                              // fontSize: "1.5em",
+                            }}
                             href="/account/log-in"
                           >
                             Start your Free Trial Now
@@ -545,6 +544,7 @@ export default function Home({ title, content }) {
                     <a
                       className="button button-primary button-wide-mobile text-white"
                       href="#"
+                      style={{ color: "white" }}
                     >
                       Get in touch
                     </a>
