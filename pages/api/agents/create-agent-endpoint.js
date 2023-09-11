@@ -232,5 +232,5 @@ export default async function handler(req, res) {
     specializedTraining,
   }).catch((error) => console.log(error));
 
-  res.send(saveAgentData);
+  res.status(200).json(saveAgentData);
 }
