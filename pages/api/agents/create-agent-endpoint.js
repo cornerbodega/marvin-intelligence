@@ -27,7 +27,7 @@ export async function createAgentFunction({
       specializedTraining,
     },
   };
-  const existingAgentsArray = req.body.existingAgentNames;
+  // const existingAgentsArray = req.body.existingAgentNames;
   // console.log("existingAgentsArray");
   const expertiseCompletion = await openai
     .createChatCompletion({
@@ -59,11 +59,12 @@ export async function createAgentFunction({
       ],
     })
     .catch((error) => console.error(error));
-  console.log("create agent expertiseResponse");
-  console.log(expertiseResponse);
+
   const expertiseResponse = JSON.parse(
     expertiseCompletion.data.choices[0].message.content
   );
+  console.log("create agent expertiseResponse");
+  console.log(expertiseResponse);
   // console.log("expertiseCompletion");
   // console.log(expertiseCompletion.data.choices[0].message.content);
   const expertises = expertiseResponse.filter((str) => str !== "");
