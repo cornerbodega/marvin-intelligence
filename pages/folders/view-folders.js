@@ -164,7 +164,6 @@ const ViewReports = ({ folders }) => {
             datumsType={"folders"}
           ></IntelliCardGroup>
           {/* <IntelliFab onClick={handleFabClick} icon="+" fabType="folders" /> */}
-
           {/* </Col> */}
         </Row>
       </div>
