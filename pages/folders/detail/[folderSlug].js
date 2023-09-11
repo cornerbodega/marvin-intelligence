@@ -60,7 +60,7 @@ export const getServerSideProps = withPageAuthRequired({
       .from("reportFolders")
       .select(
         `
-      folders (folderName),
+      folders (folderName, folderDescription),
       reports (reportTitle, reportPicUrl, reportId)
     `
       )
@@ -72,9 +72,11 @@ export const getServerSideProps = withPageAuthRequired({
 
     const missions = [];
     let folderName = "";
+    let folderDescription = "";
     missionsResponse.forEach((mission) => {
       missions.push(mission.reports);
       folderName = mission.folders.folderName;
+      folderDescription = mission.folders.folderDescription;
     });
     console.log("missions");
     console.log(missions);
@@ -122,11 +124,11 @@ export const getServerSideProps = withPageAuthRequired({
     // If no missions, go to crete report page
     // let agency;
     return {
-      props: { missions, folderName, folderId },
+      props: { missions, folderName, folderId, folderDescription },
     };
   },
 });
-const ViewReports = ({ missions, folderName, folderId }) => {
+const ViewReports = ({ missions, folderName, folderId, folderDescription }) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(1);
@@ -246,6 +248,15 @@ const ViewReports = ({ missions, folderName, folderId }) => {
 
       {/* <div>{JSON.stringify(loadedReports)}</div> */}
       <div ref={containerRef}>
+        <div
+          style={{
+            fontSize: "0.75em",
+            marginTop: "10px",
+            marginBottom: "16px",
+          }}
+        >
+          {folderDescription}
+        </div>
         <Row className="text-primary">
           <IntelliCardGroup
             offset={offset}
