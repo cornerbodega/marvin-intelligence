@@ -434,7 +434,7 @@ const CreateMission = ({ agent }) => {
       </Breadcrumb>
 
       <Row>
-        <Col md={{ size: 7, offset: 1.5 }}>
+        <Col md={{ size: 7, offset: 2 }}>
           <Form onSubmit={handleWriteDraftReport}>
             <div>
               <Card className="text-primary">
