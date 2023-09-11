@@ -104,7 +104,7 @@ export default function Home({ title, content }) {
                       <a
                         className="button text-white"
                         style={{ color: "white" }}
-                        href="#"
+                        href="#/agents/view-agents"
                       >
                         Meet your AI Team
                       </a>
