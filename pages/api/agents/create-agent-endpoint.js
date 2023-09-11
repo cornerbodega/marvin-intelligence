@@ -28,7 +28,7 @@ export async function createAgentFunction({
     },
   };
   const existingAgentsArray = req.body.existingAgentNames;
-  console.log("existingAgentsArray");
+  // console.log("existingAgentsArray");
   const expertiseCompletion = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
     messages: [
@@ -61,12 +61,12 @@ export async function createAgentFunction({
   const expertiseResponse = JSON.parse(
     expertiseCompletion.data.choices[0].message.content
   );
-  console.log("expertiseCompletion");
-  console.log(expertiseCompletion.data.choices[0].message.content);
+  // console.log("expertiseCompletion");
+  // console.log(expertiseCompletion.data.choices[0].message.content);
   const expertises = expertiseResponse.filter((str) => str !== "");
 
   const supabase = getSupabase();
-  console.log("POST");
+  // console.log("POST");
   let cannotBeAnimalsString = "";
   let newAgentModel = {
     //   agentName: req.body.animalName,
@@ -81,7 +81,7 @@ export async function createAgentFunction({
   }
 
   async function generateAnimalName() {
-    console.log("Start generate Animal Name");
+    // console.log("Start generate Animal Name");
     let result = {
       animalName: "API Erorr 1: Generate Animal Name",
       bio: "API Error 2: Unable to Generate Animal Bio",
@@ -132,8 +132,8 @@ export async function createAgentFunction({
     const animalNameResponseContent =
       chat_completion.data.choices[0].message.content;
     if (animalNameResponseContent) {
-      console.log("animalNameResponseContent");
-      console.log(animalNameResponseContent);
+      // console.log("animalNameResponseContent");
+      // console.log(animalNameResponseContent);
       const animalNameResponseObject = JSON.parse(animalNameResponseContent);
       if (animalNameResponseObject) {
         if (animalNameResponseObject.animal) {
@@ -144,8 +144,8 @@ export async function createAgentFunction({
         }
       }
     }
-    console.log(JSON.stringify(chat_completion.data.choices[0]));
-    console.log("End Generate Animal Name");
+    // console.log(JSON.stringify(chat_completion.data.choices[0]));
+    // console.log("End Generate Animal Name");
     return result;
   }
   // function getAgentName() {
