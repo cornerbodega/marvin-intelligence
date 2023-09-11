@@ -101,13 +101,13 @@ export default function Home({ title, content }) {
                       >
                         Start your Free Trial
                       </Link>
-                      <a
+                      <Link
                         className="button text-white"
                         style={{ color: "white" }}
                         href="/agents/view-agents"
                       >
                         Meet your AI Team
-                      </a>
+                      </Link>
                     </div>
                   </div>
                   <div className="hero-figure anime-element">
