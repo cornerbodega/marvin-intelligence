@@ -104,7 +104,13 @@ const CreateMission = ({ agent }) => {
     console.log("create mission handleSubmit");
     console.log("draft");
     console.log(draft);
-    e.preventDefault();
+    console.log("router.query.briefing");
+    console.log(router.query.briefing);
+    console.log("briefing");
+    console.log(briefing);
+    if (e) {
+      e.preventDefault();
+    }
     setIsSubmitting(true);
     setFeedbackInput("");
     const notificationMessagesResponse = await fetch(
@@ -122,7 +128,7 @@ const CreateMission = ({ agent }) => {
 
     setNotificationMessages(notificationJson);
     const expertises = [agent.expertise1, agent.expertise2, agent.expertise3];
-
+    console.log(" dispatch briefing");
     const draftData = { briefing, expertises };
     const specializedTraining = agent.specializedTraining;
     if (feedbackInput) {
@@ -138,6 +144,8 @@ const CreateMission = ({ agent }) => {
     if (specializedTraining) {
       draftData.specializedTraining = specializedTraining;
     }
+    console.log("draftData");
+    console.log(draftData);
 
     const res = await fetch("/api/missions/write-draft-endpoint", {
       method: "POST",
@@ -206,6 +214,8 @@ const CreateMission = ({ agent }) => {
         startIndex: router.query.startIndex,
         endIndex: router.query.endIndex,
         elementId: router.query.elementId,
+        continuumEnabled,
+        numberGenerations: generationsSliderValue,
       }),
     });
 
@@ -214,8 +224,20 @@ const CreateMission = ({ agent }) => {
     console.log("reportJson");
     console.log(reportJson);
     const reportId = reportJson.reportId;
+    const folderId = reportJson.folderId;
     // setIsSubmitting(false);
-    router.push(`/missions/report/${reportId}`);
+
+    // if this is not a continuum, go to the report
+    if (!continuumEnabled) {
+      router.push(`/missions/report/${reportId}`);
+    }
+    if (continuumEnabled) {
+      router.push(`/folders/detail/${folderId}`);
+    }
+
+    // if this is a continuum, go to the folder
+
+    // clear the notification
     clearInterval(notificationIntervalId); // Clear the interval properly
     // setNotificationMessages([]);
   }
@@ -264,6 +286,12 @@ const CreateMission = ({ agent }) => {
   //   // clearInterval(notificationIntervalId); // Clear the interval properly
   //   // setNotificationMessages([]);
   // }
+
+  // useEffect(() => {
+  //   if (briefing) {
+  //     handleWriteDraftReport();
+  //   }
+  // }, [briefing]);
   useEffect(() => {
     async function fetchBriefingSuggestion() {
       // Logic to build expertiseString from agent prop
@@ -299,7 +327,8 @@ const CreateMission = ({ agent }) => {
         console.log("briefing response data");
         console.log(data);
         if (data.briefingSuggestion) {
-          setBriefingSuggestion(data.briefingSuggestion);
+          // setBriefingSuggestion(data.briefingSuggestion);
+          setBriefing(data.briefingSuggestion);
         }
 
         if (data.parentReportSummary) {
@@ -312,8 +341,14 @@ const CreateMission = ({ agent }) => {
         console.error("Failed to fetch briefing suggestion");
       }
     }
-
-    fetchBriefingSuggestion();
+    if (!router.query.briefing) {
+      fetchBriefingSuggestion();
+    } else {
+      setBriefing(router.query.briefing);
+      console.log("router.query.briefing");
+      console.log(router.query.briefing);
+      // handle
+    }
   }, [agent]);
 
   useEffect(() => {
@@ -340,6 +375,12 @@ const CreateMission = ({ agent }) => {
     return () => clearInterval(intervalId); // Clear interval on component unmount
   }, [notificationMessages]);
   const currentQueryParams = router.query;
+
+  // Continuum
+  const [continuumEnabled, setContinuumEnabled] = useState(false);
+  const [generationsSliderValue, setGenerationsSliderValue] = useState(2);
+  // const [createNewAgentsEnabled, setCreateNewAgentsEnabled] = useState(false);
+
   return (
     <div>
       <Toaster position="bottom-center" />
@@ -371,29 +412,29 @@ const CreateMission = ({ agent }) => {
           </BreadcrumbItem>
         )}
         <BreadcrumbItem>
-          <i className="bi bi-body-text"></i>+ &nbsp;
+          <i className="bi bi-body-text"></i>+&nbsp;
           <Link
             className="text-white"
             style={{ fontWeight: "200", textDecoration: "none" }}
             href={{
-              pathname: "/missions/create-mission/agents/view-agents/",
+              pathname: "/missions/create-mission/briefing",
               query: currentQueryParams,
             }}
           >
             Create Mission
           </Link>
         </BreadcrumbItem>
-        <BreadcrumbItem style={{ fontWeight: "200" }} className="">
-          {" "}
-          <i className={`bi bi-person-badge`}></i>&nbsp; Agent {agent.agentName}
+        <BreadcrumbItem style={{ fontWeight: "800" }} className="">
+          <i className={`bi bi-person-badge`}></i>&nbsp;Dispatch Agent{" "}
+          {agent.agentName}
         </BreadcrumbItem>
-        <BreadcrumbItem className="">
+        {/* <BreadcrumbItem className="">
           <div style={{ fontWeight: "800" }}>Dispatch</div>
-        </BreadcrumbItem>
+        </BreadcrumbItem> */}
       </Breadcrumb>
 
       <Row>
-        <Col md={{ size: 6, offset: 3 }}>
+        <Col md={{ size: 7, offset: 1.5 }}>
           <Form onSubmit={handleWriteDraftReport}>
             <div>
               <Card className="text-primary">
@@ -493,15 +534,22 @@ const CreateMission = ({ agent }) => {
                     )}
 
                     {parentReportSummary && (
-                      <div>
-                        <h4>Linked Mission Context</h4>
-                      </div>
+                      <>
+                        <div>
+                          <h4>Linked Mission Context</h4>
+                        </div>
+
+                        <div>{parentReportSummary}</div>
+                      </>
                     )}
-                    <div>{parentReportSummary}</div>
-                    <div>
-                      <h4>Briefing Suggestion</h4>
-                    </div>
-                    <div>{briefingSuggestion}</div>
+                    {/* {briefingSuggestion && (
+                      <>
+                        <div>
+                          <h4>Briefing Suggestion</h4>
+                        </div>
+                        <div>{briefingSuggestion}</div>
+                      </>
+                    )} */}
                   </div>
                 </CardBody>
               </Card>
@@ -511,9 +559,23 @@ const CreateMission = ({ agent }) => {
               <div>
                 <div style={{ marginTop: "20px" }}></div>
                 <FormGroup>
-                  <Label for="exampleText" className="text-white">
+                  <Label htmlFor="exampleText" className="text-white">
                     Mission Prompt
                   </Label>
+                  <div
+                    onClick={(e) => {
+                      setBriefing("");
+                    }}
+                    style={{
+                      paddingTop: "4px",
+                      fontSize: "0.75em",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      cursor: "pointer",
+                    }}
+                  >
+                    🚫
+                  </div>
                   <Input
                     id="exampleText"
                     placeholder="What would you like to know?"
@@ -523,13 +585,14 @@ const CreateMission = ({ agent }) => {
                     value={briefing}
                     onChange={(e) => setBriefing(e.target.value)}
                   />
+
                   <div style={{ textAlign: "right", paddingTop: "8px" }}>
                     <Button
                       color="primary"
                       style={{ border: "1px solid green" }}
                       disabled={isSubmitting || !briefing}
                     >
-                      Create Draft
+                      <i className="bi bi-body-text"></i> Create Draft
                     </Button>
                   </div>
                 </FormGroup>
@@ -541,6 +604,7 @@ const CreateMission = ({ agent }) => {
             <Card>
               {/* <div className="text-white">Draft</div> */}
               <CardBody>
+                <i className="bi bi-body-text"> Draft </i>
                 <div
                   className="text-primary"
                   dangerouslySetInnerHTML={{ __html: draft }}
@@ -553,7 +617,7 @@ const CreateMission = ({ agent }) => {
               <Form onSubmit={(e) => handleWriteDraftReport(e)}>
                 <FormGroup>
                   <div style={{ marginTop: "40px" }}></div>
-                  <Label for="exampleText" className="text-white">
+                  <Label htmlFor="exampleText" className="text-white">
                     Feedback
                   </Label>
                   <Input
@@ -572,18 +636,111 @@ const CreateMission = ({ agent }) => {
                       disabled={isSubmitting}
                     >
                       <i className="bi bi-arrow-clockwise"></i>
-                      Retry
+                      &nbsp;Retry
                     </Button>
                   </div>
                 </FormGroup>
               </Form>
-              Continua
+              <h3>
+                <i className="bi bi-link"></i> Continuum
+              </h3>
+
+              <FormGroup check>
+                <Label check>
+                  <Input
+                    type="checkbox"
+                    name="missionContinuum"
+                    onChange={() => setContinuumEnabled(!continuumEnabled)}
+                  />
+                  Enable Continuum
+                </Label>
+              </FormGroup>
+              <div
+                style={{
+                  // fontFamily: "Arial, sans-serif",
+                  fontSize: "1em",
+                  color: "#333",
+                  lineHeight: "1.5",
+                  marginBottom: "40px",
+                  maxWidth: "600px",
+                }}
+              >
+                <Label>
+                  Transform your mission into a living, evolving narrative with
+                  Continuum. Spawn a vibrant web of interconnected insights,
+                  autonomously explored and expanded by AI agents. It's
+                  collaborative intelligence, reimagined – a seamless journey
+                  from a singular idea to a rich tapestry of knowledge. Try it
+                  now and experience the future of intelligent research.
+                </Label>
+              </div>
+              <div>
+                {continuumEnabled && (
+                  <div>
+                    <FormGroup>
+                      <span>
+                        <Label
+                          style={{ marginRight: "12px" }}
+                          htmlFor="missionGenerations"
+                        >
+                          <i className="bi bi-link"></i> Generations:
+                        </Label>
+                        {generationsSliderValue}
+                      </span>
+                      <Input
+                        // style={{ width: "50%" }}
+                        type="range"
+                        name="missionGenerations"
+                        id="missionGenerations"
+                        min="2"
+                        max="10"
+                        defaultValue="2"
+                        step="1"
+                        onChange={(e) =>
+                          setGenerationsSliderValue(e.target.value)
+                        }
+                      />
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span>
+                          <label htmlFor="missionGenerations">
+                            2 <i className="bi bi-body-text"></i>
+                          </label>
+                        </span>
+
+                        <span>
+                          <label htmlFor="missionGenerations">
+                            10 <i className="bi bi-body-text"></i>
+                          </label>
+                        </span>
+                      </div>
+                    </FormGroup>
+
+                    {/* <FormGroup check>
+                      <Label check>
+                        <Input
+                          type="checkbox"
+                          onChange={() =>
+                            setCreateNewAgentsEnabled(!createNewAgentsEnabled)
+                          }
+                          name="enableAgentCreation"
+                        />
+                        Create New Agents
+                      </Label>
+                    </FormGroup> */}
+                  </div>
+                )}
+              </div>
               <Form>
                 <div style={{ textAlign: "right" }}>
                   <Button
                     color="primary"
                     style={{ border: "3px solid green" }}
-                    disabled={isSubmitting}
+                    // disabled={isSubmitting}
                     onClick={(e) => handleAcceptReport(e)}
                   >
                     <i className="bi bi-body-text"></i> Save Report

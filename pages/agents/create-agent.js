@@ -4,11 +4,11 @@ import toast, { Toaster } from "react-hot-toast";
 
 // import { getSupabase } from "../../../utils/supabase";
 // import { getSupabase } from "../../../utils/supabase";
-import { getSupabase } from "../../../../utils/supabase";
+import { getSupabase } from "../../utils/supabase";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/router";
 // rest of component
-import { slugify } from "../../../../utils/slugify";
+import { slugify } from "../../utils/slugify";
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -27,7 +27,7 @@ import {
 
 import Link from "next/link";
 import { getSession } from "@auth0/nextjs-auth0";
-import { log } from "../../../../utils/log";
+import { log } from "../../utils/log";
 import { set } from "lodash";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
@@ -39,9 +39,10 @@ export const getServerSideProps = withPageAuthRequired({
       .from("agents")
       .select("agentName")
       .eq("userId", user.sub);
-    const existingAgentNames = agents.map((agent) => agent.agentName);
-    console.log("existingAgentNames");
-    console.log(existingAgentNames);
+    // const existingAgentNames = agents.map((agent) => agent.agentName);
+    const existingAgentNames = [];
+    // console.log("existingAgentNames");
+    // console.log(existingAgentNames);
     // other pages will redirect here if they're empty
     // If no agency, go to create agency page
     // If no agents, go to crete agent page
@@ -68,7 +69,8 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
 
   const specializedTrainingExample =
     "You love the McRib. You always mention the McRib in each of your replies, to a comical degree.";
-  const [expertise1, setExpertise1] = useState("");
+  const [expertiseInput, setExpertiseInput] = useState("");
+  // const [expertise1, setExpertise1] = useState("");
   const [expertise2, setExpertise2] = useState("");
   const [expertise3, setExpertise3] = useState("");
   useEffect(() => {
@@ -93,12 +95,12 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    if (!expertise1) {
+    if (!expertiseInput) {
       alert("At least one area of expertise must be provided.");
       return;
     }
     const agentData = {
-      expertises: [expertise1, expertise2, expertise3],
+      expertiseInput,
       userId: user.sub,
       existingAgentNames,
       specializedTraining,
@@ -134,7 +136,7 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
     });
     const createdAgent = await res.json();
     console.log("createdAgent");
-    const agentId = createdAgent.data[0].agentId;
+    const agentId = createdAgent.agentId;
     // router.push(`/missions/create-mission/agents/${agentId}`);
     router.push({
       pathname: "/missions/create-mission/dispatch",
@@ -187,6 +189,72 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
                 <h3>New Agent Creation</h3>
               </div>
               <FormGroup>
+                <Row>
+                  <FormGroup>
+                    <Label className="text-white">Expertise</Label>
+                    <Label className="text-white">
+                      List or describe the areas where you'd like your agent to
+                      excel. You can specify up to three areas of expertise. Our
+                      AI will process your input to extract standardized areas
+                      of expertise
+                    </Label>
+                    <Input
+                      autoFocus
+                      value={expertiseInput}
+                      onChange={(e) => setExpertiseInput(e.target.value)}
+                      placeholder={`${getRandomExpertise()}, ${getRandomExpertise()}, ${getRandomExpertise()}`}
+                      name="text"
+                      rows="10"
+                      type="textarea"
+                    />
+                  </FormGroup>
+                </Row>
+              </FormGroup>
+              <FormGroup>
+                <Row>
+                  <div style={{ marginBottom: "10px" }}>
+                    {!showSpecializedTrainingInput ? (
+                      <Label
+                        className="text-white"
+                        style={{ textDecoration: "underline" }}
+                        onClick={() =>
+                          setShowSpecializedTrainingInput(
+                            !showSpecializedTrainingInput
+                          )
+                        }
+                      >
+                        Add Specialized Training
+                      </Label>
+                    ) : (
+                      <div>
+                        <FormGroup>
+                          <Label className="text-white">
+                            Specialized Training
+                          </Label>
+                          <Label className="text-white">
+                            Provide additional information or specific skills
+                            you'd like your agent to possess. This section helps
+                            in fine-tuning your agent's capabilities
+                          </Label>
+                          <Input
+                            id="exampleText"
+                            placeholder={specializedTrainingExample}
+                            name="text"
+                            rows="10"
+                            type="textarea"
+                            value={specializedTraining}
+                            onChange={(e) =>
+                              setSpecializedTraining(e.target.value)
+                            }
+                          />
+                        </FormGroup>
+                      </div>
+                    )}
+                  </div>
+                </Row>
+              </FormGroup>
+
+              {/* <FormGroup>
                 <Row>
                   <Label className="text-white" for="expertise1" md={4}>
                     Expertise
@@ -271,7 +339,7 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
                     </FormGroup>
                   </div>
                 )}
-              </div>
+              </div> */}
 
               <div style={{ marginBottom: "40px" }}></div>
               <div style={{ textAlign: "right" }}>

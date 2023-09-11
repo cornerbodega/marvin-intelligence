@@ -17,8 +17,6 @@ export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     const session = await getSession(context.req, context.res);
     const user = session?.user;
-    console.log("session");
-    console.log(session);
 
     let { data: agency, agencyError } = await supabase
       .from("users")

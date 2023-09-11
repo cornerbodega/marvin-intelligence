@@ -18,8 +18,6 @@ export const getServerSideProps = withPageAuthRequired({
     const folderId = context.params.folderSlug.split("-")[0];
     const session = await getSession(context.req, context.res);
     const user = session?.user;
-    console.log("session");
-    console.log(session);
 
     let { data: agency, agencyError } = await supabase
       .from("users")

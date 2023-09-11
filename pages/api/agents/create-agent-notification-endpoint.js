@@ -8,17 +8,18 @@ const openai = new OpenAIApi(configuration);
 
 export default async function handler(req, res) {
   console.log("CREATE AGENT NOTIFICATION ENDOIINT");
-  const expertises = req.body.expertises.filter((str) => str !== "");
+  // const expertises = req.body.expertises.filter((str) => str !== "");
 
   if (req.method === "POST") {
     console.log("POST");
-    let expertiseString = expertises[0];
-    if (expertises.length > 1) {
-      expertiseString += " and " + expertises[1];
-    }
-    if (expertises.length > 2) {
-      expertiseString += " and " + expertises[2];
-    }
+
+    let expertiseString = req.body.expertiseInput;
+    // if (expertises.length > 1) {
+    //   expertiseString += " and " + expertises[1];
+    // }
+    // if (expertises.length > 2) {
+    //   expertiseString += " and " + expertises[2];
+    // }
 
     const chat_completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",

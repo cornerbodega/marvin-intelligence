@@ -67,8 +67,8 @@ const IntelliCard = ({
     );
   }
 
-  console.log("IntelliCard datums");
-  console.log(displayDatums);
+  // console.log("IntelliCard datums");
+  // console.log(displayDatums);
   function handleClick() {
     // console.log("Intellicard handleCardClick");
     // console.log(handleCardClick);

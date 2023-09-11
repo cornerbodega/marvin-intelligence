@@ -5,11 +5,6 @@ import { useRouter } from "next/router";
 
 const navigation = [
   // {
-  //   title: "Agents",
-  //   href: "/missions/create-mission/agents/view-agents",
-  //   icon: "bi bi-person-badge",
-  // },
-  // {
   //   title: "Missions",
   //   href: "/missions/view-missions",
   //   icon: "bi bi-patch-check",
@@ -20,7 +15,11 @@ const navigation = [
     href: "/missions/view-missions",
     icon: "bi bi-body-text",
   },
-
+  {
+    title: "Agents",
+    href: "/agents/view-agents",
+    icon: "bi bi-person-badge",
+  },
   {
     title: "Folders",
     href: "/folders/view-folders",
@@ -87,14 +86,17 @@ const Sidebar = ({ showMobilemenu }) => {
 
   return (
     <div className="p-3 ">
-      <div className="d-flex align-items-center text-white">
+      <div className="d-flex align-items-center">
         <Logo />
-        <Button
-          close
+        <a
+          close="true"
           size="sm"
           className="ms-auto d-lg-none"
+          style={{ color: "white", textDecoration: "none" }}
           onClick={showMobilemenu}
-        ></Button>
+        >
+          ✖
+        </a>
       </div>
 
       <div className="pt-4 mt-2">

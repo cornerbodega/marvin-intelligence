@@ -4,12 +4,12 @@ const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
-export default async function getSuggestion(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).end();
-  }
-  const { expertiseString, parentReportId, agentId, highlightedText } =
-    req.body;
+export async function getSuggestionFunction({
+  expertiseString,
+  parentReportId,
+  agentId,
+  highlightedText,
+}) {
   const supabase = getSupabase();
   const responseObj = {};
 
@@ -69,7 +69,7 @@ export default async function getSuggestion(req, res) {
     )}.`;
   }
   if (parentReportSummary) {
-    getSuggestionQuestionText += `We need a new research question that will be linked to from this report: ${parentReportSummary}. The text of the link will be ${highlightedText}. Bring an inspirational, creative, and interesting angle from your expertise in ${expertiseString} whenever possible.`;
+    getSuggestionQuestionText += `We need a new research question about ${highlightedText}.Context: ${parentReportSummary}. Bring an inspirational, creative, and interesting angle from your expertise in ${expertiseString} whenever possible.`;
   }
   getSuggestionQuestionText += `What is an interesting research question for further research?`;
   try {
@@ -118,7 +118,8 @@ export default async function getSuggestion(req, res) {
     if (parentReportSummary) {
       responseObj.parentReportSummary = parentReportSummary;
     }
-    res.status(200).json(responseObj);
+
+    return responseObj;
   } catch (error) {
     console.error("getSuggestion error");
     console.log(error);
@@ -130,6 +131,21 @@ export default async function getSuggestion(req, res) {
       console.log(error);
       // Handle other types of errors (e.g., network errors)
     }
-    res.status(500).json({ error: "Internal Server Error" });
   }
+}
+export default async function getSuggestion(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).end();
+  }
+  const { expertiseString, parentReportId, agentId, highlightedText } =
+    req.body;
+  const responseObj = await getSuggestionFunction({
+    expertiseString,
+    parentReportId,
+    agentId,
+    highlightedText,
+  }).catch((error) => {
+    res.status(500).json({ error: "Internal Server Error" });
+  });
+  res.status(200).json(responseObj);
 }

@@ -17,8 +17,6 @@ export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     const session = await getSession(context.req, context.res);
     const user = session?.user;
-    console.log("session");
-    console.log(session);
 
     let { data: agency, agencyError } = await supabase
       .from("users")
@@ -88,7 +86,7 @@ const ViewReports = ({ missions }) => {
   };
   const handleFabClick = () => {
     console.log("ViewReports HandleClick Clicked!");
-    goToPage("/missions/create-mission/agents/view-agents");
+    goToPage("/missions/create-mission/briefing");
   };
   const handleCardClick = (report) => {
     // console.log("handleCardClick");

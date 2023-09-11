@@ -19,24 +19,22 @@ import { useEffect, useRef, useState, useContext } from "react";
 import { debounce } from "lodash";
 // other imports
 import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
-import IntelliCardGroup from "../../../../components/IntelliCardGroup";
-import IntelliCardGroupRow from "../../../../components/IntelliCardGroupRow";
-import { getSupabase } from "../../../../utils/supabase";
-import RevealAnimations from "../../../../components/RevealAnimations";
-import IntelliFab from "../../../../components/IntelliFab";
+import IntelliCardGroup from "../../components/IntelliCardGroup";
+import IntelliCardGroupRow from "../../components/IntelliCardGroupRow";
+import { getSupabase } from "../../utils/supabase";
+import RevealAnimations from "../../components/RevealAnimations";
+import IntelliFab from "../../components/IntelliFab";
 // rest of component
-import IntelliProvider from "../../../../components/IntelliProvider/IntelliProvider";
-import IntelliContext from "../../../../components/intelliContext/IntelliContext";
+import IntelliProvider from "../../components/IntelliProvider/IntelliProvider";
+import IntelliContext from "../../components/intelliContext/IntelliContext";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { slugify } from "../../../../utils/slugify";
+import { slugify } from "../../utils/slugify";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     const session = await getSession(context.req, context.res);
     const user = session?.user;
-    console.log("session");
-    console.log(session);
 
     let { data: agency, agencyError } = await supabase
       .from("users")
@@ -126,7 +124,7 @@ const ViewAgents = ({ agents }) => {
     console.log("ViewAgents HandleClick Clicked!");
     // goToPage("/missions/create-agent");sss
     router.push({
-      pathname: "/missions/create-mission/agents/create-agent",
+      pathname: "/agents/create-agent",
       query: router.query,
     });
   };

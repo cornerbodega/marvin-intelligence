@@ -5,7 +5,7 @@ import LogoDark from "../../../public/logo.png";
 
 const Logo = () => {
   return (
-    <Link href="/dashboard">
+    <Link href="/missions/view-missions">
       {/* <a> */}
       {/* Marvin Intelligence Agency */}
       <Image src={LogoDark} alt="logo" />

@@ -35,7 +35,7 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import IntelliFab from "../../../components/IntelliFab";
 import { getSupabase } from "../../../utils/supabase";
 import { useState } from "react";
-import { set } from "lodash";
+import { set, update } from "lodash";
 import { log } from "../../../utils/log";
 import getCloudinaryImageUrlForHeight from "../../../utils/getCloudinaryImageUrlForHeight";
 // import missingsBriefingHandler from "../../api/missions/generate-briefing-suggestions-endpoint";
@@ -119,23 +119,41 @@ const ReportDetailPage = ({ report }) => {
         console.log("linksError", linksError);
         return;
       }
-
+      console.log("reportSlug link");
+      console.log(links);
       if (links && links.length > 0) {
         const container = document.createElement("div");
         container.innerHTML = report.reportContent;
-        console.log("report.reportContent");
-        console.log(report.reportContent);
+        // console.log("report.reportContent");
+        // console.log(report.reportContent);
+
         links.forEach((link) => {
           const element = container.querySelector(`[id="${link.elementId}"]`);
-
-          const highlightedText = JSON.parse(link.highlightedText);
-
+          // let highlightedText = JSON.parse(link.highlightedText);
+          let highlightedText = (() => {
+            try {
+              return JSON.parse(link.highlightedText);
+            } catch {
+              return link.highlightedText;
+            }
+          })();
+          // if (typeof link.highlightedText !== "string") {
+          // highlightedText = JSON.parse(link.highlightedText);
+          // } else {
+          // highlightedText =
+          // }
+          console.log("reportSlug element");
+          console.log(element);
+          console.log("reportSlug highlightedText");
+          console.log(highlightedText);
           if (element) {
-            const newLink = `<a href="/missions/report/${link.childReportId}-">${highlightedText}</a>`;
+            const newLink = `<a href="/missions/report/${link.childReportId}">${highlightedText}</a>`;
             const updatedHTML = element.innerHTML.replace(
               highlightedText,
               newLink
             );
+            console.log("updatedHTML");
+            console.log(updatedHTML);
             element.innerHTML = updatedHTML;
           }
         });
@@ -166,7 +184,7 @@ const ReportDetailPage = ({ report }) => {
   }, [isFirstLoad]);
   function handleFabClick() {
     router.push(
-      `/missions/create-mission/agents/view-agents?parentReportId=${
+      `/agents/view-agents?parentReportId=${
         report.reportId
       }&parentReportTitle=${JSON.stringify(
         report.reportTitle
@@ -289,7 +307,7 @@ const ReportDetailPage = ({ report }) => {
       </Breadcrumb>
 
       <Row>
-        <Col md={{ size: 8, offset: 1 }}>
+        <Col sm="12" md={{ size: 8, offset: 1 }}>
           <div>
             <Card className="cardShadow">
               <div style={{ minHeight: "364px" }}>
@@ -302,67 +320,67 @@ const ReportDetailPage = ({ report }) => {
                   src={report.reportPicUrl}
                 ></img>
               </div>
-              <CardBody>
-                {reportContent && (
-                  <Card>
-                    <CardBody style={{ marginTop: "-33px" }}>
-                      <div
-                        id="reportRoot"
-                        onMouseUp={handleTextHighlight}
-                        className="text-primary reportFont"
-                        dangerouslySetInnerHTML={{ __html: reportContent }}
-                      />
-                      <div
-                        style={{
-                          marginTop: "64px",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                        }}
-                      >
-                        {report.profilePicUrl && (
-                          <Link
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "center",
-                            }}
-                            href={`http://localhost:3000/missions/create-mission/dispatch?agentId=${report.agentId}`}
-                          >
-                            <img
-                              src={getCloudinaryImageUrlForHeight(
-                                report.profilePicUrl,
+              {/* <CardBody> */}
+              {reportContent && (
+                <Card>
+                  <CardBody style={{ marginTop: "-33px" }}>
+                    <div
+                      id="reportRoot"
+                      onMouseUp={handleTextHighlight}
+                      className="text-primary reportFont"
+                      dangerouslySetInnerHTML={{ __html: reportContent }}
+                    />
+                    <div
+                      style={{
+                        marginTop: "64px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      {report.profilePicUrl && (
+                        <Link
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                          }}
+                          href={`http://localhost:3000/missions/create-mission/dispatch?agentId=${report.agentId}`}
+                        >
+                          <img
+                            src={getCloudinaryImageUrlForHeight(
+                              report.profilePicUrl,
 
-                                250
-                              )}
-                              style={{
-                                borderRadius: "50%",
-                                height: "250px",
-                                marginBottom: "-10px",
-                              }}
-                            />
-                            <div
-                              style={{
-                                marginTop: "16px",
-                                textAlign: "center",
-                              }}
-                            >
-                              Agent {report.agentName}
-                            </div>
-                          </Link>
-                        )}
-                      </div>
-                      {highlight.text && (
-                        <IntelliFab
-                          onClick={handleFabClick}
-                          icon="+"
-                          fabType="report"
-                        />
+                              250
+                            )}
+                            style={{
+                              borderRadius: "50%",
+                              height: "250px",
+                              marginBottom: "-10px",
+                            }}
+                          />
+                          <div
+                            style={{
+                              marginTop: "16px",
+                              textAlign: "center",
+                            }}
+                          >
+                            Agent {report.agentName}
+                          </div>
+                        </Link>
                       )}
-                    </CardBody>
-                  </Card>
-                )}
-              </CardBody>
+                    </div>
+                    {highlight.text && (
+                      <IntelliFab
+                        onClick={handleFabClick}
+                        icon="+"
+                        fabType="report"
+                      />
+                    )}
+                  </CardBody>
+                </Card>
+              )}
+              {/* </CardBody> */}
             </Card>
           </div>
         </Col>
