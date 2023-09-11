@@ -195,15 +195,15 @@ export async function createAgentFunction({
   const cloudinaryImageUploadResult = await cloudinary.uploader
     .upload(imageUrl)
     .catch((error) => console.log(error));
-  console.log("cloudinaryImageUploadResult");
+  // console.log("cloudinaryImageUploadResult");
   const profilePicUrl = cloudinaryImageUploadResult.url;
   newAgentModel.profilePicUrl = profilePicUrl;
-  console.log("newAgentModel");
-  console.log(newAgentModel);
+  // console.log("newAgentModel");
+  // console.log(newAgentModel);
   //   Save Agent to Supabase
   const saveAgentData = await saveToSupabase("agents", newAgentModel);
-  console.log("saveAgentData");
-  console.log(saveAgentData);
+  // console.log("saveAgentData");
+  // console.log(saveAgentData);
   if (saveAgentData) {
     return saveAgentData.data[0];
   } else {
@@ -212,8 +212,8 @@ export async function createAgentFunction({
 
   async function saveToSupabase(table, dataToSave) {
     const response = await supabase.from(table).insert(dataToSave).select();
-    console.log("response");
-    console.log(response);
+    // console.log("response");
+    // console.log(response);
 
     return response;
   }
