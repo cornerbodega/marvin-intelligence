@@ -59,7 +59,8 @@ export async function createAgentFunction({
       ],
     })
     .catch((error) => console.error(error));
-
+  console.log("create agent expertiseResponse");
+  console.log(expertiseResponse);
   const expertiseResponse = JSON.parse(
     expertiseCompletion.data.choices[0].message.content
   );
@@ -133,11 +134,11 @@ export async function createAgentFunction({
         ],
       })
       .catch((error) => console.error(error));
+    console.log("animalNameResponseContent");
+    console.log(chat_completion);
     const animalNameResponseContent =
       chat_completion.data.choices[0].message.content;
     if (animalNameResponseContent) {
-      // console.log("animalNameResponseContent");
-      // console.log(animalNameResponseContent);
       const animalNameResponseObject = JSON.parse(animalNameResponseContent);
       if (animalNameResponseObject) {
         if (animalNameResponseObject.animal) {
@@ -222,7 +223,9 @@ export async function createAgentFunction({
     const response = await supabase.from(table).insert(dataToSave).select();
     // console.log("response");
     // console.log(response);
-
+    // if (error) {
+    //   console.error(error);
+    // }
     return response;
   }
 }
