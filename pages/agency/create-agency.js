@@ -81,7 +81,7 @@ function CreateAgency() {
 
     if (res.status === 200) {
       // alert("Agent created successfully!");
-      router.push("/missions/create-mission/agents/view-agents");
+      router.push("/missions/create-mission/briefing");
       console.log("Agent created successfully!");
     } else {
       console.log(JSON.stringify(res));
