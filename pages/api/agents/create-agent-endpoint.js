@@ -1,3 +1,6 @@
+// export const config = {
+//   runtime: "edge",
+// };
 import { get } from "lodash";
 import { log } from "../../../utils/log";
 import { getSupabase } from "../../../utils/supabase";
@@ -195,6 +198,8 @@ export async function createAgentFunction({
   newAgentModel.agentName = agentName;
   newAgentModel.bio = bio;
   newAgentModel.specializedTraining = req.body.specializedTraining;
+
+  // save this newAgent model to DB while art is created?
   const aiImageResponse = await openai.createImage({
     prompt: `front facing photograph of a wild ${agentName}`,
     n: 1,
@@ -232,6 +237,7 @@ export async function createAgentFunction({
 }
 export default async function handler(req, res) {
   console.log("CREATE AN AGENT");
+
   const expertiseInput = req.body.expertiseInput;
   const userId = req.body.userId;
   const existingAgentNames = req.body.existingAgentNames;

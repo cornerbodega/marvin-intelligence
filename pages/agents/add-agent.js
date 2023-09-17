@@ -1,13 +1,14 @@
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 // import toast, { Toaster } from "react-hot-toast";
 import toast, { Toaster } from "react-hot-toast";
-
+import { db } from "../../utils/firebase";
 // import { getSupabase } from "../../../utils/supabase";
 // import { getSupabase } from "../../../utils/supabase";
 import { getSupabase } from "../../utils/supabase";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/router";
 // rest of component
+import { setupFirebaseListener } from "../../utils/firebaseListener";
 import { slugify } from "../../utils/slugify";
 import React, { useState, useEffect } from "react";
 import {
@@ -29,130 +30,162 @@ import Link from "next/link";
 import { getSession } from "@auth0/nextjs-auth0";
 import { log } from "../../utils/log";
 import { set } from "lodash";
-export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps(context) {
-    const supabase = getSupabase();
-    const session = await getSession(context.req, context.res);
-    const user = session?.user;
+import { saveToFirebase } from "../../utils/saveToFirebase";
+import Router from "next/router";
 
-    let { data: agents, error } = await supabase
-      .from("agents")
-      .select("agentName")
-      .eq("userId", user.sub);
-    // const existingAgentNames = agents.map((agent) => agent.agentName);
-    const existingAgentNames = [];
-    // console.log("existingAgentNames");
-    // console.log(existingAgentNames);
-    // other pages will redirect here if they're empty
-    // If no agency, go to create agency page
-    // If no agents, go to crete agent page
-    // let agency;
-    return {
-      props: { existingAgentNames },
-    };
-  },
-});
-export const CreateAgentForm = ({ existingAgentNames }) => {
+export function goToAgentProfile({ agentId }) {
+  console.log("goToAgentProfile");
+  console.log(agentId);
+  // const router = useRouter();
+  Router.push({
+    pathname: "/missions/create-mission/draft-report",
+    query: { ...Router.query, agentId: agentId },
+  });
+}
+
+export const CreateAgentForm = ({}) => {
   const router = useRouter();
-  console.log("existingAgentNames");
-  console.log(existingAgentNames);
   const [notificationMessages, setNotificationMessages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const randomAnimalNames = ["Tiger", "Elephant", "Hawk", "Frog"];
-  // const randomAnimalName =
-  //   randomAnimalNames[Math.floor(Math.random() * randomAnimalNames.length)];
 
-  // const [animalName, setAnimalName] = useState(randomAnimalName);
   const [specializedTraining, setSpecializedTraining] = useState("");
   const [showSpecializedTrainingInput, setShowSpecializedTrainingInput] =
     useState(false);
 
+  const [taskId, setTaskId] = useState(null);
+  const [taskStatus, setTaskStatus] = useState(null);
+
+  useEffect(() => {
+    if (taskId) {
+      const taskRef = db.ref(`asyncTasks/${user.sub}/taskType/${taskId}`);
+
+      taskRef.on("value", (snapshot) => {
+        const taskData = snapshot.val();
+        setTaskStatus(taskData.status);
+        console.log("client addAgent taskData");
+        console.log(taskData);
+
+        if (taskData.status === "complete") {
+          console.log("client addAgent completed taskData.context");
+          console.log(taskData.context);
+          // Query Supabase to fetch the updated data when the task is completed
+          console.log(taskData.context.folderId);
+          // querySupabase();
+        }
+      });
+
+      return () => taskRef.off(); // Cleanup the listener on component unmount
+    }
+  }, [taskId]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const newTask = {
+        type: "addAgent",
+        taskId,
+        status: "queued",
+        userId: user.sub,
+        context: {
+          expertiseInput,
+          userId: user.sub,
+          // generation: 0,
+          // totalGenerations: 1,
+        },
+        createdAt: new Date().toISOString(),
+      };
+
+      const newTaskRef = await saveToFirebase(
+        `asyncTasks/${user.sub}/addAgent`,
+        newTask
+      );
+
+      if (newTaskRef) {
+        setTaskId(newTaskRef.key); // Store the task ID to set up the listener
+      } else {
+        console.error("Failed to queue the task.");
+      }
+    } catch (error) {
+      console.error("Error queuing the task:", error.message);
+    } finally {
+      // setIsSubmitting(false);
+    }
+  };
+  const querySupabase = async () => {
+    try {
+      const { data, error } = await supabaseClient.from("agents").select("*");
+      // .eq("taskId", taskId);
+      if (error) {
+        throw error;
+      }
+      console.log("Data retrieved from Supabase:", data);
+    } catch (error) {
+      console.error("Error querying Supabase:", error.message);
+    }
+  };
   const specializedTrainingExample =
     "You love the McRib. You always mention the McRib in each of your replies, to a comical degree.";
   const [expertiseInput, setExpertiseInput] = useState("");
-  // const [expertise1, setExpertise1] = useState("");
-  const [expertise2, setExpertise2] = useState("");
-  const [expertise3, setExpertise3] = useState("");
-  useEffect(() => {
-    let index = 0; // Move index outside of the setInterval
-    if (notificationMessages.length === 0) return;
-    const intervalId = setInterval(() => {
-      // Store the interval ID
-      if (index < notificationMessages.length) {
-        const notificationMessage = notificationMessages[index];
-        toast.success(notificationMessage);
-        const newNotificationMessages = [...notificationMessages];
-        newNotificationMessages.splice(index, 1);
-        setNotificationMessages(newNotificationMessages);
-        index++;
-      } else {
-        clearInterval(intervalId); // Clear the interval properly
-      }
-    }, 2000);
 
-    return () => clearInterval(intervalId); // Clear interval on component unmount
-  }, [notificationMessages]);
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    if (!expertiseInput) {
-      alert("At least one area of expertise must be provided.");
-      return;
-    }
-    const agentData = {
-      expertiseInput,
-      userId: user.sub,
-      existingAgentNames,
-      specializedTraining,
-    };
-    // before actually creating the agent
-    // ask the api for a list of comical, world-building updates
-    //   that incorporate the animal and the briefing
-    fetch("/api/agents/create-agent-notification-endpoint", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(agentData),
-    }).then(async (notificationMessagesResponse) => {
-      const notificationMessagesJson =
-        await notificationMessagesResponse.json();
-      setNotificationMessages(notificationMessagesJson);
-      log("notificationMessages fetch");
-      log(notificationMessages);
-    });
-    // Send the data to your API endpoint
+  // const oldHandleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setIsSubmitting(true);
+  //   if (!expertiseInput) {
+  //     alert("At least one area of expertise must be provided.");
+  //     return;
+  //   }
+  //   const agentData = {
+  //     expertiseInput,
+  //     userId: user.sub,
+  //     specializedTraining,
+  //   };
 
-    const res = await fetch("/api/agents/create-agent-endpoint", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(agentData),
-    }).catch((error) => {
-      console.log("error creating agent");
-      console.log(error);
-    });
-    const createdAgent = await res.json();
-    console.log("createdAgent");
-    const agentId = createdAgent.agentId;
-    // router.push(`/missions/create-mission/agents/${agentId}`);
-    router.push({
-      pathname: "/missions/create-mission/dispatch",
-      query: { ...router.query, agentId: agentId },
-    });
-    setIsSubmitting(false);
+  //   // Send the data to your API endpoint
+  //   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+  //   // This needs to be the result of receiving the firebase go-ahead to query supabase
+  //   // And then the result of the supabase query
+  //   // const savedAddAgentAsyncTask = await fetch(
+  //   //   "/api/agents/add-agent-endpoint",
+  //   //   {
+  //   //     method: "POST",
+  //   //     headers: {
+  //   //       "Content-Type": "application/json",
+  //   //     },
+  //   //     body: JSON.stringify(agentData),
+  //   //   }
+  //   // ).catch((error) => {
+  //   //   console.log("error creating agent");
+  //   //   console.log(error);
+  //   // });
+  //   // // const createdAgent = await res.json();
+  //   // console.log("savedAddAgentAsyncTask add-agent");
+  //   // console.log(savedAddAgentAsyncTask);
 
-    // if (res.status === 200) {
-    //   // alert("Agent created successfully!");
+  //   // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+  //   // const agentId = createdAgent.agentId;
+  //   // router.push({
+  //   //   pathname: "/missions/create-mission/dispatch",
+  //   //   query: { ...router.query, agentId: agentId },
+  //   // });
+  //   setIsSubmitting(false);
 
-    //   console.log("Agent created successfully!");
-    // } else {
-    //   alert("An error occurred while creating the agent. Please try again.");
-    // }
-  };
+  //   // if (res.status === 200) {
+  //   //   // alert("Agent created successfully!");
+
+  //   //   console.log("Agent created successfully!");
+  //   // } else {
+  //   //   alert("An error occurred while creating the agent. Please try again.");
+  //   // }
+  // };
   const { user, error, isLoading } = useUser();
 
+  useEffect(() => {
+    if (user) {
+      setupFirebaseListener(user);
+    }
+  }, [user]);
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
   function getRandomExpertise() {
@@ -340,7 +373,7 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
                 )}
               </div> */}
 
-              <div style={{ marginBottom: "40px" }}></div>
+              <div style={{ marginBottom: "20px" }}></div>
               <div style={{ textAlign: "right" }}>
                 <Button color="primary" disabled={isSubmitting}>
                   Create
@@ -412,7 +445,7 @@ const CreateAgent = ({ existingAgentNames }) => {
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
           <Link
-            href="/missions/create-mission/agents/view-agents"
+            href="/agents/view-agents"
             style={{
               fontWeight: "200",
               textDecoration: "none",

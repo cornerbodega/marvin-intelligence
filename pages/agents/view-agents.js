@@ -22,6 +22,7 @@ import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 import IntelliCardGroup from "../../components/IntelliCardGroup";
 import IntelliCardGroupRow from "../../components/IntelliCardGroupRow";
 import { getSupabase } from "../../utils/supabase";
+const supabase = getSupabase();
 import RevealAnimations from "../../components/RevealAnimations";
 import IntelliFab from "../../components/IntelliFab";
 // rest of component
@@ -30,7 +31,6 @@ import IntelliContext from "../../components/intelliContext/IntelliContext";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { slugify } from "../../utils/slugify";
 const PAGE_COUNT = 6;
-const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     const session = await getSession(context.req, context.res);
@@ -108,7 +108,7 @@ const ViewAgents = ({ agents }) => {
   }, []);
   useEffect(() => {
     if (!agents || agents.length === 0) {
-      goToPage("create-agent");
+      goToPage("add-agent");
     }
   });
 
@@ -122,9 +122,9 @@ const ViewAgents = ({ agents }) => {
   };
   const handleFabClick = () => {
     console.log("ViewAgents HandleClick Clicked!");
-    // goToPage("/missions/create-agent");sss
+    // goToPage("/missions/add-agent");sss
     router.push({
-      pathname: "/agents/create-agent",
+      pathname: "/agents/add-agent",
       query: router.query,
     });
   };
@@ -138,7 +138,7 @@ const ViewAgents = ({ agents }) => {
     // goToPage(`/missions/create-mission/agents/detail/${agentName}/${agentId}`);
     // let createMissionPath = `agentId=${agent.agentId}&${router.query.}`;
     router.push({
-      pathname: "/missions/create-mission/dispatch",
+      pathname: "/missions/create-mission/draft-report",
       query: { ...router.query, agentId: agent.agentId },
     });
     // const parentReportId = router.query.parentReportId;

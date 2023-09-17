@@ -1,14 +1,14 @@
-import { Button, Row, Breadcrumb, BreadcrumbItem } from "reactstrap";
+import { Button, Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import useRouter from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
 // other imports
 import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
-
 import IntelliCardGroup from "../../../components/IntelliCardGroup";
 import { getSupabase } from "../../../utils/supabase";
 import Link from "next/link";
 import IntelliFab from "../../../components/IntelliFab";
+import getCloudinaryImageUrlForHeight from "../../../utils/getCloudinaryImageUrlForHeight";
 // rest of component
 import { slugify } from "../../../utils/slugify";
 const PAGE_COUNT = 6;
@@ -37,98 +37,90 @@ export const getServerSideProps = withPageAuthRequired({
         props: {},
       };
     }
-    //   let { data: missions, error } = await supabase
-    //     .from("reportFolders")
-    //     .select(
-    //       `
-    //   folderId,
-    //   reports:*
-    // `
-    //     )
-    //     .eq("folderId", folderId)
-    //     .limit(PAGE_COUNT)
-    //     .order("reportId", { ascending: false });
 
-    //   if (error) {
-    //     console.error(error);
-    //   }
-    // let { data: missions, error } = await supabase
-    // .from('reportFolders')
-    // .select('reports:*')
-    // .eq('folderId', folderId);
     let { data: missionsResponse, error } = await supabase
       .from("reportFolders")
       .select(
         `
-      folders (folderName, folderDescription),
+      folders (folderName, folderDescription, folderPicUrl),
       reports (reportTitle, reportPicUrl, reportId)
     `
       )
       .eq("folderId", folderId);
+    let { data: linksResponse, error: linksError } = await supabase
+      .from("links")
+      .select("parentReportId, childReportId");
 
-    if (error) {
+    if (error || linksError) {
+      // handle errors
       console.error(error);
+      console.error(linksError);
+      // return {
+      //   notFound: true,
+      // };
     }
+
+    // function structureData(foldersResponse, linksResponse) {
+    //   // Your logic here to structure the data hierarchically, for example:
+
+    //   const reportMap = new Map();
+
+    //   foldersResponse.forEach((folder) => {
+    //     folder.reports.forEach((report) => {
+    //       reportMap.set(report.reportId, {
+    //         ...report,
+    //         children: [],
+    //       });
+    //     });
+    //   });
+
+    //   linksResponse.forEach((link) => {
+    //     const parentReport = reportMap.get(link.parentReportId);
+    //     const childReport = reportMap.get(link.childReportId);
+
+    //     if (parentReport && childReport) {
+    //       parentReport.children.push(childReport);
+    //     }
+    //   });
+
+    //   return foldersResponse;
+    // }
+
+    // // here you would structure the data into a hierarchical/nested format
+    // const structuredData = structureData(foldersResponse, linksResponse);
 
     const missions = [];
     let folderName = "";
     let folderDescription = "";
+    let folderPicUrl = "";
     missionsResponse.forEach((mission) => {
       missions.push(mission.reports);
       folderName = mission.folders.folderName;
       folderDescription = mission.folders.folderDescription;
+      folderPicUrl = mission.folders.folderPicUrl;
     });
     console.log("missions");
     console.log(missions);
-    // let { data: missions, error } = await supabase
-    //   .from("reports")
-    //   .select("*")
-    //   .eq("userId", user.sub)
-    //   .eq("reportFolders.folderId", folderId)
-    //   // .join("reportFolders", { foreignKey: "reportId" })
-    //   .limit(PAGE_COUNT)
-    //   .order("reportId", { ascending: false });
-    // console.log("supabase.join");
-    // console.log(supabase.join);
-    // let { data: missions, error } = await supabase
-    //   .from("reports")
-    //   .select("*")
-    //   .eq("userId", user.sub)
-    //   .eq("reportFolders.folderId", folderId)
-    //   .join("reportFolders", { foreignKey: "reportId" })
-    //   .limit(PAGE_COUNT)
-    //   .order("reportId", { ascending: false });
-    // let { data: missions, error } = await supabase
-    //   .from("reports")
-    //   .select("*")
-    //   .eq("userId", user.sub)
-    //   .join("reportFolders", { foreignKey: "reportId" })
-    //   // .eq("folderId", folderId)
-    //   .limit(PAGE_COUNT)
-    //   .order("reportId", { ascending: false });
 
-    // let { data: missions, error } = await supabase
-    //   .from("reports")
-    //   .select("reports.*")
-    //   .eq("reports.userId", user.sub)
-    //   .eq("reportFolders.folderId", folderId)
-    //   .join("reportFolders", "reportId", {
-    //     foreignTable: "reports",
-    //     foreignColumn: "reportId",
-    //   })
-    //   .limit(PAGE_COUNT)
-    //   .order("reports.reportId", { ascending: false });
-
-    // other pages will redirect here if they're empty
-    // If no agency, go to create agency page
-    // If no missions, go to crete report page
-    // let agency;
     return {
-      props: { missions, folderName, folderId, folderDescription },
+      props: {
+        missions,
+        folderName,
+        folderId,
+        folderDescription,
+        folderPicUrl,
+        // structuredData,
+      },
     };
   },
 });
-const ViewReports = ({ missions, folderName, folderId, folderDescription }) => {
+const ViewReports = ({
+  missions,
+  folderName,
+  folderId,
+  folderDescription,
+  folderPicUrl,
+}) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(1);
@@ -248,15 +240,43 @@ const ViewReports = ({ missions, folderName, folderId, folderDescription }) => {
 
       {/* <div>{JSON.stringify(loadedReports)}</div> */}
       <div ref={containerRef}>
-        <div
-          style={{
-            fontSize: "0.75em",
-            marginTop: "10px",
-            marginBottom: "16px",
-          }}
-        >
-          {folderDescription}
-        </div>
+        <Row>
+          <Col
+            style={{
+              maxWidth: "300px",
+              marginBottom: "20px",
+            }}
+          >
+            <div>
+              <img
+                style={{ borderRadius: "7px" }}
+                src={`${getCloudinaryImageUrlForHeight(folderPicUrl, 300)}`}
+              />
+            </div>
+          </Col>
+          <Col>
+            <div
+              style={{
+                fontSize: "0.75em",
+                marginTop: "10px",
+                marginBottom: "16px",
+              }}
+            >
+              <div>{folderDescription}</div>
+              <div>
+                {/* <ul>
+                  <li>1</li>
+                  <li>
+                    <ul>
+                      <li>2</li>
+                    </ul>
+                  </li>
+                </ul> */}
+              </div>
+            </div>
+          </Col>
+        </Row>
+
         <Row className="text-primary">
           <IntelliCardGroup
             offset={offset}

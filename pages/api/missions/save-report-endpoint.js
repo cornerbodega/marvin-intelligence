@@ -377,7 +377,7 @@ export default async function SaveReportEndpoint(req, res) {
           ).catch((error) => console.log(error));
           console.log("saveFolderData", saveFolderData);
 
-          return saveFolderData.data[0].folderId;
+          return saveFolderData[0].folderId;
         };
 
         console.log("addParentToFolder parentReportId");

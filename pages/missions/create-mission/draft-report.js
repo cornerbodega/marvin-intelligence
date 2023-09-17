@@ -1,7 +1,8 @@
 // @author Marvin-Rhone
 // dispatch.js is the page where the user can create a mission for an
 // agent to complete.
-import { log } from "../../../utils/log";
+import { saveToFirebase } from "../../../utils/saveToFirebase";
+// import { log } from "../../../utils/log";
 import {
   Card,
   CardImg,
@@ -35,10 +36,12 @@ import { getSupabase } from "../../../utils/supabase";
 import { useState, useRef, useEffect } from "react";
 
 import { slugify } from "../../../utils/slugify";
+import { setupFirebaseListener } from "../../../utils/firebaseListener";
 
 // bring in original report's summary
 // bring in agent's memory of previous reports
 // bring in content of link from original report
+import { useFirebaseListener } from "../../../utils/useFirebaseListener";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     // const agentId = context.params.agentId;
@@ -88,7 +91,24 @@ const CreateMission = ({ agent }) => {
   const [notificationIntervalId, setNotificationIntervalId] = useState();
   const [notificationMessages, setNotificationMessages] = useState([]);
 
+  const [writeDraftTaskId, setWriteDraftTaskId] = useState();
   const [isSaving, setIsSaving] = useState(false);
+  const [draftResponseContent, setDraftResponseContent] = useState();
+
+  const firebaseData = useFirebaseListener(
+    user ? `/asyncTasks/${user.sub}/writeDraftReport/context/data` : null
+  );
+
+  // // const [draftResponseContent, setDraftResponseContent] = useState(null);
+
+  useEffect(() => {
+    if (firebaseData) {
+      console.log("firebaseData");
+      console.log(firebaseData);
+      setDraft(firebaseData);
+    }
+  }, [firebaseData]);
+
   useEffect(() => {
     if (router.query.parentReportTitle) {
       setParentReportTitle(JSON.parse(router.query.parentReportTitle));
@@ -113,20 +133,21 @@ const CreateMission = ({ agent }) => {
     }
     setIsSubmitting(true);
     setFeedbackInput("");
-    const notificationMessagesResponse = await fetch(
-      "/api/missions/write-draft-notification-endpoint",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ briefing, agentName: agent.agentName }),
-      }
-    );
-    console.log("await notificationMessagesResponse.json()");
-    const notificationJson = await notificationMessagesResponse.json();
 
-    setNotificationMessages(notificationJson);
+    // const notificationMessagesResponse = await fetch(
+    //   "/api/missions/write-draft-notification-endpoint",
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ briefing, agentName: agent.agentName }),
+    //   }
+    // );
+    // console.log("await notificationMessagesResponse.json()");
+    // const notificationJson = await notificationMessagesResponse.json();
+
+    // setNotificationMessages(notificationJson);
     const expertises = [agent.expertise1, agent.expertise2, agent.expertise3];
     console.log(" dispatch briefing");
     const draftData = { briefing, expertises };
@@ -147,28 +168,99 @@ const CreateMission = ({ agent }) => {
     console.log("draftData");
     console.log(draftData);
 
-    const res = await fetch("/api/missions/write-draft-endpoint", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(draftData),
-    });
+    try {
+      const newTask = {
+        type: "writeDraftReport",
+        status: "queued",
+        userId: user.sub,
+        context: {
+          ...draftData,
+          userId: user.sub,
+          generation: 0,
+          totalGenerations: 1,
+        },
+        createdAt: new Date().toISOString(),
+      };
 
-    const draftResponseContent = await res.json();
-    console.log("draftResponseContent");
-    console.log(draftResponseContent.data);
+      const newTaskRef = await saveToFirebase(
+        `asyncTasks/${user.sub}/writeDraftReport`,
+        newTask
+      );
 
-    setDraft(draftResponseContent.data);
-
-    setIsSubmitting(false);
-    clearInterval(notificationIntervalId); // Clear the interval properly
-    setNotificationMessages([]);
-    // write a report!
-    // this will be a draft report
-    // it will be saved in the database as the only draft for this mission, and will be overwritten each time the user saves a new draft
-    // Once the user approves the mission, the draft will be saved as the final report
+      if (newTaskRef) {
+        setWriteDraftTaskId(newTaskRef.key); // Store the task ID to set up the listener
+        console.log("writeDraftTaskId");
+        console.log(writeDraftTaskId);
+      } else {
+        console.error("Failed to queue the task.");
+      }
+    } catch (error) {
+      console.error("Error queuing the task:", error.message);
+    } finally {
+      setIsSubmitting(false);
+      clearInterval(notificationIntervalId); // Clear the interval properly
+      setNotificationMessages([]);
+    }
   }
+
+  // async function handleWriteDraftReport(e) {
+  //   console.log("create mission handleSubmit");
+  //   console.log("draft");
+  //   console.log(draft);
+  //   console.log("router.query.briefing");
+  //   console.log(router.query.briefing);
+  //   console.log("briefing");
+  //   console.log(briefing);
+  //   if (e) {
+  //     e.preventDefault();
+  //   }
+  //   setIsSubmitting(true);
+  //   setFeedbackInput("");
+
+  //   // setNotificationMessages(notificationJson);
+  //   const expertises = [agent.expertise1, agent.expertise2, agent.expertise3];
+  //   console.log(" dispatch briefing");
+  //   const draftData = { briefing, expertises };
+  //   const specializedTraining = agent.specializedTraining;
+  //   if (feedbackInput) {
+  //     let feedback = [
+  //       { role: "assistant", content: draft },
+  //       {
+  //         role: "user",
+  //         content: `Please write the report again with the following feedback ${feedbackInput}.`,
+  //       },
+  //     ];
+  //     draftData.feedback = feedback;
+  //   }
+  //   if (specializedTraining) {
+  //     draftData.specializedTraining = specializedTraining;
+  //   }
+  //   console.log("draftData");
+  //   console.log(draftData);
+  //   // call firebase here, not the endpoint
+
+  //   const res = await fetch("/api/missions/draft-report-endpoint", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(draftData),
+  //   });
+
+  //   const draftResponseContent = await res.json();
+  //   console.log("draftResponseContent");
+  //   console.log(draftResponseContent.data);
+
+  //   setDraft(draftResponseContent.data);
+
+  //   setIsSubmitting(false);
+  //   clearInterval(notificationIntervalId); // Clear the interval properly
+  //   setNotificationMessages([]);
+  //   // write a report!
+  //   // this will be a draft report
+  //   // it will be saved in the database as the only draft for this mission, and will be overwritten each time the user saves a new draft
+  //   // Once the user approves the mission, the draft will be saved as the final report
+  // }
   useEffect(() => {
     if (!isSubmitting && draft && draftRef.current && !isSaving) {
       draftRef.current.scrollIntoView({
@@ -182,56 +274,110 @@ const CreateMission = ({ agent }) => {
     console.log("handleAcceptReport");
     setIsSaving(true);
     setIsSubmitting(true);
-    fetch("/api/missions/save-report-notification-endpoint", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ briefing, agentName: agent.agentName }),
-    }).then(async (notificationMessagesResponse) => {
-      // console.log(notificationMessagesResponse.js);
-      const notificationJson = await notificationMessagesResponse.json();
-      console.log("notificationJson");
-      console.log(notificationJson);
-      setNotificationMessages(notificationJson);
-      console.log("notificationMessages");
-      console.log(notificationMessages);
-    });
-    const reportResponse = await fetch("/api/missions/save-report-endpoint", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        draft,
-        briefing,
+    // fetch("/api/missions/save-report-notification-endpoint", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ briefing, agentName: agent.agentName }),
+    // }).then(async (notificationMessagesResponse) => {
+    //   // console.log(notificationMessagesResponse.js);
+
+    //   const notificationJson = await notificationMessagesResponse.json();
+    //   console.log("notificationJson");
+    //   console.log(notificationJson);
+    //   setNotificationMessages(notificationJson);
+    //   console.log("notificationMessages");
+    //   console.log(notificationMessages);
+    // });
+    let reportData = {};
+    if (router.query.parentReportId) {
+      reportData.parentReportId = router.query.parentReportId;
+    }
+    if (router.query.highlightedText) {
+      reportData.highlightedText = router.query.highlightedText;
+    }
+    if (router.query.elementId) {
+      reportData.elementId = router.query.elementId;
+    }
+    setWriteDraftTaskId(crypto.randomUUID());
+    const specializedTraining = agent.specializedTraining;
+    if (specializedTraining) {
+      reportData.specializedTraining = specializedTraining;
+    }
+    try {
+      const newTask = {
+        // taskId: writeDraftTaskId,
+        type: "saveReport",
+        status: "queued",
         userId: user.sub,
-        agentId: agent.agentId,
-        parentReportId: router.query.parentReportId,
-        highlightedText: router.query.highlightedText,
-        startIndex: router.query.startIndex,
-        endIndex: router.query.endIndex,
-        elementId: router.query.elementId,
-        continuumEnabled,
-        numberGenerations: generationsSliderValue,
-      }),
-    });
+        context: {
+          ...reportData,
+          draft,
+          agentId: agent.agentId,
+          expertises: [agent.expertise1, agent.expertise2, agent.expertise3],
+          userId: user.sub,
+          currentGeneration: 1,
+          maxGenerations: 3,
+        },
+        createdAt: new Date().toISOString(),
+      };
+
+      const newTaskRef = await saveToFirebase(
+        `asyncTasks/${user.sub}/saveReport`,
+        newTask
+      );
+
+      if (newTaskRef) {
+        // setWriteDraftTaskId(newTaskRef.key); // Store the task ID to set up the listener
+        console.log("writeDraftTaskId");
+        console.log(writeDraftTaskId);
+      } else {
+        console.error("Failed to queue the task.");
+      }
+    } catch (error) {
+      console.error("Error queuing the task:", error.message);
+    } finally {
+      setIsSubmitting(false);
+      clearInterval(notificationIntervalId); // Clear the interval properly
+      setNotificationMessages([]);
+    }
+    // v1
+    // const reportResponse = await fetch("/api/missions/save-report-endpoint", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     draft,
+    //     briefing,
+    //     userId: user.sub,
+    //     agentId: agent.agentId,
+    //     parentReportId: router.query.parentReportId,
+    //     highlightedText: router.query.highlightedText,
+    //     startIndex: router.query.startIndex,
+    //     endIndex: router.query.endIndex,
+    //     elementId: router.query.elementId,
+    //     continuumEnabled,
+    //     numberGenerations: generationsSliderValue,
+    //   }),
+    // });
 
     // setIsSubmitting(false);
-    const reportJson = await reportResponse.json();
-    console.log("reportJson");
-    console.log(reportJson);
-    const reportId = reportJson.reportId;
-    const folderId = reportJson.folderId;
-    // setIsSubmitting(false);
+    // const reportJson = await reportResponse.json();
+    // console.log("reportJson");
+    // console.log(reportJson);
+    // const reportId = reportJson.reportId;
+    // const folderId = reportJson.folderId;
+    // // setIsSubmitting(false);
 
-    // if this is not a continuum, go to the report
-    if (!continuumEnabled) {
-      router.push(`/missions/report/${reportId}`);
-    }
-    if (continuumEnabled) {
-      router.push(`/folders/detail/${folderId}`);
-    }
+    // // if this is not a continuum, go to the report
+    // if (!continuumEnabled) {
+    //   router.push(`/missions/report/${reportId}`);
+    // }
+    // if (continuumEnabled) {
+    //   router.push(`/folders/detail/${folderId}`);
+    // }
 
     // if this is a continuum, go to the folder
 
@@ -290,6 +436,12 @@ const CreateMission = ({ agent }) => {
   //     handleWriteDraftReport();
   //   }
   // }, [briefing]);
+
+  useEffect(() => {
+    if (user) {
+      setupFirebaseListener(user);
+    }
+  }, [user]);
   useEffect(() => {
     async function fetchBriefingSuggestion() {
       // Logic to build expertiseString from agent prop
