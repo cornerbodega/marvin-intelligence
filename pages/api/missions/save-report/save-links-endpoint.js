@@ -1,14 +1,37 @@
 // @author Marvin-Rhone
 import { saveToSupabase } from "../../../../utils/saveToSupabase";
 export default async function handler(req, res) {
-  const parentReportId = req.body.parentReportId;
+  let parentReportId = req.body.parentReportId;
+  const researchLink1 = req.body.researchLink1;
+  const researchLink2 = req.body.researchLink2;
+  const researchLink3 = req.body.researchLink3;
+  if (researchLink1) {
+    highlightedText = researchLink1.highlightedText;
+    elementId = researchLink1.elementId;
+    childReportId = researchLink1.childReportId;
+    parentReportId = req.body.researchLink1.parentReportId;
+  }
+  if (researchLink2) {
+    highlightedText = researchLink2.highlightedText;
+    elementId = researchLink2.elementId;
+    childReportId = researchLink2.childReportId;
+    parentReportId = req.body.researchLink2.parentReportId;
+  }
+  if (researchLink3) {
+    highlightedText = researchLink3.highlightedText;
+    elementId = researchLink3.elementId;
+    childReportId = researchLink3.childReportId;
+    parentReportId = req.body.researchLink3.parentReportId;
+  }
+
   if (parentReportId) {
-    const childReportId = req.body.childReportId;
-    const highlightedText = req.body.highlightedText;
+    let childReportId = req.body.childReportId;
+    let highlightedText = req.body.highlightedText;
     // const startIndex = req.body.startIndex;
     // const endIndex = req.body.endIndex;
     // const range = JSON.stringify({ startIndex, endIndex });
-    const elementId = req.body.elementId;
+    let elementId = req.body.elementId;
+
     const saveLinksObj = {
       body: {
         childReportId,

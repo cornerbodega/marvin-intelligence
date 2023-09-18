@@ -96,7 +96,7 @@ const CreateMission = ({ agent }) => {
   const [draftResponseContent, setDraftResponseContent] = useState();
 
   const firebaseData = useFirebaseListener(
-    user ? `/asyncTasks/${user.sub}/writeDraftReport/context/data` : null
+    user ? `/asyncTasks/${user.sub}/writeDraftReport/context/draft` : null
   );
 
   // // const [draftResponseContent, setDraftResponseContent] = useState(null);

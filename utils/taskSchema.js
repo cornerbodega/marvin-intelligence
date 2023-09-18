@@ -72,6 +72,12 @@ export default function taskSchema() {
         "userId",
         "maxGenerations",
         "currentGeneration",
+        "draft1",
+        "draft2",
+        "draft3",
+        "researchLink1",
+        "researchLink2",
+        "researchLink3",
       ],
       outputs: [],
       subtasks: [
@@ -182,11 +188,15 @@ export default function taskSchema() {
             "/api/missions/save-report/start-generate-continua-tasks-endpoint",
           inputs: [
             "childReportId",
+            "parentReportId",
             "draft",
             "userId",
             "maxGenerations",
             "currentGeneration",
             "reportSummary",
+            "expertises",
+            "specializedTraining",
+            "agentId",
           ],
           outputs: [],
         },
@@ -198,75 +208,129 @@ export default function taskSchema() {
       inputs: [
         "draft",
         "agentId",
+        "expertises",
         "reportSummary",
         "userId",
         "maxGenerations",
         "currentGeneration",
+        "parentReportId",
+        "childReportId",
       ],
       outputs: [], // Specify outputs
       subtasks: [
         {
           taskName: "generateResearchLinks",
           endpoint:
-            "/api/missions/save-report/continua/read-child-report-endpoint",
-          inputs: ["childReportId", "draft"],
+            "/api/missions/save-report/continua/generate-research-links-endpoint",
+          inputs: ["parentReportId", "childReportId", "draft"],
+          //   outputs: ["researchLinks"],
           outputs: ["researchLink1", "researchLink2", "researchLink3"],
         },
-        {
-          taskName: "generateResearchBriefings",
-          endpoint:
-            "/api/missions/save-report/continua/generate-research-briefings-endpoint",
-          inputs: ["draft", "researchLink1, researchLink2, researchLink3"],
-          outputs: ["briefing1, briefing2, briefing3"],
-        },
+
         // write drafts 1, 2, and 3 in separate tasks
         // save drafts 1, 2, and 3 in separate tasks
         // make sure generations is passed and updated to avoid infinite loop
 
         {
           taskName: "writeDraftReport1",
-          endpoint: "/api/missions/save-report/draft-report-endpoint", // using the existing task endpoint here
+          endpoint: "/api/missions/save-report/draft-report-endpoint",
           inputs: [
-            "selectedAgent",
-            "areasForFurtherResearch",
-            "briefing",
+            "reportSummary",
+            "agentId",
+            "researchLink1",
             "expertises",
             "specializedTraining",
             "feedback",
           ],
-          outputs: ["draftReport", "draftResponseContent"], // outputs should match the existing task outputs
+          outputs: ["draft1"],
         },
-        // {
-        //     taskName: "determineAgentForLinkedReport1",
-        //     endpoint: "/api/missions/save-report/determine-agent-endpoint",
-        //     inputs: ["researchLink1", "userId", "reportSummary"],
-        //     outputs: ["selectedAgent1"],
-        //   },
-        //   {
-        //     taskName: "determineAgentForLinkedReport2",
-        //     endpoint: "/api/missions/save-report/determine-agent-endpoint",
-        //     inputs: ["researchLink2", "userId", "reportSummary"],
-        //     outputs: ["selectedAgent2"],
-        //   },
-        // },
-        // {
-        //   taskName: "saveReport", // using the existing task here
-        //   endpoint: "/api/missions/save-report/save-report-endpoint-v2",
-        //   inputs: [
-        //     "draftReport",
-        //     "agentId",
-        //     "parentReportId",
-        //     "userId",
-        //     "currentGeneration",
-        //   ],
-        //   outputs: [], // outputs should match the existing task outputs
-        //   subtasks: [
-        //     /* ... add the relevant subtasks here just as defined in the saveReport task ... */
-        //   ],
-        // },
-        // You can add more existing tasks here, as necessary
+        {
+          taskName: "writeDraftReport2",
+          endpoint: "/api/missions/save-report/draft-report-endpoint",
+          inputs: [
+            "reportSummary",
+            "agentId",
+            "researchLink2",
+            "expertises",
+            "specializedTraining",
+            "feedback",
+          ],
+          outputs: ["draft2"],
+        },
+        {
+          taskName: "writeDraftReport3",
+          endpoint: "/api/missions/save-report/draft-report-endpoint",
+          inputs: [
+            "reportSummary",
+            "agentId",
+            "researchLink3",
+            "expertises",
+            "specializedTraining",
+            "feedback",
+          ],
+          outputs: ["draft3"],
+        },
+        {
+          taskName: "queueSaveReport1Task",
+          endpoint:
+            "/api/missions/save-report/continua/queue-save-report-endpoint",
+          inputs: [
+            "draft1",
+            "researchLink1",
+            "agentId",
+            "expertises",
+            "specializedTraining",
+            "userId",
+            "maxGenerations",
+            "currentGeneration",
+          ],
+          outputs: [],
+          subtasks: [],
+        },
+        {
+          taskName: "queueSaveReport2Task",
+          endpoint:
+            "/api/missions/save-report/continua/queue-save-report-endpoint",
+          inputs: [
+            "draft2",
+            "researchLink2",
+            "agentId",
+            "expertises",
+            "specializedTraining",
+            "userId",
+            "maxGenerations",
+            "currentGeneration",
+          ],
+          outputs: [],
+          subtasks: [],
+        },
+        {
+          taskName: "queueSaveReport3Task",
+          endpoint:
+            "/api/missions/save-report/continua/queue-save-report-endpoint",
+          inputs: [
+            "draft3",
+            "researchLink3",
+            "agentId",
+            "expertises",
+            "specializedTraining",
+            "userId",
+            "maxGenerations",
+            "currentGeneration",
+          ],
+          outputs: [],
+          subtasks: [],
+        },
       ],
     },
+    // {
+    //   taskName: "generateResearchBriefings",
+    //   endpoint:
+    //     "/api/missions/save-report/continua/generate-briefings-endpoint",
+    //   inputs: ["draft", "researchLinks"],
+    //   //   inputs: ["draft", "researchLink1, researchLink2, researchLink3"],
+    //   outputs: ["briefing1, briefing2, briefing3"],
+    // },
     // generateContinuumTasks: {
     //   endpoint: "/api/missions/save-report/generate-continuum-tasks-endpoint",
     //   inputs: ["childReportId", "userId", "generationsRemaining"],

@@ -5,6 +5,41 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 export async function writeDraftFunction(req) {
+  console.log("WRITE DRAFT FUNCTION INPUT:");
+  console.log(req.body);
+  let researchLink = {};
+  if (req.body.researchLink1) {
+    researchLink = req.body.researchLink1;
+  }
+  if (req.body.researchLink2) {
+    researchLink = req.body.researchLink2;
+  }
+  if (req.body.researchLink3) {
+    researchLink = req.body.researchLink3;
+  }
+  let briefing = req.body.briefing;
+  if (researchLink.researchQuestion) {
+    briefing = researchLink.researchQuestion;
+  }
+  if (!briefing) {
+    console.log("error 544: where is the researchquesiton");
+    return;
+    // return res.send(500);
+  }
+  // let draftVariable = "draft";
+  // if (req.body.briefing1) {
+  //   briefing = req.body.briefing1;
+  //   // draftVariable = "draft1";
+  // }
+  // if (req.body.briefing2) {
+  //   briefing = req.body.briefing2;
+  //   // draftVariable = "draft2";
+  // }
+  // if (req.body.briefing3) {
+  //   briefing = req.body.briefing3;
+  //   // draftVariable = "draft3";
+  // }
+
   let expertiseString = req.body.expertises[0];
 
   if (req.body.expertises.length > 1) {
@@ -17,15 +52,20 @@ export async function writeDraftFunction(req) {
   if (req.body.specializedTraining) {
     specializedTrainingString += `${req.body.specializedTraining}.`;
   }
-  console.log("expertiseString");
-  console.log(specializedTrainingString);
+  if (specializedTrainingString.length > 0) {
+    console.log("specializedTrainingString");
+    console.log(specializedTrainingString);
+  }
   // agents' areas of expertise
   // agents' specialized training
   // parent report summary aka "context"
   // parent report sanitized briefing
   // highlighted text
   // previous reports titles
-
+  let reportSummary = "";
+  if (req.body.reportSummary) {
+    reportSummary = `Given the context of this report: ${req.body.reportSummary}, please generate a report on the following topic:`;
+  }
   let messages = [
     {
       role: "system",
@@ -60,7 +100,7 @@ export async function writeDraftFunction(req) {
 
   messages.push({
     role: "user",
-    content: `${req.body.briefing}?`,
+    content: `${reportSummary} ${briefing}?`,
   });
   const feedback = req.body.feedback;
   if (feedback && feedback.length > 0) {
@@ -74,15 +114,29 @@ export async function writeDraftFunction(req) {
   return draftResponseContent;
 }
 export default async function writeDraftEndpoint(req, res) {
-  console.log("Write Draft Endpoint");
+  console.log("Draft Report Endpoint");
+  console.log(req.body);
+  let draftVariable = "draft";
+  let draftRequestObj = { ...req };
 
+  if (req.body.researchLink1) {
+    draftVariable = "draft1";
+  }
+  if (req.body.researchLink2) {
+    draftVariable = "draft2";
+  }
+  if (req.body.researchLink3) {
+    draftVariable = "draft3";
+  }
   if (req.method === "POST") {
-    const draftResponseContent = await writeDraftFunction(req);
+    const draftResponseContent = await writeDraftFunction(draftRequestObj);
     if (draftResponseContent) {
-      // console.log("write draft endpoint");
+      console.log(" draft report  endpoint");
+      console.log(draftVariable);
       // console.log(draftResponseContent);
-
-      res.status(200).json({ message: "Success", data: draftResponseContent });
+      const responseObj = { message: "Success" };
+      responseObj[draftVariable] = draftResponseContent;
+      res.status(200).json(responseObj);
     } // Process a POST request
   } else {
     return res.send(500);

@@ -5,12 +5,18 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 export default async function handler(req, res) {
+  console.log("GENERATE REPORT IMAGE ENDPOINT");
+  console.log(req.body);
   const { imageDescriptionResponseContent } = req.body;
-  const aiImageResponse = await openai.createImage({
-    prompt: `${imageDescriptionResponseContent}`,
-    n: 1,
-    size: "1024x1024",
-  });
+  const aiImageResponse = await openai
+    .createImage({
+      prompt: `${imageDescriptionResponseContent}`,
+      n: 1,
+      size: "1024x1024",
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   const imageUrl = aiImageResponse.data.data[0].url;
   return res.status(200).json({ imageUrl });
 }

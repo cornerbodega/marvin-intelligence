@@ -157,9 +157,9 @@ const CreateMission = ({ agent }) => {
 
     const draftResponseContent = await res.json();
     console.log("draftResponseContent");
-    console.log(draftResponseContent.data);
+    console.log(draftResponseContent.draft);
 
-    setDraft(draftResponseContent.data);
+    setDraft(draftResponseContent.draft);
 
     setIsSubmitting(false);
     clearInterval(notificationIntervalId); // Clear the interval properly
