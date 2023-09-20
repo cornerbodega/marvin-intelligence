@@ -392,7 +392,7 @@ const CreateAgent = ({ existingAgentNames }) => {
               color: "white",
             }}
           >
-            Missions
+            Reports
           </Link>
         </BreadcrumbItem>
         {parentReportTitle && (

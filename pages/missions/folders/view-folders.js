@@ -4,13 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
 // other imports
 import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
-import IntelliCardGroup from "../../components/IntelliCardGroup";
+// import IntelliCardGroup from "../../../components/IntelliCardGroup";
+// import IntelliCardGroup from "../../../components/IntelliCardGroup";
+import { getSupabase } from "../../../utils/supabase";
 
-import { getSupabase } from "../../utils/supabase";
-
-import IntelliFab from "../../components/IntelliFab";
+import IntelliFab from "../../../components/IntelliFab";
 // rest of component
-import { slugify } from "../../utils/slugify";
+import { slugify } from "../../../utils/slugify";
+import IntelliCardGroup from "../../../components/IntelliCardGroup";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
@@ -91,7 +92,7 @@ const ViewReports = ({ folders }) => {
   };
   const handleFabClick = () => {
     console.log("ViewReports HandleClick Clicked!");
-    goToPage("/missions/create-mission/agents/view-agents");
+    goToPage("/missions/create-mission/briefing");
   };
   const handleCardClick = (folder) => {
     console.log(folder);
@@ -103,7 +104,7 @@ const ViewReports = ({ folders }) => {
     console.log("ViewReports HandleCardClick Clicked!");
     // setSelectedReport(report);
     const folderSlug = slugify(`${folderId}-${folderName}`);
-    goToPage(`/folders/detail/${folderSlug}`);
+    goToPage(`/missions/folders/detail/${folderSlug}`);
   };
   const router = useRouter;
   function goToPage(name) {
@@ -130,7 +131,7 @@ const ViewReports = ({ folders }) => {
       };
 
       if (isInView) {
-        console.log(`LOAD MORE AGENTS ${offset}`);
+        console.log(`LOAD MORE FOLDERS ${offset}`);
         loadMoreReports().then((moreReports) => {
           console.log("moreReports");
           console.log(moreReports);
@@ -150,7 +151,7 @@ const ViewReports = ({ folders }) => {
       <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white" active>
           <i className={`bi bi-folder`}></i>
-          &nbsp; Folders
+          &nbsp; Reports
         </BreadcrumbItem>
       </Breadcrumb>
 
@@ -163,8 +164,6 @@ const ViewReports = ({ folders }) => {
             datums={loadedReports}
             datumsType={"folders"}
           ></IntelliCardGroup>
-          {/* <IntelliFab onClick={handleFabClick} icon="+" fabType="folders" /> */}
-          {/* </Col> */}
         </Row>
       </div>
     </>

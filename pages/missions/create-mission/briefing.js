@@ -10,6 +10,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/router";
 // rest of component
 import { slugify } from "../../../utils/slugify";
+// import { slugify } from "../../../utils/slugify"utils/slugify";
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -187,16 +188,14 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
           <Col md={{ size: 6, offset: 3 }}>
             <Form onSubmit={handleSubmit}>
               <div style={{ marginBottom: "40px" }}>
-                <h3>Create a New Mission</h3>
+                <h3>Create a New Report</h3>
               </div>
               <FormGroup>
                 <Row>
                   <FormGroup>
-                    <Label className="text-white">Briefing</Label>
+                    {/* <Label className="text-white">Briefing</Label> */}
                     <Label className="text-white">
-                      What would you like to know? Briefly describe the research
-                      task and any guidelines here. The clearer the mission, the
-                      better the results.
+                      What would you like to know?
                     </Label>
                     <div
                       onClick={(e) => {
@@ -410,7 +409,7 @@ const CreateAgent = ({ existingAgentNames }) => {
               color: "white",
             }}
           >
-            Missions
+            Reports
           </Link>
         </BreadcrumbItem>
         {parentReportTitle && (
@@ -427,7 +426,7 @@ const CreateAgent = ({ existingAgentNames }) => {
         <BreadcrumbItem className="text-white">
           {" "}
           <i className={`bi-body-text`}></i>
-          <div style={{ fontWeight: "800" }}>+ Create Mission</div>
+          <div style={{ fontWeight: "800" }}>+ Create Report</div>
         </BreadcrumbItem>
       </Breadcrumb>
       <CreateAgentForm existingAgentNames={existingAgentNames} />

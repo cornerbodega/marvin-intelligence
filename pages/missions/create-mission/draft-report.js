@@ -376,7 +376,7 @@ const CreateMission = ({ agent }) => {
     //   router.push(`/missions/report/${reportId}`);
     // }
     // if (continuumEnabled) {
-    //   router.push(`/folders/detail/${folderId}`);
+    //   router.push(`/missions/folders/detail/${folderId}`);
     // }
 
     // if this is a continuum, go to the folder
@@ -540,14 +540,14 @@ const CreateMission = ({ agent }) => {
         className="text-white"
       >
         <BreadcrumbItem>
-          <i className="bi  bi-body-text"></i>
-          &nbsp;&nbsp;
+          <i className="bi  bi-folder"></i>
+          &nbsp;
           <Link
             style={{ fontWeight: "200", textDecoration: "none" }}
             className="text-white"
             href="/missions/view-missions"
           >
-            Missions
+            Reports
           </Link>
         </BreadcrumbItem>
         {parentReportTitle && (
@@ -561,8 +561,8 @@ const CreateMission = ({ agent }) => {
             </Link>
           </BreadcrumbItem>
         )}
-        <BreadcrumbItem>
-          <i className="bi bi-body-text"></i>+&nbsp;
+        {/* <BreadcrumbItem>
+          <i className="bi bi-folder"></i>+&nbsp;
           <Link
             className="text-white"
             style={{ fontWeight: "200", textDecoration: "none" }}
@@ -571,9 +571,9 @@ const CreateMission = ({ agent }) => {
               query: currentQueryParams,
             }}
           >
-            Create Mission
+            Create Report
           </Link>
-        </BreadcrumbItem>
+        </BreadcrumbItem> */}
         <BreadcrumbItem style={{ fontWeight: "800" }} className="">
           <i className={`bi bi-person-badge`}></i>&nbsp;Dispatch Agent{" "}
           {agent.agentName}
@@ -654,7 +654,7 @@ const CreateMission = ({ agent }) => {
                     {agentMissionHistory && (
                       <>
                         <div>
-                          <h4>Mission History</h4>
+                          <h4>Report History</h4>
                         </div>
                         <ul>
                           {agentMissionHistory.map((mission, index) => {
@@ -686,7 +686,7 @@ const CreateMission = ({ agent }) => {
                     {parentReportSummary && (
                       <>
                         <div>
-                          <h4>Linked Mission Context</h4>
+                          <h4>Linked Report Context</h4>
                         </div>
 
                         <div>{parentReportSummary}</div>
@@ -708,24 +708,31 @@ const CreateMission = ({ agent }) => {
             <FormGroup>
               <div>
                 <div style={{ marginTop: "20px" }}></div>
+
                 <FormGroup>
-                  <Label htmlFor="exampleText" className="text-white">
-                    Mission Prompt
-                  </Label>
-                  <div
-                    onClick={(e) => {
-                      setBriefing("");
-                    }}
-                    style={{
-                      paddingTop: "4px",
-                      fontSize: "0.75em",
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      cursor: "pointer",
-                    }}
-                  >
-                    🚫
-                  </div>
+                  <Row>
+                    <Col>
+                      <Label htmlFor="exampleText" className="text-white">
+                        What would you like to know?
+                      </Label>
+                    </Col>
+                    <Col>
+                      <div
+                        onClick={(e) => {
+                          setBriefing("");
+                        }}
+                        style={{
+                          paddingTop: "4px",
+                          fontSize: "0.75em",
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          cursor: "pointer",
+                        }}
+                      >
+                        🚫
+                      </div>
+                    </Col>
+                  </Row>
                   <Input
                     id="exampleText"
                     placeholder="What would you like to know?"

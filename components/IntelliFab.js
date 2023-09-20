@@ -22,7 +22,7 @@ const IntelliFab = ({ onClick, icon, fabType }) => {
     if (fabType === "report") {
       console.log("logo");
       console.log(logo);
-      setLogo(`bi bi-body-text`);
+      setLogo(`bi bi-folder`);
     }
     if (fabType === "agent") {
       setLogo(`bi bi-person-badge`);

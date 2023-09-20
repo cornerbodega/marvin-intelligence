@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
 // other imports
 import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
-import IntelliCardGroup from "../../../components/IntelliCardGroup";
-import { getSupabase } from "../../../utils/supabase";
+import IntelliCardGroup from "../../../../components/IntelliCardGroup";
+import { getSupabase } from "../../../../utils/supabase";
 import Link from "next/link";
-import IntelliFab from "../../../components/IntelliFab";
-import getCloudinaryImageUrlForHeight from "../../../utils/getCloudinaryImageUrlForHeight";
+import IntelliFab from "../../../../components/IntelliFab";
+import getCloudinaryImageUrlForHeight from "../../../../utils/getCloudinaryImageUrlForHeight";
 // rest of component
-import { slugify } from "../../../utils/slugify";
+import { slugify } from "../../../../utils/slugify";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
@@ -47,6 +47,8 @@ export const getServerSideProps = withPageAuthRequired({
     `
       )
       .eq("folderId", folderId);
+    // .limit(3);
+
     let { data: linksResponse, error: linksError } = await supabase
       .from("links")
       .select("parentReportId, childReportId");
@@ -173,44 +175,55 @@ const ViewReports = ({
     console.log(name);
     router.push(name);
   }
-  useEffect(() => {
-    if (!isLast) {
-      const loadMoreReports = async () => {
-        const from = offset * PAGE_COUNT;
-        const to = from + PAGE_COUNT - 1;
-        setOffset((prev) => prev + 1);
+  // useEffect(() => {
+  //   if (!isLast) {
+  //     const loadMoreReports = async () => {
+  //       const from = offset * PAGE_COUNT;
+  //       const to = from + PAGE_COUNT - 1;
+  //       const { data } = await supabase
+  //         .from("reportFolders")
+  //         .select(
+  //           `
+  //         folders (folderName, folderDescription, folderPicUrl),
+  //         reports (reportTitle, reportPicUrl, reportId)
+  //         `
+  //         )
+  //         .eq("folderId", folderId)
+  //         .range(from, to)
+  //         .order("createdAt", { ascending: false });
+  //       // .limit(3);
+  //       setOffset((prev) => prev + 1);
+  //       return data;
+  //       // const { data } = await supabase
+  //       //   // .from("reports")
+  //       //   // .select("*")
+  //       //   .from("reportFolders")
+  //       //   .select("reports (reportTitle, reportPicUrl, reportId)")
+  //       //   .eq("folderId", folderId)
+  //       //   .range(from, to)
+  //       //   .order("createdAt", { ascending: false });
+  //       // console.log("load more missions data");
 
-        const { data } = await supabase
-          // .from("reports")
-          // .select("*")
-          .from("reportFolders")
-          .select("reports (reportTitle, reportPicUrl, reportId)")
-          .eq("folderId", folderId)
-          .range(from, to)
-          .order("createdAt", { ascending: false });
-        console.log("load more missions data");
+  //       // console.log(data);
+  //     };
 
-        console.log(data);
-        return data;
-      };
-
-      if (isInView) {
-        console.log(`LOAD MORE AGENTS ${offset}`);
-        loadMoreReports().then((moreReports) => {
-          console.log("moreReports");
-          console.log(moreReports);
-          if (!moreReports) {
-            return setIsLast(true);
-          }
-          setLoadedReports([...loadedReports, ...moreReports]);
-          if (moreReports.length < PAGE_COUNT) {
-            setIsLast(true);
-          }
-          // setLoadedReports((prev) => [...prev, ...moreReports]);
-        });
-      }
-    }
-  }, [isInView, isLast]);
+  //     if (isInView) {
+  //       console.log(`LOAD MORE REPORTS ${offset}`);
+  //       loadMoreReports().then((moreReports) => {
+  //         console.log("moreReports");
+  //         console.log(moreReports);
+  //         if (!moreReports) {
+  //           return setIsLast(true);
+  //         }
+  //         // setLoadedReports([...loadedReports, ...moreReports]);
+  //         // if (moreReports.length < PAGE_COUNT) {
+  //         //   setIsLast(true);
+  //         // }
+  //         // setLoadedReports((prev) => [...prev, ...moreReports]);
+  //       });
+  //     }
+  //   }
+  // }, [isInView, isLast]);
 
   // }
   return (
@@ -222,10 +235,9 @@ const ViewReports = ({
           <Link
             style={{ textDecoration: "none", fontWeight: "300" }}
             className="text-white"
-            href="/folders/view-folders"
+            href="/missions/folders/view-folders"
           >
-            {" "}
-            Folders
+            Reports
           </Link>
         </BreadcrumbItem>
 

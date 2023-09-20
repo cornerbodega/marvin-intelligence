@@ -49,11 +49,20 @@ export const getServerSideProps = withPageAuthRequired({
     const reportId = context.params.reportSlug.split("-")[0];
     const supabase = getSupabase();
 
+    // let { data: reports, error } = await supabase
+    //   .from("reports")
+    //   .select("*")
+    //   .eq("reportId", reportId);
+
     let { data: reports, error } = await supabase
       .from("reports")
-      .select("*")
+      .select(
+        `
+    *,
+    reportFolders:reportFolders(reportId, folder:folders(folderName, folderId))
+  `
+      )
       .eq("reportId", reportId);
-
     if (error) console.log(error);
 
     if (!reports || reports.length === 0) {
@@ -265,17 +274,51 @@ const ReportDetailPage = ({ report }) => {
     <div>
       <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white">
-          <i className="bi bi-body-text"></i>
+          <i className="bi bi-folder"></i>
           &nbsp;
           <Link
             className="text-white"
             href="/missions/view-missions"
             style={{ textDecoration: "none", fontWeight: "200" }}
           >
-            Missions
+            Reports
           </Link>
         </BreadcrumbItem>
+
+        {report.reportFolders && (
+          <BreadcrumbItem style={{ fontFamily: "monospace" }}>
+            {/* {JSON.stringify(report.reportFolders[0])} */}
+            <Link
+              className="text-white"
+              href={`/missions/folders/detail/${report.reportFolders[0].folder.folderId}-`}
+              style={{ textDecoration: "none", fontWeight: "200" }}
+            >
+              {report.reportFolders[0].folder.folderName}
+            </Link>
+          </BreadcrumbItem>
+        )}
         {ancestry &&
+          ancestry
+            .slice()
+            .reverse()
+            .map((ancestor, index) => (
+              <BreadcrumbItem className="text-white" key={index}>
+                <Link
+                  href={`/missions/report/${ancestor.reportId}-${slugify(
+                    ancestor.reportTitle
+                  )}`}
+                  style={{
+                    textDecoration: "none",
+                    fontSize: `${0.5 + index * 0.25}em`, // Adjust the base size and multiplier as needed
+                    fontWeight: "200",
+                  }}
+                  className="text-white"
+                >
+                  <i className="bi bi-body-text"></i> {ancestor.reportTitle}
+                </Link>
+              </BreadcrumbItem>
+            ))}
+        {/* {ancestry &&
           ancestry.map((ancestor, index) => (
             <BreadcrumbItem className="text-white" key={index}>
               <Link
@@ -289,10 +332,10 @@ const ReportDetailPage = ({ report }) => {
                 }}
                 className="text-white"
               >
-                {ancestor.reportTitle}
+                <i className="bi bi-body-text"></i> {ancestor.reportTitle}
               </Link>
             </BreadcrumbItem>
-          ))}
+          ))} */}
         <BreadcrumbItem>
           <div
             className="text-white"
@@ -301,7 +344,7 @@ const ReportDetailPage = ({ report }) => {
             )}`}
             style={{ textDecoration: "none", fontWeight: "800" }}
           >
-            {report.reportTitle}
+            <i className="bi bi-body-text"></i> {report.reportTitle}
           </div>
         </BreadcrumbItem>
       </Breadcrumb>

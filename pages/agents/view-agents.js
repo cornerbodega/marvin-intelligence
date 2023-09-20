@@ -193,17 +193,17 @@ const ViewAgents = ({ agents }) => {
     <>
       <Breadcrumb style={{ fontWeight: "200", fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white">
-          <i className={`bi bi-body-text`}></i>
+          <i className={`bi bi-person-badge`}></i>
           &nbsp;
           <Link
-            href="/missions/view-missions"
+            href="/agents/view-agents"
             style={{
               fontWeight: "200",
               textDecoration: "none",
               color: "white",
             }}
           >
-            Missions
+            Agents
           </Link>
         </BreadcrumbItem>
         {parentReportTitle && (
@@ -218,17 +218,17 @@ const ViewAgents = ({ agents }) => {
           </BreadcrumbItem>
         )}
         <BreadcrumbItem className="text-white">
-          <i className={`bi-body-text`}></i>+ Create Mission
+          <i className={`bi-folder`}></i>+ Create Report
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
           <i className={`bi bi-person-badge`}></i>
           &nbsp;
-          <Link
-            href="/missions/create-mission/agents/view-agents"
-            style={{ textDecoration: "none", color: "white" }}
-          >
-            Select Agent
-          </Link>
+          {/* <Link */}
+          {/* href="/missions/create-mission/agents/view-agents" */}
+          {/* style={{ textDecoration: "none", color: "white" }} */}
+          {/* > */}
+          Select Agent
+          {/* </Link> */}
         </BreadcrumbItem>
       </Breadcrumb>
       <div style={{ marginBottom: "32px", textAlign: "right" }}>

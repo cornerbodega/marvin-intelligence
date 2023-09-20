@@ -144,12 +144,12 @@ const ViewReports = ({ missions }) => {
       <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white" active>
           <i className={`bi bi-body-text`}></i>
-          &nbsp; Missions
+          &nbsp; Reports
         </BreadcrumbItem>
       </Breadcrumb>
       <div style={{ marginBottom: "32px", textAlign: "right" }}>
         <Button style={{ border: "1px solid white" }} onClick={handleFabClick}>
-          <i className="bi bi-body-text"></i>+ Create Mission
+          <i className="bi bi-body-text"></i>+ Create Report
         </Button>
       </div>
 

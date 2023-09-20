@@ -38,12 +38,12 @@ async function getAllParentReports(childReportId, supabase) {
   const parentReports = [];
   let currentId = childReportId;
 
-  while (!!currentId) {
+  while (currentId) {
     const parentData = await fetchParentId(currentId, supabase);
 
-    if (!!parentData) {
+    if (parentData) {
       parentReports.push(parentData);
-      currentId = parentData.parentReportId;
+      currentId = parentData.reportId; // Updated this line
     } else {
       currentId = null;
     }

@@ -11,20 +11,21 @@ const navigation = [
   // },
 
   {
-    title: "Missions",
-    href: "/missions/view-missions",
-    icon: "bi bi-body-text",
-  },
-  {
     title: "Agents",
     href: "/agents/view-agents",
     icon: "bi bi-person-badge",
   },
+
   {
-    title: "Folders",
-    href: "/folders/view-folders",
+    title: "Reports",
+    href: "/missions/folders/view-folders",
     icon: "bi bi-folder",
   },
+  // {
+  //   title: "Reports",
+  //   href: "/missions/view-missions",
+  //   icon: "bi bi-body-text",
+  // },
   // Make Insights part of Missions UI
   // {
   //   title: "Insights",

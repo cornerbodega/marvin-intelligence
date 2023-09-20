@@ -414,20 +414,20 @@ const CreateAgent = ({ existingAgentNames }) => {
       {/* <button onClick={notify}>Make me a toast</button> */}
       <Toaster position="bottom-center" />
       <Breadcrumb style={{ fontWeight: "200", fontFamily: "monospace" }}>
-        <BreadcrumbItem className="text-white">
-          <i className={`bi bi-body-text`}></i>
+        {/* <BreadcrumbItem className="text-white">
+          <i className={`bi bi-person-badge`}></i>
           &nbsp;
           <Link
-            href="/missions/view-missions"
+            href="/agents/view-agents"
             style={{
               fontWeight: "200",
               textDecoration: "none",
               color: "white",
             }}
           >
-            Missions
+            Agents
           </Link>
-        </BreadcrumbItem>
+        </BreadcrumbItem> */}
         {parentReportTitle && (
           <BreadcrumbItem className="text-white">
             <Link
@@ -439,10 +439,10 @@ const CreateAgent = ({ existingAgentNames }) => {
             </Link>
           </BreadcrumbItem>
         )}
-        <BreadcrumbItem style={{ fontWeight: "200" }} className="text-white">
+        {/* <BreadcrumbItem style={{ fontWeight: "200" }} className="text-white">
           {" "}
-          <i className={`bi-body-text`}></i>+ Create Mission
-        </BreadcrumbItem>
+          <i className={`bi-folder`}></i>+ Create Report
+        </BreadcrumbItem> */}
         <BreadcrumbItem className="text-white" active>
           <Link
             href="/agents/view-agents"

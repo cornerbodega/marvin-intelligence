@@ -1,7 +1,7 @@
 // @author Marvin-Rhone
 // dispatch.js is the page where the user can create a mission for an
 // agent to complete.
-import { log } from "../../../utils/log";
+import { log } from "../../../../utils/log";
 import {
   Card,
   CardImg,
@@ -31,10 +31,10 @@ import { useRouter } from "next/router";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 // import IntelliFab from "../components/IntelliFab";
 
-import { getSupabase } from "../../../utils/supabase";
+import { getSupabase } from "../../../../utils/supabase";
 import { useState, useRef, useEffect } from "react";
 
-import { slugify } from "../../../utils/slugify";
+import { slugify } from "../../../../utils/slugify";
 
 // bring in original report's summary
 // bring in agent's memory of previous reports
@@ -230,7 +230,7 @@ const CreateMission = ({ agent }) => {
       router.push(`/missions/report/${reportId}`);
     }
     if (continuumEnabled) {
-      router.push(`/folders/detail/${folderId}`);
+      router.push(`/missions/folders/detail/${folderId}`);
     }
 
     // if this is a continuum, go to the folder
@@ -395,7 +395,7 @@ const CreateMission = ({ agent }) => {
             className="text-white"
             href="/missions/view-missions"
           >
-            Missions
+            Reports
           </Link>
         </BreadcrumbItem>
         {parentReportTitle && (
@@ -534,7 +534,7 @@ const CreateMission = ({ agent }) => {
                     {parentReportSummary && (
                       <>
                         <div>
-                          <h4>Linked Mission Context</h4>
+                          <h4>Linked Report Context</h4>
                         </div>
 
                         <div>{parentReportSummary}</div>

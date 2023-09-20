@@ -25,8 +25,8 @@ const IntelliCard = ({
   // console.log("Intellicard handleCardClick");
   // console.log(handleCardClick);
   // const router = useRouter();
-  console.log("key");
-  console.log(index);
+  // console.log("key");
+  // console.log(index);
   const imageStyle = {};
   // if (index === 0) {
   imageStyle.borderTopLeftRadius = "25px";
