@@ -217,9 +217,9 @@ const ViewAgents = ({ agents }) => {
             </Link>
           </BreadcrumbItem>
         )}
-        <BreadcrumbItem className="text-white">
+        {/* <BreadcrumbItem className="text-white">
           <i className={`bi-folder`}></i>+ Create Report
-        </BreadcrumbItem>
+        </BreadcrumbItem> */}
         <BreadcrumbItem className="text-white" active>
           <i className={`bi bi-person-badge`}></i>
           &nbsp;

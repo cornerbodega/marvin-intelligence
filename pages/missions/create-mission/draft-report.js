@@ -36,7 +36,7 @@ import { getSupabase } from "../../../utils/supabase";
 import { useState, useRef, useEffect } from "react";
 
 import { slugify } from "../../../utils/slugify";
-import { setupFirebaseListener } from "../../../utils/firebaseListener";
+// import { setupFirebaseListener } from "../../../utils/firebaseListener";
 
 // bring in original report's summary
 // bring in agent's memory of previous reports
@@ -80,6 +80,7 @@ const CreateMission = ({ agent }) => {
   const [briefing, setBriefing] = useState();
   const [showSuggestedBriefing, setShowSuggestedBriefing] = useState();
   const [draft, setDraft] = useState();
+  const [isStreaming, setIsStreaming] = useState(false);
   const [feedbackInput, setFeedbackInput] = useState("");
   const router = useRouter();
 
@@ -95,19 +96,41 @@ const CreateMission = ({ agent }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [draftResponseContent, setDraftResponseContent] = useState();
 
-  const firebaseData = useFirebaseListener(
+  const firebaseDraftData = useFirebaseListener(
     user ? `/asyncTasks/${user.sub}/writeDraftReport/context/draft` : null
   );
-
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  // const firebaseDraftCompletedAt = useFirebaseListener(
+  //   user ? `/asyncTasks/${user.sub}/writeDraftReport/context/draft` : null
+  // );
   // // const [draftResponseContent, setDraftResponseContent] = useState(null);
 
   useEffect(() => {
-    if (firebaseData) {
-      console.log("firebaseData");
-      console.log(firebaseData);
-      setDraft(firebaseData);
+    if (firebaseDraftData && hasSubmitted) {
+      console.log("firebaseDraftData");
+      console.log(firebaseDraftData);
+      function cleanIncompleteHTML(input) {
+        // First, find the last complete tag.
+        const lastOpenBracket = input.lastIndexOf("<");
+        const lastCloseBracket = input.lastIndexOf(">");
+
+        // If the last '<' appears after the last '>', then we have an incomplete tag.
+        if (lastOpenBracket > lastCloseBracket) {
+          // setIsStreaming(false);
+          return input.substring(0, lastOpenBracket);
+        } else {
+          // setIsStreaming(true);
+        }
+      }
+      // console.log("isStreaming");
+      // console.log(isStreaming);
+
+      setDraft(firebaseDraftData);
+      if (isSubmitting) {
+        setIsSubmitting(false);
+      }
     }
-  }, [firebaseData]);
+  }, [firebaseDraftData]);
 
   useEffect(() => {
     if (router.query.parentReportTitle) {
@@ -133,6 +156,7 @@ const CreateMission = ({ agent }) => {
     }
     setIsSubmitting(true);
     setFeedbackInput("");
+    setHasSubmitted(true);
 
     // const notificationMessagesResponse = await fetch(
     //   "/api/missions/write-draft-notification-endpoint",
@@ -176,8 +200,6 @@ const CreateMission = ({ agent }) => {
         context: {
           ...draftData,
           userId: user.sub,
-          generation: 0,
-          totalGenerations: 1,
         },
         createdAt: new Date().toISOString(),
       };
@@ -197,7 +219,6 @@ const CreateMission = ({ agent }) => {
     } catch (error) {
       console.error("Error queuing the task:", error.message);
     } finally {
-      setIsSubmitting(false);
       clearInterval(notificationIntervalId); // Clear the interval properly
       setNotificationMessages([]);
     }
@@ -261,14 +282,21 @@ const CreateMission = ({ agent }) => {
   //   // it will be saved in the database as the only draft for this mission, and will be overwritten each time the user saves a new draft
   //   // Once the user approves the mission, the draft will be saved as the final report
   // }
-  useEffect(() => {
-    if (!isSubmitting && draft && draftRef.current && !isSaving) {
-      draftRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, [isSubmitting, draft]);
+
+  // useEffect(() => {
+  //   if (
+  //     !isSubmitting &&
+  //     draft &&
+  //     draftRef.current &&
+  //     !isSaving &&
+  //     !isStreaming
+  //   ) {
+  //     draftRef.current.scrollIntoView({
+  //       behavior: "smooth",
+  //       block: "start",
+  //     });
+  //   }
+  // }, [isSubmitting, draft]);
   async function handleAcceptReport(e) {
     e.preventDefault();
     console.log("handleAcceptReport");
@@ -306,7 +334,7 @@ const CreateMission = ({ agent }) => {
       reportData.specializedTraining = specializedTraining;
     }
     try {
-      const newTask = {
+      const saveReportTask = {
         // taskId: writeDraftTaskId,
         type: "saveReport",
         status: "queued",
@@ -318,17 +346,17 @@ const CreateMission = ({ agent }) => {
           expertises: [agent.expertise1, agent.expertise2, agent.expertise3],
           userId: user.sub,
           currentGeneration: 1,
-          maxGenerations: 3,
+          maxGenerations: generationsSliderValue,
         },
         createdAt: new Date().toISOString(),
       };
 
-      const newTaskRef = await saveToFirebase(
+      const saveReportTaskRef = await saveToFirebase(
         `asyncTasks/${user.sub}/saveReport`,
-        newTask
+        saveReportTask
       );
 
-      if (newTaskRef) {
+      if (saveReportTaskRef) {
         // setWriteDraftTaskId(newTaskRef.key); // Store the task ID to set up the listener
         console.log("writeDraftTaskId");
         console.log(writeDraftTaskId);
@@ -437,11 +465,12 @@ const CreateMission = ({ agent }) => {
   //   }
   // }, [briefing]);
 
-  useEffect(() => {
-    if (user) {
-      setupFirebaseListener(user);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     setupFirebaseListener(user);
+  //   }
+  // }, [user]);
+
   useEffect(() => {
     async function fetchBriefingSuggestion() {
       // Logic to build expertiseString from agent prop
@@ -528,7 +557,7 @@ const CreateMission = ({ agent }) => {
 
   // Continuum
   const [continuumEnabled, setContinuumEnabled] = useState(false);
-  const [generationsSliderValue, setGenerationsSliderValue] = useState(2);
+  const [generationsSliderValue, setGenerationsSliderValue] = useState(1);
   // const [createNewAgentsEnabled, setCreateNewAgentsEnabled] = useState(false);
 
   return (
@@ -586,6 +615,56 @@ const CreateMission = ({ agent }) => {
       <Row>
         <Col md={{ size: 7, offset: 2 }}>
           <Form onSubmit={handleWriteDraftReport}>
+            <FormGroup>
+              <div>
+                <div style={{ marginTop: "20px" }}></div>
+
+                <FormGroup>
+                  <Row>
+                    <Col>
+                      <Label htmlFor="exampleText" className="text-white">
+                        What would you like to know?
+                      </Label>
+                    </Col>
+                    <Col>
+                      <div
+                        onClick={(e) => {
+                          setBriefing("");
+                        }}
+                        style={{
+                          paddingTop: "4px",
+                          fontSize: "0.75em",
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          cursor: "pointer",
+                        }}
+                      >
+                        🚫
+                      </div>
+                    </Col>
+                  </Row>
+                  <Input
+                    id="exampleText"
+                    placeholder="What would you like to know?"
+                    name="text"
+                    rows="5"
+                    type="textarea"
+                    value={briefing}
+                    onChange={(e) => setBriefing(e.target.value)}
+                  />
+
+                  <div style={{ textAlign: "right", paddingTop: "8px" }}>
+                    <Button
+                      color="primary"
+                      style={{ border: "1px solid green" }}
+                      disabled={isSubmitting || !briefing}
+                    >
+                      <i className="bi bi-body-text"></i> Create Draft
+                    </Button>
+                  </div>
+                </FormGroup>
+              </div>
+            </FormGroup>
             <div>
               <Card className="text-primary">
                 <CardBody>
@@ -704,64 +783,13 @@ const CreateMission = ({ agent }) => {
                 </CardBody>
               </Card>
             </div>
-
-            <FormGroup>
-              <div>
-                <div style={{ marginTop: "20px" }}></div>
-
-                <FormGroup>
-                  <Row>
-                    <Col>
-                      <Label htmlFor="exampleText" className="text-white">
-                        What would you like to know?
-                      </Label>
-                    </Col>
-                    <Col>
-                      <div
-                        onClick={(e) => {
-                          setBriefing("");
-                        }}
-                        style={{
-                          paddingTop: "4px",
-                          fontSize: "0.75em",
-                          display: "flex",
-                          justifyContent: "flex-end",
-                          cursor: "pointer",
-                        }}
-                      >
-                        🚫
-                      </div>
-                    </Col>
-                  </Row>
-                  <Input
-                    id="exampleText"
-                    placeholder="What would you like to know?"
-                    name="text"
-                    rows="5"
-                    type="textarea"
-                    value={briefing}
-                    onChange={(e) => setBriefing(e.target.value)}
-                  />
-
-                  <div style={{ textAlign: "right", paddingTop: "8px" }}>
-                    <Button
-                      color="primary"
-                      style={{ border: "1px solid green" }}
-                      disabled={isSubmitting || !briefing}
-                    >
-                      <i className="bi bi-body-text"></i> Create Draft
-                    </Button>
-                  </div>
-                </FormGroup>
-              </div>
-            </FormGroup>
           </Form>
           <div style={{ marginTop: "50px" }} ref={draftRef}></div>
           {draft && (
             <Card>
               {/* <div className="text-white">Draft</div> */}
               <CardBody>
-                <i className="bi bi-body-text"> Draft </i>
+                <i className="bi bi-body-text"> New Draft </i>
                 <div
                   className="text-primary"
                   dangerouslySetInnerHTML={{ __html: draft }}
@@ -802,7 +830,7 @@ const CreateMission = ({ agent }) => {
                 <i className="bi bi-link"></i> Continuum
               </h3>
 
-              <FormGroup check>
+              {/* <FormGroup check>
                 <Label check>
                   <Input
                     type="checkbox"
@@ -811,7 +839,7 @@ const CreateMission = ({ agent }) => {
                   />
                   Enable Continuum
                 </Label>
-              </FormGroup>
+              </FormGroup> */}
               <div
                 style={{
                   // fontFamily: "Arial, sans-serif",
@@ -823,61 +851,61 @@ const CreateMission = ({ agent }) => {
                 }}
               >
                 <Label>
-                  Transform your mission into a living, evolving narrative with
-                  Continuum. Spawn a vibrant web of interconnected insights,
-                  autonomously explored and expanded by AI agents. It's
-                  collaborative intelligence, reimagined – a seamless journey
-                  from a singular idea to a rich tapestry of knowledge. Try it
-                  now and experience the future of intelligent research.
+                  Elevate your mission with Continuum. Transform ideas into an
+                  interconnected web of insights, dynamically expanded by AI.
+                  Experience collaborative intelligence reimagined – dive from a
+                  single thought into a vast knowledge tapestry. Try the future
+                  of intelligent research now.
                 </Label>
               </div>
               <div>
-                {continuumEnabled && (
-                  <div>
-                    <FormGroup>
-                      <span>
-                        <Label
-                          style={{ marginRight: "12px" }}
-                          htmlFor="missionGenerations"
-                        >
-                          <i className="bi bi-link"></i> Generations:
-                        </Label>
-                        {generationsSliderValue}
-                      </span>
-                      <Input
-                        // style={{ width: "50%" }}
-                        type="range"
-                        name="missionGenerations"
-                        id="missionGenerations"
-                        min="2"
-                        max="10"
-                        defaultValue="2"
-                        step="1"
-                        onChange={(e) =>
-                          setGenerationsSliderValue(e.target.value)
-                        }
-                      />
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
+                <div>
+                  <FormGroup>
+                    <span>
+                      <Label
+                        style={{ marginRight: "12px" }}
+                        htmlFor="missionGenerations"
                       >
-                        <span>
-                          <label htmlFor="missionGenerations">
-                            2 <i className="bi bi-body-text"></i>
-                          </label>
-                        </span>
+                        Continuum Generations:
+                        {/* <i className="bi bi-link"></i> : */}
+                      </Label>
+                      {generationsSliderValue}{" "}
+                      <i className="bi bi-body-text"></i>
+                    </span>
+                    <Input
+                      // style={{ width: "50%" }}
+                      type="range"
+                      name="missionGenerations"
+                      id="missionGenerations"
+                      min="1"
+                      max="7"
+                      defaultValue="1"
+                      step="3"
+                      onChange={(e) =>
+                        setGenerationsSliderValue(e.target.value)
+                      }
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>
+                        <label htmlFor="missionGenerations">
+                          1 <i className="bi bi bi-body-text"></i>
+                        </label>
+                      </span>
 
-                        <span>
-                          <label htmlFor="missionGenerations">
-                            10 <i className="bi bi-body-text"></i>
-                          </label>
-                        </span>
-                      </div>
-                    </FormGroup>
+                      <span>
+                        <label htmlFor="missionGenerations">
+                          7 <i className="bi bi-body-text"></i>
+                        </label>
+                      </span>
+                    </div>
+                  </FormGroup>
 
-                    {/* <FormGroup check>
+                  {/* <FormGroup check>
                       <Label check>
                         <Input
                           type="checkbox"
@@ -889,19 +917,30 @@ const CreateMission = ({ agent }) => {
                         Create New Agents
                       </Label>
                     </FormGroup> */}
-                  </div>
-                )}
+                </div>
               </div>
               <Form>
                 <div style={{ textAlign: "right" }}>
-                  <Button
-                    color="primary"
-                    style={{ border: "3px solid green" }}
-                    // disabled={isSubmitting}
-                    onClick={(e) => handleAcceptReport(e)}
-                  >
-                    <i className="bi bi-body-text"></i> Save Report
-                  </Button>
+                  {generationsSliderValue == 1 && (
+                    <Button
+                      color="primary"
+                      style={{ border: "3px solid green" }}
+                      disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
+                      onClick={(e) => handleAcceptReport(e)}
+                    >
+                      <i className="bi bi-folder"></i> Save Report
+                    </Button>
+                  )}
+                  {generationsSliderValue > 1 && (
+                    <Button
+                      color="primary"
+                      style={{ border: "3px solid green" }}
+                      disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
+                      onClick={(e) => handleAcceptReport(e)}
+                    >
+                      <i className="bi bi-link"></i> Start Continuum
+                    </Button>
+                  )}
                 </div>
               </Form>
             </>

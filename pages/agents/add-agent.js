@@ -8,7 +8,7 @@ import { getSupabase } from "../../utils/supabase";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/router";
 // rest of component
-import { setupFirebaseListener } from "../../utils/firebaseListener";
+// import { setupFirebaseListener } from "../../utils/firebaseListener";
 import { slugify } from "../../utils/slugify";
 import React, { useState, useEffect } from "react";
 import {
@@ -27,9 +27,7 @@ import {
 } from "reactstrap";
 
 import Link from "next/link";
-import { getSession } from "@auth0/nextjs-auth0";
-import { log } from "../../utils/log";
-import { set } from "lodash";
+
 import { saveToFirebase } from "../../utils/saveToFirebase";
 import Router from "next/router";
 
@@ -181,11 +179,11 @@ export const CreateAgentForm = ({}) => {
   // };
   const { user, error, isLoading } = useUser();
 
-  useEffect(() => {
-    if (user) {
-      setupFirebaseListener(user);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     setupFirebaseListener(user);
+  //   }
+  // }, [user]);
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
   function getRandomExpertise() {

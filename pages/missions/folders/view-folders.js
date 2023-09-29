@@ -104,7 +104,7 @@ const ViewReports = ({ folders }) => {
     console.log("ViewReports HandleCardClick Clicked!");
     // setSelectedReport(report);
     const folderSlug = slugify(`${folderId}-${folderName}`);
-    goToPage(`/missions/folders/detail/${folderSlug}`);
+    goToPage(`/missions/folders/intelligence-report/${folderSlug}`);
   };
   const router = useRouter;
   function goToPage(name) {

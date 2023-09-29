@@ -29,9 +29,6 @@ const Header = ({ showMobmenu }) => {
   return (
     <Navbar color="black" dark expand="md">
       <div className="d-flex align-items-center">
-        <NavbarBrand href="/missions/view-missions" className="d-lg-none">
-          <Image src={LogoWhite} height="40" alt="logo" />
-        </NavbarBrand>
         <Button color="primary" className="d-lg-none" onClick={showMobmenu}>
           <i className="bi bi-list"></i>
         </Button>

@@ -36,7 +36,7 @@ import IntelliFab from "../../../components/IntelliFab";
 import { getSupabase } from "../../../utils/supabase";
 import { useState } from "react";
 import { set, update } from "lodash";
-import { log } from "../../../utils/log";
+
 import getCloudinaryImageUrlForHeight from "../../../utils/getCloudinaryImageUrlForHeight";
 // import missingsBriefingHandler from "../../api/missions/generate-briefing-suggestions-endpoint";
 const { Configuration, OpenAIApi } = require("openai");

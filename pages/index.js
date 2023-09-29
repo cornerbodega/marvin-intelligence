@@ -12,6 +12,7 @@ import {
   useThree,
   useLoader,
 } from "@react-three/fiber";
+import { Button } from "reactstrap";
 import { Environment, OrbitControls } from "@react-three/drei";
 // import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
@@ -55,7 +56,7 @@ export default function Home({ title, content }) {
           />
         </>
       </Head>
-      <HomeAnimations />
+
       <div className="is-boxed has-animations">
         <div className="body-wrap gradient-background">
           <header className="site-header">
@@ -94,20 +95,22 @@ export default function Home({ title, content }) {
                       matter effortlessly.
                     </p>
                     <div className="hero-cta">
-                      <Link
-                        className="button button-primary text-white"
+                      <Button
+                        // className="button btn-primary text-white"
                         href="/account/log-in"
                         style={{ color: "white" }}
                       >
                         Start your Free Trial
-                      </Link>
-                      <Link
-                        className="button text-white"
+                      </Button>
+                      <span className="text-white" style={{ margin: "10px" }}>
+                        or
+                      </span>
+                      <Button
                         style={{ color: "white" }}
                         href="/agents/view-agents"
                       >
                         Meet your AI Team
-                      </Link>
+                      </Button>
                     </div>
                   </div>
                   <div className="hero-figure anime-element">
@@ -324,8 +327,7 @@ export default function Home({ title, content }) {
                           Get Started
                         </h4>
                         <p className="text-md mb-0">
-                          <Link
-                            className="button text-white"
+                          <Button
                             style={{
                               color: "white",
                               // textDecoration: "none",
@@ -334,7 +336,7 @@ export default function Home({ title, content }) {
                             href="/account/log-in"
                           >
                             Start your Free Trial Now
-                          </Link>
+                          </Button>
                         </p>
                       </div>
                     </div>
@@ -546,13 +548,13 @@ export default function Home({ title, content }) {
                     Talk to Marvin about it:
                   </h3>
                   <div className="cta-cta">
-                    <a
-                      className="button button-primary button-wide-mobile text-white"
-                      href="#"
+                    <Button
+                      // className="button button-primary button-wide-mobile text-white"
+                      href="/agents/view-agents"
                       style={{ color: "white" }}
                     >
                       Get in touch
-                    </a>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -607,6 +609,7 @@ export default function Home({ title, content }) {
           </div>
         </div>
       </div>
+      {/* <HomeAnimations /> */}
     </div>
   );
 }

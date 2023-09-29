@@ -43,7 +43,7 @@ export const getServerSideProps = withPageAuthRequired({
       .select(
         `
       folders (folderName, folderDescription, folderPicUrl),
-      reports (reportTitle, reportPicUrl, reportId)
+      reports (reportTitle, reportPicUrl, reportId, reportContent)
     `
       )
       .eq("folderId", folderId);

@@ -12,8 +12,7 @@ import {
   Table,
 } from "reactstrap";
 import getCloudinaryImageUrlForHeight from "../utils/getCloudinaryImageUrlForHeight";
-import styles from "./IntelliCard.module.css";
-import { log } from "../utils/log";
+
 const IntelliCard = ({
   imageSize,
   datums,
@@ -90,7 +89,10 @@ const IntelliCard = ({
 
   return (
     <>
-      <Card style={{ borderRadius: "25px" }} className="cardShadow">
+      <Card
+        style={{ background: "black", borderRadius: "25px" }}
+        className="cardShadow text-white"
+      >
         <img
           onClick={handleClick}
           src={displayDatums.picUrl} // insert image transformations based on imageSize here
@@ -101,6 +103,7 @@ const IntelliCard = ({
         <CardBody
           style={{
             display: "flex",
+            background: "black",
             flexDirection: "column",
             justifyContent: "center",
           }}
@@ -112,7 +115,7 @@ const IntelliCard = ({
               style={{
                 // fontStyle: "italic",
                 fontWeight: "800",
-                color: "#0645ad",
+                color: "white",
                 marginBottom: "16px",
                 fontSize: "1.3rem",
               }}
