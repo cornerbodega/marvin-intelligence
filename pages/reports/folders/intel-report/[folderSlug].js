@@ -1,23 +1,23 @@
 import { Button, Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import useRouter from "next/router";
 import { useEffect, useRef, useState } from "react";
-import _, { debounce } from "lodash";
+// import _, { debounce, get, has, set } from "lodash";
 // other imports
 import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
-import IntelliCardGroup from "../../../../components/IntelliCardGroup";
+// import IntelliCardGroup from "../../../../components/IntelliCardGroup";
 import { getSupabase } from "../../../../utils/supabase";
-import Link from "next/link";
+// import Link from "next/link";
 import IntelliFab from "../../../../components/IntelliFab";
-import getCloudinaryImageUrlForHeight from "../../../../utils/getCloudinaryImageUrlForHeight";
+// import getCloudinaryImageUrlForHeight from "../../../../utils/getCloudinaryImageUrlForHeight";
 // rest of component
-import { slugify } from "../../../../utils/slugify";
-const PAGE_COUNT = 6;
+// import { slugify } from "../../../../utils/slugify";
+// const PAGE_COUNT = 6;
 const supabase = getSupabase();
 import { useUser } from "@auth0/nextjs-auth0/client";
 import LoadingDots from "../../../../components/LoadingDots";
 import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
-import { child } from "@firebase/database";
+// import { child } from "@firebase/database";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     const folderId = context.params.folderSlug.split("-")[0];
@@ -180,7 +180,7 @@ const ViewReports = ({
   const [offset, setOffset] = useState(1);
   const [isInView, setIsInView] = useState(false);
   const [loadedReports, setLoadedReports] = useState(_loadedReports);
-  const [tableOfContents, setTableOfContents] = useState([]);
+  // const [tableOfContents, setTableOfContents] = useState([]);
   const [highlight, setHighlight] = useState({
     text: "",
     startIndex: undefined,
@@ -192,16 +192,19 @@ const ViewReports = ({
   const [folderDescription, setFolderDescription] =
     useState(_folderDescription);
   const [folderPicUrl, setFolderPicUrl] = useState(_folderPicUrl);
-
+  const [reportLinksMap, setReportLinksMap] = useState({});
   const [reportPicUrl, setReportPicUrl] = useState("");
   const [draft, setDraft] = useState("");
-
+  const [hasStartedContinuum, setHasStartedContinuum] = useState(false);
   const firebaseSaveData = useFirebaseListener(
     user ? `/asyncTasks/${userId}/finalizeAndVisualizeReport/context/` : null
   );
   const firebaseFolderData = useFirebaseListener(
     user ? `/asyncTasks/${userId}/regenerateFolder/context` : null
   );
+  // const firebaseContinuumStatus = useFirebaseListener(
+  //   user ? `/asyncTasks/${userId}/contu/status` : null
+  // );
   async function fetchUpdatedReports() {
     console.log("FETCH UPDATED REPORTS");
     // Fetch the updated data from the database using the folderId
@@ -235,19 +238,29 @@ const ViewReports = ({
     console.log(updatedMissions);
     // Update the state with the newly fetched data
     setLoadedReports(updatedMissions);
-    updateReports();
+    // updateReports();
   }
 
   const firebaseDraftData = useFirebaseListener(
-    user ? `/asyncTasks/${userId}/continuum/context/` : null
+    user ? `/asyncTasks/${userId}/continuum/` : null
   );
   useEffect(() => {
     if (firebaseDraftData) {
-      console.log("firebaseDraftData");
-      console.log(firebaseDraftData);
-      setDraft(firebaseDraftData.draft);
+      // console.log("firebaseDraftData");
+      // console.log(firebaseDraftData);
+      if (firebaseDraftData.context) {
+        setDraft(firebaseDraftData.context.draft);
+      }
+      if (firebaseDraftData.status == "complete") {
+        if (hasStartedContinuum) {
+          fetchUpdatedReports();
+          setHasStartedContinuum(false);
+          setIsStreaming(false);
+        }
+      }
     }
   }, [firebaseDraftData]);
+
   useEffect(() => {
     if (firebaseFolderData) {
       console.log("firebaseFolderData save data");
@@ -304,6 +317,18 @@ const ViewReports = ({
     // "agentId",
     // "expertises",
     // "specializedTraining",
+    // console.log("parentReport");
+    // console.log(parentReport.reportId);
+    // console.log("reportLinksMap");
+    // console.log(reportLinksMap);
+    // console.log("reportLinksMap[parentReport.reportId]");
+    // console.log(reportLinksMap[parentReport.reportId]);
+    const existingHyperlinks = await getLinksForContinuum(
+      parentReport.reportId
+    );
+    console.log("existingHyperlinks");
+    console.log(existingHyperlinks);
+    setHasStartedContinuum(true);
     setIsStreaming(true);
     const parentReportId = parentReport.reportId;
     const parentReportContent = parentReport.reportContent;
@@ -318,6 +343,7 @@ const ViewReports = ({
         agentId,
         expertises,
         specializedTraining,
+        existingHyperlinks,
       },
       createdAt: new Date().toISOString(),
     });
@@ -375,7 +401,7 @@ const ViewReports = ({
   }
   useEffect(() => {
     updateReports();
-  }, [supabase]);
+  }, [supabase, isStreaming]);
   async function updateReports() {
     console.log("UPDATE REPORTS");
     if (!loadedReports) return;
@@ -402,7 +428,34 @@ const ViewReports = ({
         });
       });
     }
-    setIsStreaming(false);
+    // setIsStreaming(false);
+  }
+  async function getLinksForContinuum(reportId) {
+    console.log("getLinksForContinuum");
+    let { data: links, error: linksError } = await supabase
+      .from("links")
+      .select("*")
+      .eq("parentReportId", reportId);
+
+    if (linksError) {
+      console.log("linksError", linksError);
+      return;
+    }
+
+    if (links && links.length > 0) {
+      links.forEach((link) => {
+        let highlightedText = (() => {
+          try {
+            return JSON.parse(link.highlightedText);
+          } catch {
+            return link.highlightedText;
+          }
+        })();
+      });
+    }
+    console.log("links");
+    console.log(links);
+    return links;
   }
   async function getLinks(report) {
     let { data: links, error: linksError } = await supabase
@@ -418,7 +471,6 @@ const ViewReports = ({
     if (links && links.length > 0) {
       const container = document.createElement("div");
       container.innerHTML = report.reportContent;
-
       links.forEach((link) => {
         const element = container.querySelector(`[id="${link.elementId}"]`);
         let highlightedText = (() => {
@@ -640,7 +692,7 @@ const ViewReports = ({
     getParentChildIdMap().then((map) => {
       setParentChildIdMap(map);
     });
-  }, [loadedReports]);
+  }, [loadedReports, isStreaming]);
   const NestedList = ({ children, loadedReports }) => {
     return (
       <ul>
@@ -914,8 +966,8 @@ const ViewReports = ({
           );
         })}
       {/* Draft */}
-      Is streaming{JSON.stringify(isStreaming)}
-      {JSON.stringify(loadedReports)}
+      {/* Is streaming{JSON.stringify(isStreaming)} */}
+      {/* {JSON.stringify(loadedReports)} */}
       {isStreaming && (
         <div id="draft">
           <div className="reportTitle reportFont section-title">Draft</div>
