@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getDatabase, ref, onValue } from "firebase/database";
-
+import { getDatabase, onValue } from "firebase/database";
+import { db, ref } from "./firebase";
 export function useFirebaseListener(path) {
   const [firebaseData, setFirebaseData] = useState(null);
 
@@ -8,12 +8,12 @@ export function useFirebaseListener(path) {
     console.log("path");
     console.log(path);
     if (!path) return;
-    const db = getDatabase();
+    // const db = getDatabase();
     const dataRef = ref(db, path);
 
     const unsubscribe = onValue(dataRef, (snapshot) => {
-      console.log("settingFirebaseData(snapshot.val());");
-      console.log(snapshot.val());
+      // console.log("settingFirebaseData(snapshot.val());");
+      // console.log(snapshot.val());
       setFirebaseData(snapshot.val());
     });
 

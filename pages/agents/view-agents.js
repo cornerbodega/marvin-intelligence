@@ -138,7 +138,7 @@ const ViewAgents = ({ agents }) => {
     // goToPage(`/missions/create-mission/agents/detail/${agentName}/${agentId}`);
     // let createMissionPath = `agentId=${agent.agentId}&${router.query.}`;
     router.push({
-      pathname: "/missions/create-mission/draft-report",
+      pathname: "/agents/detail/draft-report",
       query: { ...router.query, agentId: agent.agentId },
     });
     // const parentReportId = router.query.parentReportId;

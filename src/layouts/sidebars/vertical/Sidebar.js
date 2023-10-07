@@ -11,15 +11,14 @@ const navigation = [
   // },
 
   {
+    title: "Reports",
+    href: "/reports/folders/view-folders",
+    icon: "bi bi-folder",
+  },
+  {
     title: "Agents",
     href: "/agents/view-agents",
     icon: "bi bi-person-badge",
-  },
-
-  {
-    title: "Reports",
-    href: "/missions/folders/view-folders",
-    icon: "bi bi-folder",
   },
   // {
   //   title: "Reports",
@@ -39,7 +38,7 @@ const navigation = [
   // },
   {
     title: "IntelNet",
-    href: "/ui/buttons",
+    href: "/intelnet/view-intelnet",
     icon: "bi bi-columns",
   },
 

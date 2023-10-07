@@ -1,23 +1,58 @@
-.image-container {
-  height: 500px; /* Adjust based on how much of the image you want to show */
-  overflow: hidden;
-  position: relative;
-  border-radius: 10px;  /* Optional: for rounded corners */
+.loading-indicator {
+  display: flex;
+  gap: 15px;
+  padding: 40px;
+  
 }
 
-.middle-image {
-  width: 100%;
-  position: absolute;
-  top: -50%;  /* Adjust to focus on the middle 80% of the image */
-  transform: translateY(-10%); 
+.dot circle {
+  animation: pulse 1s infinite alternate;
 }
 
-.folder-description {
-  color: white;
-  padding: 20px; /* Optional: Add padding as required */
+.dot:nth-child(2) circle {
+  animation-delay: 0.33s;
+}
+
+.dot:nth-child(3) circle {
+  animation-delay: 0.66s;
+}
+
+@keyframes pulse {
+  0% {
+    fill: rgb(255, 255, 255);
+    fill: #B52572;
+
+    opacity: 0;
+  }
+  25%{
+    fill: rgb(255, 255, 255);
+    fill: #B52572;
+
+    opacity: 0;
+  }
+  /* 75%{
+    opacity: 0.9;
+  } */
+  100% {
+    opacity: 1;
+    fill: #B52572;
+    /* fill:rgb(255, 255, 255); */
+  }
 }
 
 
+
+
+
+/* Changing the hover effect to a smoother zoom-in */
+/* .report:hover .report-image {
+  transform: scale(1.1);
+  filter: brightness(1.1);
+} */
+
+.no-underline:hover {
+  text-decoration: underline !important;
+}
 .report-section {
   margin-bottom: 40px;
   opacity: 0;
@@ -27,84 +62,59 @@
   transition: box-shadow 0.5s ease-in-out;
   border-radius: 10px;
   overflow: hidden;
-  perspective: 1000px; /* Added perspective for a more 3D feel to the zoom */
+  perspective: 1000px; 
 }
 
 .report-image {
   width: 100%;
   max-height: 500px;
   object-fit: cover;
-  transition: transform 0.5s ease-in-out, filter 0.3s ease-in-out;
+  transition: transform 0.5s ease-in-out, filter 0.3s ease-in-out; 
 }
 
-/* Changing the hover effect to a smoother zoom-in */
-.report:hover .report-image {
-  transform: scale(1.1);
+/* Removed hover effect on the entire .report section */
+
+.report-section:hover .report-image {
+  transform: scale(1.003);
   filter: brightness(1.1);
 }
 
+/* Removed hover effect on .report that caused the entire section to lift */
+
 .report {
   color: white;
   padding: 20px;
-  transition: transform 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
-}
-
-.report:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  /* Removed transition effects from here */
 }
 
 @keyframes fadeInUp {
   to {
-      opacity: 1;
-      transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 .report-section:nth-child(1) { --i: 1; }
 .report-section:nth-child(2) { --i: 2; }
 
-.title-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.image-container {
+  height: 500px; 
+  overflow: hidden;
+  position: relative;
+  border-radius: 10px;  
 }
 
-.report-image {
+.middle-image {
   width: 100%;
-  max-height: 500px;
-  object-fit: cover;
-  transition: transform 0.5s ease-in-out, filter 0.5s ease-in-out; 
+  position: absolute;
+  top: -0%; 
+  transform: translateY(-10%); 
 }
 
-.report-image:hover {
-  transform: scale(1.03);
-  filter: brightness(1.1);  /* Added a brightness effect on hover for a dynamic look */
-}
-
-.report {
+.folder-description {
   color: white;
   padding: 20px;
-  transition: transform 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
 }
-
-.report:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Enhanced shadow for a more dynamic effect */
-}
-
-/* Animations */
-@keyframes fadeInUp {
-  to {
-      opacity: 1;
-      transform: translateY(0);
-  }
-}
-
-.report-section:nth-child(1) { --i: 1; }
-.report-section:nth-child(2) { --i: 2; }
-/* Add as many as the number of report sections you have */
 
 
 .folder-image {
@@ -184,6 +194,7 @@
 .report li {
   color: white !important;
 }
+
 .section-title {
   position: relative;
   padding-bottom: 10px;
@@ -197,7 +208,11 @@
   right: 0;
   bottom: 0;
   height: 2px;
-  background: linear-gradient(to right, transparent, #ccc, transparent);
+  background: linear-gradient(to right, #ccc,#ccc, transparent);
+}
+a:hover {
+  color: white !important;
+  text-decoration: underline !important;
 }
 .report a, .Link {  /* The .Link class is just an example, use the actual class applied to your Link components if any */
     /* text-decoration: underline; */

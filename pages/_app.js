@@ -41,7 +41,7 @@ function AppContent({ Component, pageProps }) {
         stopActiveTab();
       } else {
         startActiveTab();
-        console.log("1233t4y5turjy");
+        console.log("start active tab");
         // if (user && isActiveTab()) {
         //   setupFirebaseListener(user);
         // }

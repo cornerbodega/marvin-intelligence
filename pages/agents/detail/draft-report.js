@@ -1,6 +1,7 @@
 // @author Marvin-Rhone
 // dispatch.js is the page where the user can create a mission for an
 // agent to complete.
+// import { saveToFirebase } from "../../utils/saveToFirebase";
 import { saveToFirebase } from "../../../utils/saveToFirebase";
 // import { log } from "../../../utils/log";
 import {
@@ -32,6 +33,7 @@ import { useRouter } from "next/router";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 // import IntelliFab from "../components/IntelliFab";
 
+// import { getSupabase } from "../../utils/supabase";
 import { getSupabase } from "../../../utils/supabase";
 import { useState, useRef, useEffect } from "react";
 
@@ -404,7 +406,7 @@ const CreateMission = ({ agent }) => {
     //   router.push(`/missions/report/${reportId}`);
     // }
     // if (continuumEnabled) {
-    //   router.push(`/missions/folders/detail/${folderId}`);
+    //   router.push(`/reports/folders/detail/${folderId}`);
     // }
 
     // if this is a continuum, go to the folder
@@ -493,7 +495,7 @@ const CreateMission = ({ agent }) => {
         getSuggestionParams.highlightedText = router.query.highlightedText;
       }
       // try {
-      const briefingResponse = await fetch("/api/missions/get-suggestion", {
+      const briefingResponse = await fetch("/api/reports/get-suggestion", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

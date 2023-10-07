@@ -90,7 +90,7 @@ const IntelliCard = ({
   return (
     <>
       <Card
-        style={{ background: "black", borderRadius: "25px" }}
+        style={{ background: "black", borderRadius: "25px", cursor: "pointer" }}
         className="cardShadow text-white"
       >
         <img

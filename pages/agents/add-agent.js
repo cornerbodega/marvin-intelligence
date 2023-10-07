@@ -36,7 +36,7 @@ export function goToAgentProfile({ agentId }) {
   console.log(agentId);
   // const router = useRouter();
   Router.push({
-    pathname: "/missions/create-mission/draft-report",
+    pathname: "/agents/detail/draft-report",
     query: { ...Router.query, agentId: agentId },
   });
 }

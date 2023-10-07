@@ -17,12 +17,12 @@ const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     const session = await getSession(context.req, context.res);
-    const user = session?.user;
-
+    // const user = ;
+    const userId = session?.user.sub;
     let { data: agency, agencyError } = await supabase
       .from("users")
       .select("agencyName")
-      .eq("userId", user.sub);
+      .eq("userId", userId);
     if (agencyError) {
       console.log("agencyError");
     }
@@ -41,7 +41,7 @@ export const getServerSideProps = withPageAuthRequired({
     let { data: folders, error } = await supabase
       .from("folders")
       .select("*")
-      .eq("userId", user.sub)
+      .eq("userId", userId)
       .filter("folderName", "neq", null)
       .filter("folderPicUrl", "neq", null)
       .limit(PAGE_COUNT)
@@ -53,18 +53,72 @@ export const getServerSideProps = withPageAuthRequired({
     // If no missions, go to crete report page
     // let agency;
     return {
-      props: { folders },
+      props: { folders, userId },
     };
   },
 });
-const ViewReports = ({ folders }) => {
+const ViewReports = ({ folders, userId }) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
-  const [offset, setOffset] = useState(1);
+  const [offset, setOffset] = useState(2);
   const [isInView, setIsInView] = useState(false);
   const [loadedReports, setLoadedReports] = useState(folders);
+  const [briefingInput, setBriefingInput] = useState("");
   console.log("loadedReports");
   console.log(loadedReports);
+
+  async function handleQuickDraftClick() {
+    // await queueQuickDraftTask();
+    // async function queueQuickDraftTask() {
+    const draftData = { briefingInput };
+    const newTask = {
+      type: "quickDraft",
+      status: "queued",
+      userId,
+      context: {
+        ...draftData,
+        userId,
+      },
+      createdAt: new Date().toISOString(),
+    };
+
+    // const newTaskRef = await saveToFirebase(
+    //   `asyncTasks/${user.sub}/writeDraftReport`,
+    //   newTask
+    // );
+    try {
+      const response = await fetch("/api/tasks/save-task", {
+        method: "POST", // Specify the request method
+        headers: {
+          "Content-Type": "application/json", // Content type header to tell the server the nature of the request body
+        },
+        body: JSON.stringify(newTask), // Convert the JavaScript object to a JSON string
+      });
+
+      if (response.ok) {
+        console.log("Task saved successfully");
+        // Process the response if needed
+        const data = await response.json();
+        console.log(data);
+        goToPage("/reports/create-report/quick-draft");
+      } else {
+        console.error("Failed to save the task");
+      }
+    } catch (error) {
+      console.error("An error occurred while saving the task:", error);
+    }
+    // }
+    // Go to quick draft page
+    // immediately start writing the report
+    // let the user provide feedback
+    // let the user save the report
+    // the user will go to the folder detail page
+    // the report will be there
+    // the agent, folder, reportFolder, and report will be saved to supabase with no art
+    // the agent will be created
+    // the images for the folder and report and agent will load dynamically
+    // at the bottom of the report is a continuum button
+  }
   // const reportNames = missions.map((report) => report.reportName);
   useEffect(() => {
     const handleDebouncedScroll = debounce(
@@ -104,7 +158,7 @@ const ViewReports = ({ folders }) => {
     console.log("ViewReports HandleCardClick Clicked!");
     // setSelectedReport(report);
     const folderSlug = slugify(`${folderId}-${folderName}`);
-    goToPage(`/missions/folders/intelligence-report/${folderSlug}`);
+    goToPage(`/reports/folders/intel-report/${folderSlug}`);
   };
   const router = useRouter;
   function goToPage(name) {
@@ -112,6 +166,7 @@ const ViewReports = ({ folders }) => {
     console.log(name);
     router.push(name);
   }
+
   useEffect(() => {
     if (!isLast) {
       const loadMoreReports = async () => {
@@ -154,7 +209,39 @@ const ViewReports = ({ folders }) => {
           &nbsp; Reports
         </BreadcrumbItem>
       </Breadcrumb>
-
+      <div id="quickDraftBriefingInput">
+        <div>
+          <textarea
+            autoFocus
+            value={briefingInput}
+            onChange={(e) => setBriefingInput(e.target.value)}
+            type="text"
+            placeholder="What would you like to know?"
+            lines="3"
+            style={{
+              padding: "12px 12px 13px 13px",
+              width: "100%",
+              borderRadius: "5px",
+            }}
+          />
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <div
+            onClick={handleQuickDraftClick}
+            style={{
+              textAlign: "right",
+              alignContent: "right",
+              marginBottom: "40px",
+              marginRight: "10px",
+              cursor: "pointer",
+            }}
+            className="btn btn-primary"
+          >
+            {/* ↳ */}
+            Quick Draft
+          </div>
+        </div>
+      </div>
       {/* <div>{JSON.stringify(loadedReports)}</div> */}
       <div ref={containerRef}>
         <Row className="text-primary">
