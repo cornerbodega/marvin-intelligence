@@ -17,6 +17,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import LoadingDots from "../../../../components/LoadingDots";
 import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
+import { update } from "lodash";
 // import { child } from "@firebase/database";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
@@ -194,6 +195,7 @@ const ViewReports = ({
   const [folderPicUrl, setFolderPicUrl] = useState(_folderPicUrl);
   const [reportLinksMap, setReportLinksMap] = useState({});
   const [reportPicUrl, setReportPicUrl] = useState("");
+  const [continuumCompleted, setContinuumCompleted] = useState(false);
   const [draft, setDraft] = useState("");
   const [hasStartedContinuum, setHasStartedContinuum] = useState(false);
   const firebaseSaveData = useFirebaseListener(
@@ -238,7 +240,7 @@ const ViewReports = ({
     console.log(updatedMissions);
     // Update the state with the newly fetched data
     setLoadedReports(updatedMissions);
-    // updateReports();
+    updateReports(updatedMissions); // this one sets links on initial load
   }
 
   const firebaseDraftData = useFirebaseListener(
@@ -256,6 +258,8 @@ const ViewReports = ({
           fetchUpdatedReports();
           setHasStartedContinuum(false);
           setIsStreaming(false);
+          // updateReports();
+          setContinuumCompleted(true);
         }
       }
     }
@@ -290,6 +294,7 @@ const ViewReports = ({
         firebaseSaveData.reportPicUrl
       ) {
         fetchUpdatedReports();
+        // updateReports();
       }
     }
   }, [firebaseSaveData, folderId]); // Added folderId as a dependency
@@ -399,37 +404,72 @@ const ViewReports = ({
     console.log(name);
     router.push(name);
   }
+
   useEffect(() => {
-    updateReports();
-  }, [supabase, isStreaming]);
-  async function updateReports() {
+    // This conditional check ensures that updateReports is only called
+    // when all necessary conditions are met
+    // if (supabase && isStreaming && continuumCompleted) {
+    console.log("Continuum Completed. Calling updateReports");
+    // updateReports();
+    // }
+  }, [supabase, isStreaming, continuumCompleted]); // The dependencies are narrowed down
+
+  async function updateReports(newestReports) {
     console.log("UPDATE REPORTS");
     if (!loadedReports) return;
+    let reports = newestReports;
+    if (!reports) reports = loadedReports;
     const updatedReports = await Promise.all(
-      loadedReports.map(async (report) => {
-        const clonedReport = { ...report }; // Create a shallow copy
-        await getLinks(clonedReport); // Update the cloned report's content
-        return clonedReport; // Return the updated report
+      reports.map(async (report) => {
+        const clonedReport = { ...report };
+        await getLinks(clonedReport);
+        return clonedReport;
       })
     );
 
-    // Compare if there’s a change in the reports, then only update the state
-    const isChanged = updatedReports.some(
-      (report, index) =>
-        report.reportContent !== loadedReports[index].reportContent
-    );
+    // This checks if any report content has changed
+    // const isChanged = updatedReports.some(
+    //   (report, index) =>
+    //     report.reportContent !== loadedReports[index].reportContent
+    // );
 
-    if (isChanged) {
-      setLoadedReports((prevReports) => {
-        return updatedReports.map((report, index) => {
-          return report.reportContent !== prevReports[index].reportContent
-            ? report
-            : prevReports[index]; // Avoid updating the item if there's no change
-        });
-      });
-    }
-    // setIsStreaming(false);
+    // if (isChanged) {
+    console.log("Setting Loaded Reports");
+    setLoadedReports(updatedReports); // Simply setting the whole updatedReports array
+    // }
   }
+  // useEffect(() => {
+  //   updateReports();
+  // }, [supabase, isStreaming, continuumCompleted]);
+  // async function updateReports() {
+  //   console.log("UPDATE REPORTS");
+  //   if (!loadedReports) return;
+  //   const updatedReports = await Promise.all(
+  //     loadedReports.map(async (report) => {
+  //       const clonedReport = { ...report }; // Create a shallow copy
+  //       await getLinks(clonedReport); // Update the cloned report's content
+  //       return clonedReport; // Return the updated report
+  //     })
+  //   );
+
+  //   // Compare if there’s a change in the reports, then only update the state
+  //   const isChanged = updatedReports.some(
+  //     (report, index) =>
+  //       report.reportContent !== loadedReports[index].reportContent
+  //   );
+
+  //   if (isChanged) {
+  //     console.log("Setting Loaded Reports");
+  //     setLoadedReports((prevReports) => {
+  //       return updatedReports.map((report, index) => {
+  //         return report.reportContent !== prevReports[index].reportContent
+  //           ? report
+  //           : prevReports[index]; // Avoid updating the item if there's no change
+  //       });
+  //     });
+  //   }
+  //   // setIsStreaming(false);
+  // }
   async function getLinksForContinuum(reportId) {
     console.log("getLinksForContinuum");
     let { data: links, error: linksError } = await supabase
@@ -442,17 +482,17 @@ const ViewReports = ({
       return;
     }
 
-    if (links && links.length > 0) {
-      links.forEach((link) => {
-        let highlightedText = (() => {
-          try {
-            return JSON.parse(link.highlightedText);
-          } catch {
-            return link.highlightedText;
-          }
-        })();
-      });
-    }
+    // if (links && links.length > 0) {
+    //   links.forEach((link) => {
+    //     let highlightedText = (() => {
+    //       try {
+    //         return JSON.parse(link.highlightedText);
+    //       } catch {
+    //         return link.highlightedText;
+    //       }
+    //     })();
+    //   });
+    // }
     console.log("links");
     console.log(links);
     return links;
@@ -467,7 +507,8 @@ const ViewReports = ({
       console.log("linksError", linksError);
       return;
     }
-
+    console.log("links");
+    console.log(links);
     if (links && links.length > 0) {
       const container = document.createElement("div");
       container.innerHTML = report.reportContent;
@@ -495,93 +536,12 @@ const ViewReports = ({
       });
 
       report.reportContent = container.innerHTML; // Update the reportContent directly
+      console.log(report.reportContent);
     }
   }
-  // useEffect(() => {
-  //   const element = document.getElementById("reportRoot");
-  //   console.log("element");
-  //   console.log(element);
-  //   if (element) {
-  //     element.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // }, []);
 
-  // Table of Contents
-  // useEffect(() => {
-  //   async function fetchChildReports(parentReportId) {
-  //     try {
-  //       const response = await fetch("/api/reports/get-children-of-report", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ parentReportId }),
-  //       });
-
-  //       try {
-  //         const { childReports } = await response.json();
-  //         return childReports;
-  //       } catch {
-  //         console.error("Error fetching child reports");
-  //       }
-  //       return [];
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //       return [];
-  //     }
-  //   }
-  //   async function getChildren() {
-  //     for (const loadedReport of loadedReports) {
-  //       console.log("loadedReport");
-  //       console.log(loadedReport.reportId);
-  //       const reportChildren = await fetchChildReports(loadedReport.reportId);
-  //       console.log(`reportChildren for ${loadedReport.reportId}`);
-  //       console.log(reportChildren);
-  //     }
-  //   }
-  //   getChildren();
-
-  // }, [loadedReports]);
   const [parentChildIdMap, setParentChildIdMap] = useState({});
-  // useEffect(() => {
-  //   async function fetchChildReports(parentReportId) {
-  //     try {
-  //       const response = await fetch("/api/reports/get-children-of-report", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ parentReportId }),
-  //       });
 
-  //       if (!response.ok) {
-  //         console.error("Error fetching child reports");
-  //         return [];
-  //       }
-
-  //       const { childReports } = await response.json();
-  //       // console.log("childReports");
-  //       // console.log(childReports);
-  //       return childReports;
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //       return [];
-  //     }
-  //   }
-
-  //   async function getParentChildIdMap() {
-  //     const parentChildIdMap = {};
-  //     for (const loadedReport of loadedReports) {
-  //       const reportChildren = await fetchChildReports(loadedReport.reportId);
-  //       parentChildIdMap[loadedReport.reportId] = reportChildren;
-  //     }
-  //     console.log("parentChildIdMap");
-  //     console.log(parentChildIdMap);
-  //     return parentChildIdMap;
-  //   }
-
-  //   setParentChildIdMap(getParentChildIdMap());
-  // }, [loadedReports]);
   useEffect(() => {
     async function fetchChildReports(parentReportId) {
       try {
@@ -692,7 +652,7 @@ const ViewReports = ({
     getParentChildIdMap().then((map) => {
       setParentChildIdMap(map);
     });
-  }, [loadedReports, isStreaming]);
+  }, [loadedReports, isStreaming, hasStartedContinuum]);
   const NestedList = ({ children, loadedReports }) => {
     return (
       <ul>
@@ -892,6 +852,7 @@ const ViewReports = ({
         </li>
       </ul> */}
       {/* {Object.keys(parentChildIdMap)} */}
+      {loadedReports.length}
       {loadedReports &&
         loadedReports.map((cols, index) => {
           const report = loadedReports[index];
