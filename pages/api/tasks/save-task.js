@@ -6,6 +6,8 @@ export default async function handler(req, res) {
 
   console.log("req.body");
   console.log(req.body);
+  console.log("serverUrl");
+  console.log(serverUrl);
   await fetch(
     `${serverUrl}/api/tasks/save-task`,
 
