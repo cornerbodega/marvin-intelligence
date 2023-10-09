@@ -16,6 +16,7 @@ Xtreme admin is Free NextJs React admin Template. It allows you to create stunni
 The free version comes with elegant grid design that helps you play around with the look and feel of the web app the way you want. Even if you're a novice developer, clean code and easy to customize will get you up to speed in no time.
 
 If you're looking for the best React templates across the web, we've curated a list that's sure to meet your needs. Just pick from our wide variety of free responsive react templates that work seamlessly across devices and get started today!
+
 </p>
 <p>
   It allows building high-performing web-applications and other projects in a couple of days giving a seamless experience. You also get a variety of widgets, elements, page templates, icons and much more when you download it. The best part of this free admin theme bootstrap 5 is its full responsiveness and savior when you are low on budget. For all commercial projects, you can opt-in pro version of this template.
@@ -29,7 +30,7 @@ If you're looking for the best React templates across the web, we've curated a l
 <h4><a href="https://www.wrappixel.com/demos/admin-templates/xtreme-admin/html/ltr/index.html">Demo</a></h4> -->
 
 <!-- Versions of Template -->
-<h2><a id="user-content-versions" class="anchor" aria-hidden="true" href="#versions"></a>Versions</h2>
+<h2><a id="user-content-versions" className="anchor" aria-hidden="true" href="#versions"></a>Versions</h2>
 <table>
 <thead>
 <tr>
@@ -96,7 +97,6 @@ If you're looking for the best React templates across the web, we've curated a l
     <p>Licensed under MIT (<a href="https://www.wrappixel.com/license/">https://www.wrappixel.com/license/</a>)</p>
   </li>
 </ul>
-
 
 <!-- Upgrade to Premium version of Template -->
 <h2>Upgrade to Premium version</h2>

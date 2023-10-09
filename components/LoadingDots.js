@@ -7,14 +7,14 @@ export default function LoadingDots() {
         justifyContent: "center",
       }}
     >
-      <div class="loading-indicator">
-        <svg class="dot" viewBox="0 0 10 10" width="10" height="10">
+      <div className="loading-indicator">
+        <svg className="dot" viewBox="0 0 10 10" width="10" height="10">
           <circle cx="5" cy="5" r="5" fill="white"></circle>
         </svg>
-        <svg class="dot" viewBox="0 0 10 10" width="10" height="10">
+        <svg className="dot" viewBox="0 0 10 10" width="10" height="10">
           <circle cx="5" cy="5" r="5" fill="white"></circle>
         </svg>
-        <svg class="dot" viewBox="0 0 10 10" width="10" height="10">
+        <svg className="dot" viewBox="0 0 10 10" width="10" height="10">
           <circle cx="5" cy="5" r="5" fill="white"></circle>
         </svg>
       </div>
