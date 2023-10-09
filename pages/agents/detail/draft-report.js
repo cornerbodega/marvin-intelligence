@@ -777,9 +777,12 @@ const CreateMission = ({ agent }) => {
                                   className="reportFont"
                                   style={{
                                     textDecoration: "none",
-                                    fontStyle: "italic",
+                                    // fontStyle: "italic",
                                     fontWeight: 300,
                                     color: "#0645ad",
+                                    // color: "#B52572",
+
+                                    cursor: "pointer",
                                   }}
                                   // className="text-white"
                                   href={`/missions/report/${
@@ -878,6 +881,7 @@ const CreateMission = ({ agent }) => {
                   // fontFamily: "Arial, sans-serif",
                   fontSize: "1em",
                   color: "#333",
+                  cursor: "pointer",
                   lineHeight: "1.5",
                   marginBottom: "40px",
                   maxWidth: "600px",

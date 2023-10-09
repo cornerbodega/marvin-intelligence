@@ -18,7 +18,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import LoadingDots from "../../../../components/LoadingDots";
 import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
-import { update } from "lodash";
+
 import Router from "next/router";
 
 // import { child } from "@firebase/database";
@@ -215,6 +215,7 @@ const ViewReports = ({
     user ? `/asyncTasks/${userId}/finalizeAndVisualizeReport/context/` : null
   );
   const [folderPicUrls, setFolderPicUrls] = useState(_folderPicUrls);
+  const [agent, setAgent] = useState({});
   // const folderPicUrls = [
   //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png",
   //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png",
@@ -268,7 +269,15 @@ const ViewReports = ({
     setLoadedReports(updatedMissions);
     updateReports(updatedMissions); // this one sets links on initial load
   }
+  function goToAgentProfile({ agentId }) {
+    // console.log("goToAgentProfile");
+    // console.log(agentId);
 
+    Router.push({
+      pathname: "/agents/detail/draft-report",
+      query: { ...Router.query, agentId: agentId },
+    });
+  }
   useEffect(() => {
     if (firebaseDraftData) {
       // console.log("firebaseDraftData");
@@ -323,11 +332,33 @@ const ViewReports = ({
         fetchUpdatedReports();
         updateReports();
       }
-      if (firebaseSaveData.agentId) {
+      if (firebaseSaveData.agentId && !agentId) {
         setLoadedAgentId(firebaseSaveData.agentId);
       }
     }
   }, [firebaseSaveData, folderId]); // Added folderId as a dependency
+
+  useEffect(() => {
+    // get agent from supabase by agentId
+    // set agent name
+    updateAgent(loadedAgentId);
+  }, [loadedAgentId]);
+  async function updateAgent(loadedAgentId) {
+    let { data: agents, error: agentsError } = await supabase
+      .from("agents")
+      .select("*")
+      .eq("agentId", loadedAgentId);
+
+    if (agentsError) {
+      console.log("agentError", agentError);
+      return;
+    }
+    console.log("agent");
+    console.log(agents);
+    if (agents && agents.length > 0) {
+      setAgent(agents[0]);
+    }
+  }
 
   // useEffect(() => {
   //   if (firebaseSaveData) {
@@ -706,19 +737,23 @@ const ViewReports = ({
         {children &&
           children.map((item) => (
             <li key={item.id}>
-              <a
-                style={{
-                  fontWeight: 800,
-                  color: "#B52572",
-                  fontWeight: "200",
-                  textDecoration: "none",
-                }}
-                href={`#${item.id}`}
-                onClick={() => console.log(`Navigating to report ${item.id}`)}
-              >
-                {loadedReports.find((report) => report.reportId === item.id)
-                  ?.reportTitle || `Report ID: ${item.id}`}
-              </a>
+              {!item.id && <LoadingDots style={{ marginTop: "20px" }} />}
+              {item.id && (
+                <a
+                  style={{
+                    fontWeight: 800,
+                    color: "#B52572",
+                    fontWeight: "200",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                  href={`#${item.id}`}
+                  onClick={() => console.log(`Navigating to report ${item.id}`)}
+                >
+                  {loadedReports.find((report) => report.reportId === item.id)
+                    ?.reportTitle || `Report ID: ${item.id}`}
+                </a>
+              )}
               {item.children && (
                 <NestedList
                   children={item.children}
@@ -895,27 +930,31 @@ const ViewReports = ({
         <i className="bi bi-body-text"></i>]
       </div>
       {/* {JSON.stringify(parentChildIdMap)} */}
-      <ul>
-        <li key={parentChildIdMap.id}>
-          <a
-            style={{
-              color: "#B52572",
-              textDecoration: "none",
-              fontWeight: 400,
-            }}
-            href={`#${parentChildIdMap.id}`}
-            onClick={() => console.log("Navigating to parent report")}
-          >
-            {loadedReports.find(
-              (report) => report.reportId === parentChildIdMap.id
-            )?.reportTitle || `Report ID: ${parentChildIdMap.id}`}
-          </a>
-          <NestedList
-            children={parentChildIdMap.children}
-            loadedReports={loadedReports}
-          />
-        </li>
-      </ul>
+      {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
+      {parentChildIdMap.id && (
+        <ul>
+          <li key={parentChildIdMap.id}>
+            <a
+              style={{
+                color: "#B52572",
+                textDecoration: "none",
+                cursor: "pointer",
+                fontWeight: 400,
+              }}
+              href={`#${parentChildIdMap.id}`}
+              onClick={() => console.log("Navigating to parent report")}
+            >
+              {loadedReports.find(
+                (report) => report.reportId === parentChildIdMap.id
+              )?.reportTitle || `Report ID: ${parentChildIdMap.id}`}
+            </a>
+            <NestedList
+              children={parentChildIdMap.children}
+              loadedReports={loadedReports}
+            />
+          </li>
+        </ul>
+      )}
       {/* <ul>
         <li key={parentChildIdMap.id}>
           {parentChildIdMap.id}
@@ -1007,6 +1046,41 @@ const ViewReports = ({
             className="report text-primary reportFont"
             dangerouslySetInnerHTML={{ __html: draft }}
           ></div>
+        </div>
+      )}
+      {/* {JSON.stringify(agent)} */}
+      {agent && !isStreaming && (
+        <div
+          style={{ textAlign: "center" }}
+          onClick={() => goToAgentProfile({ agentId: agent.agentId })}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              height: "237px",
+              objectFit: "cover",
+              textAlign: "center",
+            }}
+          >
+            <img
+              src={`${agent.profilePicUrl}`}
+              style={{ borderRadius: "50%", cursor: "pointer" }}
+              alt="agent"
+            />
+          </div>
+          <a
+            style={{
+              marginTop: "8px",
+              fontWeight: 800,
+              color: "#B52572",
+              fontWeight: "200",
+              textDecoration: "none",
+              cursor: "pointer",
+            }}
+          >
+            Agent {agent.agentName}
+          </a>
         </div>
       )}
       {highlight.text && loadedAgentId != 0 && (
