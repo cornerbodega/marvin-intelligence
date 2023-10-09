@@ -55,7 +55,9 @@ export const CreateAgentForm = ({}) => {
 
   useEffect(() => {
     if (taskId) {
-      const taskRef = db.ref(`asyncTasks/${user.sub}/taskType/${taskId}`);
+      const taskRef = db.ref(
+        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/taskType/${taskId}`
+      );
 
       taskRef.on("value", (snapshot) => {
         const taskData = snapshot.val();
@@ -96,7 +98,7 @@ export const CreateAgentForm = ({}) => {
       };
 
       const newTaskRef = await saveToFirebase(
-        `asyncTasks/${user.sub}/addAgent`,
+        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/addAgent`,
         newTask
       );
 

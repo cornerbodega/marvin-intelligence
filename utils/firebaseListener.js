@@ -7,7 +7,7 @@
 // export default function setupFirebaseListener(user) {
 //   console.log("SETUP FIREBASE LISTENER");
 
-//   const taskRef = ref(db, `asyncTasks/${user.sub}`);
+//   const taskRef = ref(db, `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}`);
 
 //   onValue(taskRef, async (snapshot) => {
 //     if (!snapshot.val()) {
@@ -47,7 +47,7 @@
 //         }
 
 //         const updatedStatusToInProgress = await set(
-//           ref(db, `/asyncTasks/${user.sub}/${taskType}/status`),
+//           ref(db, `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/${taskType}/status`),
 //           "in-progress"
 //         );
 //         try {
@@ -72,16 +72,16 @@
 //             );
 //           }
 //           const updatedStatusToComplete = await set(
-//             ref(db, `/asyncTasks/${user.sub}/${taskType}/status`),
+//             ref(db, `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/${taskType}/status`),
 //             "complete"
 //           );
 
 //           const updatedStatusCompletedAt = await set(
-//             ref(db, `/asyncTasks/${user.sub}/${taskType}/completedAt`),
+//             ref(db, `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/${taskType}/completedAt`),
 //             new Date().toISOString()
 //           );
 //           const updatedStatusContext = await set(
-//             ref(db, `/asyncTasks/${user.sub}/${taskType}/context`),
+//             ref(db, `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/${taskType}/context`),
 //             updatedContext
 //           );
 
@@ -89,13 +89,13 @@
 //           // await querySupabase(taskType, updatedContext);
 //         } catch (error) {
 //           const updatedStatusError = await set(
-//             ref(db, `/asyncTasks/${user.sub}/${taskType}/status`),
+//             ref(db, `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/${taskType}/status`),
 //             "error"
 //           );
 //           console.log("firebase listener error");
 //           console.log(error);
 //           const updatedStatusErrorMessage = await set(
-//             ref(db, `/asyncTasks/${user.sub}/${taskType}/errorMessage`),
+//             ref(db, `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/${taskType}/errorMessage`),
 //             error
 //           );
 //         }

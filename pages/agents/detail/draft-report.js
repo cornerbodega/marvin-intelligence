@@ -99,14 +99,18 @@ const CreateMission = ({ agent }) => {
   const [draftResponseContent, setDraftResponseContent] = useState();
 
   const firebaseDraftData = useFirebaseListener(
-    user ? `/asyncTasks/${user.sub}/writeDraftReport/context/draft` : null
+    user
+      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport/context/draft`
+      : null
   );
   const firebaseFolderIdData = useFirebaseListener(
-    user ? `/asyncTasks/${user.sub}/saveReport/context/folderId` : null
+    user
+      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport/context/folderId`
+      : null
   );
   const [hasSubmitted, setHasSubmitted] = useState(false);
   // const firebaseDraftCompletedAt = useFirebaseListener(
-  //   user ? `/asyncTasks/${user.sub}/writeDraftReport/context/draft` : null
+  //   user ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport/context/draft` : null
   // );
   // // const [draftResponseContent, setDraftResponseContent] = useState(null);
 
@@ -225,15 +229,15 @@ const CreateMission = ({ agent }) => {
         createdAt: new Date().toISOString(),
       };
       const clearOldDraftRef = await saveToFirebase(
-        `asyncTasks/${user.sub}/writeDraftReport`,
+        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
         {}
       );
       const clearOldSaveRef = await saveToFirebase(
-        `asyncTasks/${user.sub}/saveReport`,
+        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
         {}
       );
       const newTaskRef = await saveToFirebase(
-        `asyncTasks/${user.sub}/writeDraftReport`,
+        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
         newTask
       );
 
@@ -385,7 +389,7 @@ const CreateMission = ({ agent }) => {
       };
 
       const saveReportTaskRef = await saveToFirebase(
-        `asyncTasks/${user.sub}/saveReport`,
+        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
         saveReportTask
       );
 

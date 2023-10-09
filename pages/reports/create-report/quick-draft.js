@@ -55,10 +55,14 @@ const CreateMission = ({}) => {
   const [expertiseOutput, setExpertiseOutput] = useState("");
   const [folderId, setFolderId] = useState("");
   const firebaseDraftData = useFirebaseListener(
-    user ? `/asyncTasks/${userId}/quickDraft/context/` : null
+    user
+      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/quickDraft/context/`
+      : null
   );
   const firebaseSaveData = useFirebaseListener(
-    user ? `/asyncTasks/${userId}/finalizeAndVisualizeReport/context/` : null
+    user
+      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/finalizeAndVisualizeReport/context/`
+      : null
   );
   useEffect(() => {
     if (firebaseDraftData) {

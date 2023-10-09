@@ -212,7 +212,9 @@ const ViewReports = ({
   const [hasStartedContinuum, setHasStartedContinuum] = useState(false);
   const [loadedAgentId, setLoadedAgentId] = useState(agentId);
   const firebaseSaveData = useFirebaseListener(
-    user ? `/asyncTasks/${userId}/finalizeAndVisualizeReport/context/` : null
+    user
+      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/finalizeAndVisualizeReport/context/`
+      : null
   );
   const [folderPicUrls, setFolderPicUrls] = useState(_folderPicUrls);
   const [agent, setAgent] = useState({});
@@ -226,13 +228,17 @@ const ViewReports = ({
     folderPicUrls ? Math.floor(Math.random() * folderPicUrls.length) : 0
   );
   const firebaseFolderData = useFirebaseListener(
-    user ? `/asyncTasks/${userId}/regenerateFolder/context` : null
+    user
+      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/regenerateFolder/context`
+      : null
   );
   const firebaseDraftData = useFirebaseListener(
-    user ? `/asyncTasks/${userId}/continuum/` : null
+    user
+      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/continuum/`
+      : null
   );
   // const firebaseContinuumStatus = useFirebaseListener(
-  //   user ? `/asyncTasks/${userId}/contu/status` : null
+  //   user ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
   // );
   async function fetchUpdatedReports() {
     console.log("FETCH UPDATED REPORTS");
@@ -858,7 +864,8 @@ const ViewReports = ({
   //     </li>
   //   );
   // };
-
+  // console.log("process.env.NEXT_PUBLIC_serverUid");
+  // console.log(process.env.NEXT_PUBLIC_serverUid);
   return (
     <div style={{ maxWidth: "90%" }}>
       <Breadcrumb style={{ marginTop: "65px" }}>

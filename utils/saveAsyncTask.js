@@ -5,7 +5,7 @@
 // import { getSupabase } from "./supabase";
 
 // async function saveAsyncTask({ userId, taskType, payload }) {
-//   return await saveToFirebase(`/asyncTasks/${userId}/${taskType}`, {
+//   return await saveToFirebase(`/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/${taskType}`, {
 //     payload,
 //   });
 // }

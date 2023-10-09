@@ -83,7 +83,7 @@ const ViewReports = ({ folders, userId }) => {
     };
 
     // const newTaskRef = await saveToFirebase(
-    //   `asyncTasks/${user.sub}/writeDraftReport`,
+    //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
     //   newTask
     // );
     try {
