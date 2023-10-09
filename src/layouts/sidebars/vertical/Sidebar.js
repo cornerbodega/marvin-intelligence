@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 const navigation = [
   // {
   //   title: "Missions",
-  //   href: "/missions/view-missions",
+  //   href: "/reports/folders/view-folders",
   //   icon: "bi bi-patch-check",
   // },
 
@@ -22,7 +22,7 @@ const navigation = [
   },
   // {
   //   title: "Reports",
-  //   href: "/missions/view-missions",
+  //   href: "/reports/folders/view-folders",
   //   icon: "bi bi-body-text",
   // },
   // Make Insights part of Missions UI

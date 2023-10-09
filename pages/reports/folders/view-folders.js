@@ -132,7 +132,7 @@ const ViewReports = ({ folders, userId }) => {
   }, []);
   // useEffect(() => {
   //   if (!missions || missions.length === 0) {
-  //     goToPage("/missions/view-missions");
+  //     goToPage("/reports/folders/view-folders");
   //   }
   // });
 

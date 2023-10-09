@@ -385,7 +385,7 @@ const CreateAgent = ({ existingAgentNames }) => {
           <i className={`bi bi-body-text`}></i>
           &nbsp;
           <Link
-            href="/missions/view-missions"
+            href="/reports/folders/view-folders"
             style={{
               fontWeight: "200",
               textDecoration: "none",

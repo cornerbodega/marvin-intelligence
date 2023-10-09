@@ -1,6 +1,7 @@
 import { Button, Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import useRouter from "next/router";
 import { useEffect, useRef, useState } from "react";
+
 // import _, { debounce, get, has, set } from "lodash";
 // other imports
 import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
@@ -18,6 +19,8 @@ import LoadingDots from "../../../../components/LoadingDots";
 import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
 import { update } from "lodash";
+import Router from "next/router";
+import IntelliSlideshow from "../../../../components/intelliSlideshow";
 // import { child } from "@firebase/database";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
@@ -52,7 +55,8 @@ export const getServerSideProps = withPageAuthRequired({
         folders:folders (
             folderName,
             folderDescription,
-            folderPicUrl
+            folderPicUrl,
+            folderPicUrls
         ),
         reports:reports (
             reportTitle,
@@ -130,6 +134,7 @@ export const getServerSideProps = withPageAuthRequired({
     let _folderName = "";
     let _folderDescription = "";
     let _folderPicUrl = "";
+    let _folderPicUrls = "";
     missionsResponse.forEach((mission) => {
       _loadedReports.push(mission.reports);
       // console.log("mission.folders");
@@ -137,6 +142,10 @@ export const getServerSideProps = withPageAuthRequired({
       _folderName = mission.folders.folderName;
       _folderDescription = mission.folders.folderDescription;
       _folderPicUrl = mission.folders.folderPicUrl;
+      _folderPicUrls = mission.folders.folderPicUrls;
+      if (_folderPicUrls) {
+        _folderPicUrls = JSON.parse(_folderPicUrls);
+      }
     });
     // console.log("missions");
     // console.log(missions);
@@ -148,6 +157,7 @@ export const getServerSideProps = withPageAuthRequired({
         folderId,
         _folderDescription,
         _folderPicUrl,
+        _folderPicUrls,
         agentId,
         expertises,
         specializedTraining,
@@ -162,6 +172,7 @@ const ViewReports = ({
   folderId,
   _folderDescription,
   _folderPicUrl,
+  _folderPicUrls,
   agentId,
   expertises,
   specializedTraining,
@@ -174,6 +185,7 @@ const ViewReports = ({
   // agentId,
   // expertises,
   // specializedTraining,
+
   const { user, error, isLoading } = useUser();
   const userId = user ? user.sub : null;
   const [isLast, setIsLast] = useState(false);
@@ -198,11 +210,25 @@ const ViewReports = ({
   const [continuumCompleted, setContinuumCompleted] = useState(false);
   const [draft, setDraft] = useState("");
   const [hasStartedContinuum, setHasStartedContinuum] = useState(false);
+  const [loadedAgentId, setLoadedAgentId] = useState(agentId);
   const firebaseSaveData = useFirebaseListener(
     user ? `/asyncTasks/${userId}/finalizeAndVisualizeReport/context/` : null
   );
+  const [folderPicUrls, setFolderPicUrls] = useState(_folderPicUrls);
+  // const folderPicUrls = [
+  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png",
+  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png",
+  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png",
+  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png",
+  // ];
+  const [currentfolderPicUrlIndex, setCurrentfolderPicUrlIndex] = useState(
+    folderPicUrls ? Math.floor(Math.random() * folderPicUrls.length) : 0
+  );
   const firebaseFolderData = useFirebaseListener(
     user ? `/asyncTasks/${userId}/regenerateFolder/context` : null
+  );
+  const firebaseDraftData = useFirebaseListener(
+    user ? `/asyncTasks/${userId}/continuum/` : null
   );
   // const firebaseContinuumStatus = useFirebaseListener(
   //   user ? `/asyncTasks/${userId}/contu/status` : null
@@ -243,9 +269,6 @@ const ViewReports = ({
     updateReports(updatedMissions); // this one sets links on initial load
   }
 
-  const firebaseDraftData = useFirebaseListener(
-    user ? `/asyncTasks/${userId}/continuum/` : null
-  );
   useEffect(() => {
     if (firebaseDraftData) {
       // console.log("firebaseDraftData");
@@ -280,6 +303,10 @@ const ViewReports = ({
         setFolderName(firebaseFolderData.folderName);
         setFolderDescription(firebaseFolderData.folderDescription);
         setFolderPicUrl(firebaseFolderData.folderPicUrl);
+        if (firebaseFolderData.folderPicUrls) {
+          setFolderPicUrls(firebaseFolderData.folderPicUrls);
+          setCurrentfolderPicUrlIndex(folderPicUrls.length - 1);
+        }
       }
     }
   }, [firebaseFolderData, folderId]); // Added folderId as a dependency
@@ -294,7 +321,10 @@ const ViewReports = ({
         firebaseSaveData.reportPicUrl
       ) {
         fetchUpdatedReports();
-        // updateReports();
+        updateReports();
+      }
+      if (firebaseSaveData.agentId) {
+        setLoadedAgentId(firebaseSaveData.agentId);
       }
     }
   }, [firebaseSaveData, folderId]); // Added folderId as a dependency
@@ -358,7 +388,7 @@ const ViewReports = ({
   useEffect(() => {
     console.log("Updated highlight.text", highlight);
   }, [highlight]);
-  const handleTextHighlight = (event) => {
+  const handleTextHighlight = (event, report) => {
     console.log("handleTextHighlight");
     const selection = window.getSelection();
     console.log("selection", selection);
@@ -387,15 +417,32 @@ const ViewReports = ({
 
     setHighlight({
       text: selection.toString(),
-      startIndex,
-      endIndex,
+      // startIndex,
+      // endIndex,
       elementId,
+      parentReportId: report.reportId,
+      parentReportTitle: report.reportTitle,
     });
   };
 
   const handleFabClick = () => {
+    console.log("handleFabClick");
+    const highlightedText = highlight.highlightedText;
+    const elementId = highlight.elementId;
+    const parentReportId = highlight.parentReportId;
+    const parentReportTitle = JSON.stringify(highlight.parentReportTitle);
     console.log("ViewReports HandleClick Clicked!");
-    goToPage("/missions/create-mission/agents/view-agents");
+    Router.push({
+      pathname: "/agents/detail/draft-report",
+      query: {
+        ...Router.query,
+        agentId: loadedAgentId,
+        parentReportId,
+        parentReportTitle,
+        highlightedText,
+        elementId,
+      },
+    });
   };
 
   const router = useRouter;
@@ -410,7 +457,7 @@ const ViewReports = ({
     // when all necessary conditions are met
     // if (supabase && isStreaming && continuumCompleted) {
     console.log("Continuum Completed. Calling updateReports");
-    // updateReports();
+    updateReports(); // this one makes links happen for existing reports
     // }
   }, [supabase, isStreaming, continuumCompleted]); // The dependencies are narrowed down
 
@@ -788,40 +835,65 @@ const ViewReports = ({
       </Breadcrumb>
       <div className="folder-section report-section">
         {/* {folderPicUrl} */}
-        <div
-          style={{
-            height: "500px",
-          }}
-        >
-          {!folderPicUrl && (
-            <LoadingDots style={{ position: "absolute", top: "125px" }} />
-          )}
-          {folderPicUrl && (
-            <div className="content-container">
-              <a href={folderPicUrl} target="_blank" rel="noopener noreferrer">
-                <div className="image-container">
-                  <img
-                    src={folderPicUrl}
-                    className="middle-image "
-                    alt="Folder"
-                  />
-                </div>
-              </a>
-
-              <div
-                className="report text-white reportFont folder-description"
-                dangerouslySetInnerHTML={{ __html: folderDescription }}
-              />
+        {/* ["http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png"] */}
+        {/* {folderPicUrls} */}
+        {folderPicUrls && (
+          <div>
+            <div
+              style={{
+                // backgroundImage: `url(${folderPicUrls[currentfolderPicUrlIndex]})`,
+                height: "500px",
+              }}
+            >
+              <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
+              {!folderPicUrl && (
+                <LoadingDots style={{ position: "absolute", top: "125px" }} />
+              )}
+              {/* <IntelliSlideshow imageUrls={folderPicUrls} /> */}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+        {/* {JSON.stringify(folderPicUrls)} */}
+        {!folderPicUrls && (
+          <div
+            style={{
+              height: "500px",
+            }}
+          >
+            {!folderPicUrl && (
+              <LoadingDots style={{ position: "absolute", top: "125px" }} />
+            )}
+            {folderPicUrl && (
+              <div className="content-container">
+                <a
+                  href={folderPicUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="image-container">
+                    <img
+                      src={folderPicUrl}
+                      className="middle-image "
+                      alt="Folder"
+                    />
+                  </div>
+                </a>
+
+                <div
+                  className="report text-white reportFont folder-description"
+                  dangerouslySetInnerHTML={{ __html: folderDescription }}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
       <div
         className="reportTitle reportFont section-title"
         style={{ marginTop: "30px" }}
-        id="top"
       >
-        Table of Contents
+        Table of Contents [{loadedReports.length}{" "}
+        <i className="bi bi-body-text"></i>]
       </div>
       {/* {JSON.stringify(parentChildIdMap)} */}
       <ul>
@@ -852,7 +924,7 @@ const ViewReports = ({
         </li>
       </ul> */}
       {/* {Object.keys(parentChildIdMap)} */}
-      {loadedReports.length}
+
       {loadedReports &&
         loadedReports.map((cols, index) => {
           const report = loadedReports[index];
@@ -908,7 +980,7 @@ const ViewReports = ({
               </div>
               <div
                 id={`reportRoot${index}`}
-                onMouseUp={(e) => handleTextHighlight(e)}
+                onMouseUp={(e) => handleTextHighlight(e, report)}
                 className="report text-primary reportFont"
                 dangerouslySetInnerHTML={{ __html }}
               />
@@ -938,7 +1010,7 @@ const ViewReports = ({
           ></div>
         </div>
       )}
-      {highlight.text && (
+      {highlight.text && loadedAgentId != 0 && (
         <IntelliFab onClick={handleFabClick} icon="+" fabType="report" />
       )}
     </div>

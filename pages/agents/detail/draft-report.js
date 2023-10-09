@@ -101,12 +101,31 @@ const CreateMission = ({ agent }) => {
   const firebaseDraftData = useFirebaseListener(
     user ? `/asyncTasks/${user.sub}/writeDraftReport/context/draft` : null
   );
+  const firebaseFolderIdData = useFirebaseListener(
+    user ? `/asyncTasks/${user.sub}/saveReport/context/folderId` : null
+  );
   const [hasSubmitted, setHasSubmitted] = useState(false);
   // const firebaseDraftCompletedAt = useFirebaseListener(
   //   user ? `/asyncTasks/${user.sub}/writeDraftReport/context/draft` : null
   // );
   // // const [draftResponseContent, setDraftResponseContent] = useState(null);
 
+  useEffect(() => {
+    if (firebaseFolderIdData && hasSubmitted) {
+      console.log("firebaseFolderIdData");
+      console.log(firebaseFolderIdData);
+
+      // console.log("isStreaming");
+      // console.log(isStreaming);
+
+      goToPage(`/reports/folders/intel-report/${firebaseFolderIdData}`);
+    }
+  }, [firebaseFolderIdData]);
+  function goToPage(name) {
+    console.log("go to page");
+    console.log(name);
+    router.push(name);
+  }
   useEffect(() => {
     if (firebaseDraftData && hasSubmitted) {
       console.log("firebaseDraftData");
@@ -205,7 +224,14 @@ const CreateMission = ({ agent }) => {
         },
         createdAt: new Date().toISOString(),
       };
-
+      const clearOldDraftRef = await saveToFirebase(
+        `asyncTasks/${user.sub}/writeDraftReport`,
+        {}
+      );
+      const clearOldSaveRef = await saveToFirebase(
+        `asyncTasks/${user.sub}/saveReport`,
+        {}
+      );
       const newTaskRef = await saveToFirebase(
         `asyncTasks/${user.sub}/writeDraftReport`,
         newTask
@@ -335,6 +361,11 @@ const CreateMission = ({ agent }) => {
     if (specializedTraining) {
       reportData.specializedTraining = specializedTraining;
     }
+    let generationsCount = 1;
+    if (continuumEnabled) {
+      generationsCount = 3;
+    }
+
     try {
       const saveReportTask = {
         // taskId: writeDraftTaskId,
@@ -348,7 +379,7 @@ const CreateMission = ({ agent }) => {
           expertises: [agent.expertise1, agent.expertise2, agent.expertise3],
           userId: user.sub,
           currentGeneration: 1,
-          maxGenerations: generationsSliderValue,
+          maxGenerations: generationsCount,
         },
         createdAt: new Date().toISOString(),
       };
@@ -368,7 +399,7 @@ const CreateMission = ({ agent }) => {
     } catch (error) {
       console.error("Error queuing the task:", error.message);
     } finally {
-      setIsSubmitting(false);
+      // setIsSubmitting(false);
       clearInterval(notificationIntervalId); // Clear the interval properly
       setNotificationMessages([]);
     }
@@ -576,7 +607,7 @@ const CreateMission = ({ agent }) => {
           <Link
             style={{ fontWeight: "200", textDecoration: "none" }}
             className="text-white"
-            href="/missions/view-missions"
+            href="/reports/folders/view-folders"
           >
             Reports
           </Link>
@@ -799,7 +830,7 @@ const CreateMission = ({ agent }) => {
               </CardBody>
             </Card>
           )}
-          {draft && (
+          {draft && !isSubmitting && draft.endsWith(" ".repeat(3)) && (
             <>
               <Form onSubmit={(e) => handleWriteDraftReport(e)}>
                 <FormGroup>
@@ -832,7 +863,7 @@ const CreateMission = ({ agent }) => {
                 <i className="bi bi-link"></i> Continuum
               </h3>
 
-              {/* <FormGroup check>
+              <FormGroup check>
                 <Label check>
                   <Input
                     type="checkbox"
@@ -841,7 +872,7 @@ const CreateMission = ({ agent }) => {
                   />
                   Enable Continuum
                 </Label>
-              </FormGroup> */}
+              </FormGroup>
               <div
                 style={{
                   // fontFamily: "Arial, sans-serif",
@@ -861,69 +892,11 @@ const CreateMission = ({ agent }) => {
                 </Label>
               </div>
               <div>
-                <div>
-                  <FormGroup>
-                    <span>
-                      <Label
-                        style={{ marginRight: "12px" }}
-                        htmlFor="missionGenerations"
-                      >
-                        Continuum Generations:
-                        {/* <i className="bi bi-link"></i> : */}
-                      </Label>
-                      {generationsSliderValue}{" "}
-                      <i className="bi bi-body-text"></i>
-                    </span>
-                    <Input
-                      // style={{ width: "50%" }}
-                      type="range"
-                      name="missionGenerations"
-                      id="missionGenerations"
-                      min="1"
-                      max="7"
-                      defaultValue="1"
-                      step="3"
-                      onChange={(e) =>
-                        setGenerationsSliderValue(e.target.value)
-                      }
-                    />
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span>
-                        <label htmlFor="missionGenerations">
-                          1 <i className="bi bi bi-body-text"></i>
-                        </label>
-                      </span>
-
-                      <span>
-                        <label htmlFor="missionGenerations">
-                          7 <i className="bi bi-body-text"></i>
-                        </label>
-                      </span>
-                    </div>
-                  </FormGroup>
-
-                  {/* <FormGroup check>
-                      <Label check>
-                        <Input
-                          type="checkbox"
-                          onChange={() =>
-                            setCreateNewAgentsEnabled(!createNewAgentsEnabled)
-                          }
-                          name="enableAgentCreation"
-                        />
-                        Create New Agents
-                      </Label>
-                    </FormGroup> */}
-                </div>
+                <div></div>
               </div>
               <Form>
                 <div style={{ textAlign: "right" }}>
-                  {generationsSliderValue == 1 && (
+                  {!continuumEnabled && (
                     <Button
                       color="primary"
                       style={{ border: "3px solid green" }}
@@ -933,7 +906,7 @@ const CreateMission = ({ agent }) => {
                       <i className="bi bi-folder"></i> Save Report
                     </Button>
                   )}
-                  {generationsSliderValue > 1 && (
+                  {continuumEnabled && (
                     <Button
                       color="primary"
                       style={{ border: "3px solid green" }}
@@ -958,3 +931,62 @@ export default CreateMission;
 // Dispatch Notifications
 // Describe the 5 steps needed to create a research report draft on the following topic. The 5th step should be writing draft report. The first step should be analyzing research objective: How can deep learning techniques be used to enhance idea generation processes and optimize monetization strategies in computer science? Return your answer as a JSON array of strings. Do not explain your answer. Use present tense -ing language. Maximum 5 words per step.
 // What are 5 humorous status updates for Agent Haida Gwaii Black Bear, an expert in Totem Poles, doing a mission with the following briefing: What are the effects of different blending and layering techniques with oil pastels on depth perception and emotional response in abstract artwork?
+{
+  /* <FormGroup>
+                    <span>
+                      <Label
+                        style={{ marginRight: "12px" }}
+                        htmlFor="missionGenerations"
+                      >
+                        Continuum Generations:
+                      </Label>
+                      {generationsSliderValue}{" "}
+                      <i className="bi bi-body-text"></i>
+                    </span>
+                    <Input
+                      type="range"
+                      name="missionGenerations"
+                      id="missionGenerations"
+                      min="1"
+                      max="7"
+                      defaultValue="1"
+                      step="1"
+                      onChange={(e) =>
+                        setGenerationsSliderValue(e.target.value)
+                      }
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>
+                        <label htmlFor="missionGenerations">
+                          2 <i className="bi bi bi-body-text"></i>
+                        </label>
+                      </span>
+
+                      <span>
+                        <label htmlFor="missionGenerations">
+                          3 <i className="bi bi-body-text"></i>
+                        </label>
+                      </span>
+                    </div>
+                  </FormGroup> */
+}
+
+{
+  /* <FormGroup check>
+                      <Label check>
+                        <Input
+                          type="checkbox"
+                          onChange={() =>
+                            setCreateNewAgentsEnabled(!createNewAgentsEnabled)
+                          }
+                          name="enableAgentCreation"
+                        />
+                        Create New Agents
+                      </Label>
+                    </FormGroup> */
+}
