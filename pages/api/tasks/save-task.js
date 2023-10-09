@@ -1,6 +1,9 @@
 export default async function handler(req, res) {
   console.log("NEXT api Save Task Request");
-  const serverUrl = "http://localhost:8080";
+  // const serverUrl = "http://localhost:8080";
+  const serverUrl =
+    process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8080";
+
   console.log("req.body");
   console.log(req.body);
   await fetch(
