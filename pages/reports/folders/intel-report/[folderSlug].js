@@ -20,7 +20,7 @@ import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
 import { update } from "lodash";
 import Router from "next/router";
-import IntelliSlideshow from "../../../../components/intelliSlideshow";
+
 // import { child } from "@firebase/database";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
@@ -849,7 +849,6 @@ const ViewReports = ({
               {!folderPicUrl && (
                 <LoadingDots style={{ position: "absolute", top: "125px" }} />
               )}
-              {/* <IntelliSlideshow imageUrls={folderPicUrls} /> */}
             </div>
           </div>
         )}
