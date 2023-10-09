@@ -756,9 +756,11 @@ const ViewReports = ({
               )}
               {item.children && (
                 <NestedList
-                  children={item.children}
+                  // children={item.children}
                   loadedReports={loadedReports}
-                />
+                >
+                  {item.children}
+                </NestedList>
               )}
             </li>
           ))}
@@ -949,9 +951,11 @@ const ViewReports = ({
               )?.reportTitle || `Report ID: ${parentChildIdMap.id}`}
             </a>
             <NestedList
-              children={parentChildIdMap.children}
+              // children={parentChildIdMap.children}
               loadedReports={loadedReports}
-            />
+            >
+              {parentChildIdMap.children}
+            </NestedList>
           </li>
         </ul>
       )}

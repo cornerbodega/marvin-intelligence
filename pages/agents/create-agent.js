@@ -27,35 +27,10 @@ import {
 
 import Link from "next/link";
 import { getSession } from "@auth0/nextjs-auth0";
-import { log } from "../../utils/log";
-import { set } from "lodash";
-export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps(context) {
-    const supabase = getSupabase();
-    const session = await getSession(context.req, context.res);
-    const user = session?.user;
 
-    let { data: agents, error } = await supabase
-      .from("agents")
-      .select("agentName")
-      .eq("userId", user.sub);
-    // const existingAgentNames = agents.map((agent) => agent.agentName);
-    const existingAgentNames = [];
-    // console.log("existingAgentNames");
-    // console.log(existingAgentNames);
-    // other pages will redirect here if they're empty
-    // If no agency, go to create agency page
-    // If no agents, go to crete agent page
-    // let agency;
-    return {
-      props: { existingAgentNames },
-    };
-  },
-});
-export const CreateAgentForm = ({ existingAgentNames }) => {
+export const CreateAgentForm = ({}) => {
   const router = useRouter();
-  console.log("existingAgentNames");
-  console.log(existingAgentNames);
+
   const [notificationMessages, setNotificationMessages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // const randomAnimalNames = ["Tiger", "Elephant", "Hawk", "Frog"];
@@ -102,7 +77,7 @@ export const CreateAgentForm = ({ existingAgentNames }) => {
     const agentData = {
       expertiseInput,
       userId: user.sub,
-      existingAgentNames,
+      existingAgentNames: "[]",
       specializedTraining,
     };
     // before actually creating the agent
