@@ -2,7 +2,7 @@
 // dispatch.js is the page where the user can create a mission for an
 // agent to complete.
 // import { saveToFirebase } from "../../utils/saveToFirebase";
-import { saveToFirebase } from "../../../utils/saveToFirebase";
+// import { saveToFirebase } from "../../../utils/saveToFirebase";
 // import { log } from "../../../utils/log";
 import {
   Card,
@@ -39,11 +39,12 @@ import { useState, useRef, useEffect } from "react";
 
 import { slugify } from "../../../utils/slugify";
 // import { setupFirebaseListener } from "../../../utils/firebaseListener";
-
+import saveTask from "../../../utils/saveTask";
 // bring in original report's summary
 // bring in agent's memory of previous reports
 // bring in content of link from original report
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
+import LoadingDots from "../../../components/LoadingDots";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     // const agentId = context.params.agentId;
@@ -228,18 +229,35 @@ const CreateMission = ({ agent }) => {
         },
         createdAt: new Date().toISOString(),
       };
-      const clearOldDraftRef = await saveToFirebase(
-        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
-        {}
-      );
-      const clearOldSaveRef = await saveToFirebase(
-        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
-        {}
-      );
-      const newTaskRef = await saveToFirebase(
-        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
-        newTask
-      );
+      const clearWriteDraftReportTask = {
+        type: "writeDraftReport",
+        status: "cleared",
+        userId: user.sub,
+        context: {},
+        createdAt: new Date().toISOString(),
+      };
+      await saveTask(clearWriteDraftReportTask);
+      const clearSaveReportTask = {
+        type: "saveReport",
+        status: "cleared",
+        userId: user.sub,
+        context: {},
+        createdAt: new Date().toISOString(),
+      };
+      await saveTask(clearSaveReportTask);
+      // const clearOldDraftRef = await saveToFirebase(
+      //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+      //   {}
+      // );
+      // const clearOldSaveRef = await saveToFirebase(
+      //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
+      //   {}
+      // );
+      const newTaskRef = await saveTask(newTask);
+      // const newTaskRef = await saveToFirebase(
+      //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+      //   newTask
+      // );
 
       if (newTaskRef) {
         setWriteDraftTaskId(newTaskRef.key); // Store the task ID to set up the listener
@@ -383,15 +401,21 @@ const CreateMission = ({ agent }) => {
           expertises: [agent.expertise1, agent.expertise2, agent.expertise3],
           userId: user.sub,
           currentGeneration: 1,
-          maxGenerations: generationsCount,
+          maxGenerations: 1,
+          // maxGenerations: generationsCount,
+          maxGenerations: 1,
         },
         createdAt: new Date().toISOString(),
       };
 
-      const saveReportTaskRef = await saveToFirebase(
-        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
-        saveReportTask
-      );
+      const saveReportTaskRef = await saveTask(saveReportTask);
+      console.log("newTaskRef");
+      console.log(newTaskRef);
+
+      // const saveReportTaskRef = await saveToFirebase(
+      //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
+      //   saveReportTask
+      // );
 
       if (saveReportTaskRef) {
         // setWriteDraftTaskId(newTaskRef.key); // Store the task ID to set up the listener
@@ -767,6 +791,10 @@ const CreateMission = ({ agent }) => {
                       <h4>Bio</h4>
                     </div>
                     <div>{agent.bio}</div>
+                    {/* {JSON.stringify(agentMissionHistory)} */}
+                    {/* {!agentMissionHistory && <LoadingDots></LoadingDots>} */}
+                    {/* {!agentMissionHistory ||
+                      (agentMissionHistory.length == 0 && <LoadingDots />)} */}
                     {agentMissionHistory && (
                       <>
                         <div>
@@ -774,8 +802,12 @@ const CreateMission = ({ agent }) => {
                         </div>
                         <ul>
                           {agentMissionHistory.map((mission, index) => {
+                            if (mission.reportFolders.length == 0) {
+                              return <></>;
+                            }
                             return (
                               <li key={index}>
+                                {/* {JSON.stringify(mission)} */}
                                 <Link
                                   // style={{ }}
                                   className="reportFont"
@@ -789,9 +821,8 @@ const CreateMission = ({ agent }) => {
                                     cursor: "pointer",
                                   }}
                                   // className="text-white"
-                                  href={`/missions/report/${
-                                    mission.reportId
-                                  }-${slugify(mission.reportTitle)}`}
+                                  href={`/reports/folders/intel-report/${mission.reportFolders[0].folderId}`}
+                                  // href={`/missions/reports/folders/${mission.reportFolders[0].folderId}`}
                                 >
                                   {mission.reportTitle}
                                 </Link>

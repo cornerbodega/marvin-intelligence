@@ -561,7 +561,15 @@ export default function Home({ title, content }) {
             </section>
           </main>
           <div style={{ height: "60px" }}></div>
-          <Mlogo></Mlogo>
+          <div
+            style={{
+              maxWidth: "33%",
+              marginRight: "auto",
+              marginLeft: "auto",
+            }}
+          >
+            <Mlogo />
+          </div>
 
           <footer className="site-footer">
             <div className="container">

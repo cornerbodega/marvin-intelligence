@@ -69,11 +69,11 @@ export const getServerSideProps = withPageAuthRequired({
     // If no agents, go to crete agent page
     // let agency;
     return {
-      props: { agents },
+      props: { agents, userId: user.sub, agencyName: agency[0].agencyName },
     };
   },
 });
-const ViewAgents = ({ agents }) => {
+const ViewAgents = ({ agents, userId, agencyName }) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(1);
@@ -83,6 +83,7 @@ const ViewAgents = ({ agents }) => {
   const [parentReportTitle, setParentReportTitle] = useState("");
   const [parentReportId, setParentReportId] = useState("");
   const [parentReportSlug, setParentReportSlug] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const router = useRouter;
   useEffect(() => {
     if (router.query.parentReportTitle) {
@@ -128,6 +129,55 @@ const ViewAgents = ({ agents }) => {
       query: router.query,
     });
   };
+  async function loadPagedResults() {
+    console.log("Loading paged results");
+
+    const { data, error } = await supabase
+      .from("agents")
+      .select("*")
+      .eq("userId", userId)
+      .filter("agentName", "neq", null)
+      .filter("profilePicUrl", "neq", null)
+      .limit(PAGE_COUNT)
+      .order("agentId", { ascending: false });
+
+    if (error) {
+      console.error("Error loading paged results:", error);
+      return;
+    }
+
+    setLoadedAgents(data);
+  }
+
+  async function handleSearch(searchInput) {
+    setSearchInput(searchInput);
+    console.log("handleSearch");
+    console.log(searchInput);
+
+    if (searchInput.trim() === "") {
+      loadPagedResults();
+      return;
+    }
+
+    try {
+      let { data: filteredAgents, error } = await supabase
+        .from("agents")
+        .select("*")
+        .ilike("bio", `%${searchInput}%`)
+        .eq("userId", userId);
+
+      if (error) {
+        console.error("Error fetching data:", error);
+        return;
+      }
+
+      console.log("filteredReports");
+      console.log(filteredAgents);
+      setLoadedAgents(filteredAgents);
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+    }
+  }
   const handleCardClick = (agent) => {
     // console.log("handleCardClick");
     // const agentName = event.target.dataset.datums.agentName;
@@ -192,6 +242,7 @@ const ViewAgents = ({ agents }) => {
   return (
     <>
       <Breadcrumb style={{ fontWeight: "200", fontFamily: "monospace" }}>
+        <BreadcrumbItem className="text-white">{agencyName}</BreadcrumbItem>
         <BreadcrumbItem className="text-white">
           <i className={`bi bi-person-badge`}></i>
           &nbsp;
@@ -217,6 +268,7 @@ const ViewAgents = ({ agents }) => {
             </Link>
           </BreadcrumbItem>
         )}
+
         {/* <BreadcrumbItem className="text-white">
           <i className={`bi-folder`}></i>+ Create Report
         </BreadcrumbItem> */}
@@ -235,6 +287,26 @@ const ViewAgents = ({ agents }) => {
         <Button style={{ border: "1px solid white" }} onClick={handleFabClick}>
           <i className="bi bi-person-badge"></i>+ Add Agent
         </Button>
+      </div>
+      <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
+        <input
+          type="text"
+          style={{
+            borderRadius: "8px",
+            borderWidth: "0px",
+            backgroundColor: "#444",
+            color: "white",
+            // marginLeft: "12px",
+            // width: "auto", // Make the width auto to fit the content
+            // maxWidth: "100%", // Control the maximum width for larger screens
+            height: "2em",
+            flexGrow: 1, // Let it grow to take the available space
+            textIndent: "10px",
+          }}
+          lines="1"
+          placeholder="🔎 Existing Agents"
+          onChange={(e) => handleSearch(e.target.value)}
+        />
       </div>
       {/* <div>{JSON.stringify(loadedAgents)}</div> */}
       <div ref={containerRef}>

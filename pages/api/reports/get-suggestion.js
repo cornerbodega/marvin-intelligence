@@ -18,9 +18,30 @@ export async function getSuggestionFunction({
   // #######################
   let { data: agentMissionHistory, error } = await supabase
     .from("reports")
-    .select("reportTitle, reportSummary, reportId")
+    .select(
+      `
+        reportTitle, 
+        reportSummary, 
+        reportId, 
+        reportFolders (
+          folderId
+        )
+    `
+    )
     .eq("agentId", agentId)
     .limit(3);
+
+  if (error) {
+    console.error("Error fetching data:", error);
+    return;
+  }
+
+  console.log(agentMissionHistory);
+  // let { data: agentMissionHistory, error } = await supabase
+  //   .from("reports")
+  //   .select("reportTitle, reportSummary, reportId")
+  //   .eq("agentId", agentId)
+  //   .limit(3);
   // let { data: agentReports, agentReportsError } = await supabase
   //   .from("reports")
   //   .select("reportTitle, reportSummary, reportId")

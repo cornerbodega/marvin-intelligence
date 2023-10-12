@@ -108,12 +108,41 @@ const IntelliCard = ({
             justifyContent: "center",
           }}
         >
-          <div onClick={handleClick}>
-            {/* <CardTitle tag="h5" className="text-primary"> */}
-            {/* Agent {datums.agentName} */}
+          <div
+            style={{
+              fontWeight: "800",
+              color: "white",
+              marginBottom: "16px",
+              fontSize: "1.3rem",
+              // height: "100px", // specify a fixed height
+              overflow: "hidden", // hide the overflow content
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 2, // limit the content to 2 lines at most
+            }}
+            className={titleClassName}
+          >
+            {icon && <i className={icon}></i>} {displayDatums.title}
+          </div>
+          <CardSubtitle
+            className="mb-2 text-muted"
+            // style={{ marginTop: "-50px" }}
+            tag="h6"
+          >
+            <Badge color="info" className="ms-3 expertiseBadge">
+              {datums.expertise1}
+            </Badge>
+            <Badge color="info" className="ms-3 expertiseBadge">
+              {datums.expertise2}
+            </Badge>
+            <Badge color="info" className="ms-3 expertiseBadge">
+              {datums.expertise3}
+            </Badge>
+          </CardSubtitle>
+          {/* <div onClick={handleClick}>
+            
             <div
               style={{
-                // fontStyle: "italic",
                 fontWeight: "800",
                 color: "white",
                 marginBottom: "16px",
@@ -123,8 +152,7 @@ const IntelliCard = ({
             >
               {icon && <i className={icon}></i>} {displayDatums.title}
             </div>
-            {/* </CardTitle> */}
-            {/* {displayDatums.folderDescription} */}
+            
             <CardSubtitle className="mb-2 text-muted" tag="h6">
               <Badge color="info" className="ms-3 expertiseBadge">
                 {datums.expertise1}
@@ -136,21 +164,7 @@ const IntelliCard = ({
                 {datums.expertise3}
               </Badge>
             </CardSubtitle>
-          </div>
-          {/* <CardText>{datums.bio}</CardText> */}
-          {/* {datumsType === "agents" && (
-            <Button
-              style={{
-                border: "1px solid white",
-                position: "absolute",
-                bottom: "4px",
-                right: "4px",
-              }}
-              onClick={handleHire}
-            >
-              <i className="bi bi-body-text"></i>+
-            </Button>
-          )} */}
+          </div> */}
         </CardBody>
       </Card>
     </>

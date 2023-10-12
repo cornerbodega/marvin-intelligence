@@ -53,11 +53,11 @@ export const getServerSideProps = withPageAuthRequired({
     // If no missions, go to crete report page
     // let agency;
     return {
-      props: { folders, userId, agencyName: agency[0].agencyName },
+      props: { folders, userId },
     };
   },
 });
-const ViewReports = ({ folders, userId, agencyName }) => {
+const ViewReports = ({ folders, userId }) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(2);
@@ -249,7 +249,7 @@ const ViewReports = ({ folders, userId, agencyName }) => {
     console.log("ViewReports HandleCardClick Clicked!");
     // setSelectedReport(report);
     const folderSlug = slugify(`${folderId}-${folderName}`);
-    goToPage(`/reports/folders/intel-report/${folderSlug}`);
+    goToPage(`/intelnet/folders/intelnet-report/${folderSlug}`);
   };
   const router = useRouter;
   function goToPage(name) {
@@ -295,52 +295,12 @@ const ViewReports = ({ folders, userId, agencyName }) => {
   return (
     <>
       <Breadcrumb style={{ fontFamily: "monospace" }}>
-        <BreadcrumbItem className="text-white">{agencyName}</BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
-          <i className={`bi bi-folder`}></i>
-          &nbsp; Reports
+          <i className={`bi bi-columns`}></i>
+          &nbsp; Intelnet
         </BreadcrumbItem>
       </Breadcrumb>
-      <div id="quickDraftBriefingInput">
-        <div>
-          <textarea
-            autoFocus
-            value={briefingInput}
-            onChange={(e) => setBriefingInput(e.target.value)}
-            type="text"
-            placeholder="What would you like to know?"
-            lines="5"
-            style={{
-              padding: "12px 12px 13px 13px",
-              borderWidth: "0px",
-              width: "100%",
-              height: "180px",
-              color: "white",
-              borderRadius: "8px",
-              backgroundColor: "#444",
-            }}
-          />
-        </div>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button
-            onClick={handleQuickDraftClick}
-            style={{
-              textAlign: "right",
-              borderColor: "green",
-              borderWidth: "2px",
-              alignContent: "right",
-              marginBottom: "40px",
-              marginRight: "10px",
-              cursor: "pointer",
-            }}
-            disabled={briefingInput.length === 0}
-            className="btn btn-primary section-title"
-          >
-            {/* ↳ */}
-            <i className="bi bi-folder"></i>+ Quick Draft
-          </Button>
-        </div>
-      </div>
+
       <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
         <input
           type="text"
@@ -357,7 +317,7 @@ const ViewReports = ({ folders, userId, agencyName }) => {
             textIndent: "10px",
           }}
           lines="1"
-          placeholder="🔎 Existing Reports"
+          placeholder="🔎 Global Reports"
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>

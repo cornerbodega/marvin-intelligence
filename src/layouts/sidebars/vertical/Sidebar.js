@@ -37,8 +37,8 @@ const navigation = [
   //   icon: "bi bi-link",
   // },
   {
-    title: "IntelNet",
-    href: "/intelnet/view-intelnet",
+    title: "Intelnet",
+    href: "/intelnet/folders/view-intelnet",
     icon: "bi bi-columns",
   },
 

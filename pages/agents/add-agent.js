@@ -1,4 +1,3 @@
-import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 // import toast, { Toaster } from "react-hot-toast";
 import toast, { Toaster } from "react-hot-toast";
 import { db } from "../../utils/firebase";
@@ -30,7 +29,9 @@ import Link from "next/link";
 
 import { saveToFirebase } from "../../utils/saveToFirebase";
 import Router from "next/router";
-
+import saveTask from "../../utils/saveTask";
+import { useFirebaseListener } from "../../utils/useFirebaseListener";
+import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 export function goToAgentProfile({ agentId }) {
   console.log("goToAgentProfile");
   console.log(agentId);
@@ -40,8 +41,8 @@ export function goToAgentProfile({ agentId }) {
     query: { ...Router.query, agentId: agentId },
   });
 }
-
-export const CreateAgentForm = ({}) => {
+const supabase = getSupabase();
+export const CreateAgentForm = ({ userId }) => {
   const router = useRouter();
   const [notificationMessages, setNotificationMessages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,10 +54,11 @@ export const CreateAgentForm = ({}) => {
   const [taskId, setTaskId] = useState(null);
   const [taskStatus, setTaskStatus] = useState(null);
 
+  //
   useEffect(() => {
     if (taskId) {
       const taskRef = db.ref(
-        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/taskType/${taskId}`
+        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/taskType/${taskId}`
       );
 
       taskRef.on("value", (snapshot) => {
@@ -90,17 +92,18 @@ export const CreateAgentForm = ({}) => {
         userId: user.sub,
         context: {
           expertiseInput,
-          userId: user.sub,
+          userId: userId,
           // generation: 0,
           // totalGenerations: 1,
         },
         createdAt: new Date().toISOString(),
       };
 
-      const newTaskRef = await saveToFirebase(
-        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/addAgent`,
-        newTask
-      );
+      const newTaskRef = await saveTask(newTask);
+      // const newTaskRef = await saveToFirebase(
+      //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/addAgent`,
+      //   newTask
+      // );
 
       if (newTaskRef) {
         setTaskId(newTaskRef.key); // Store the task ID to set up the listener
@@ -386,11 +389,69 @@ export const CreateAgentForm = ({}) => {
     </>
   );
 };
-const CreateAgent = ({ existingAgentNames }) => {
+export const getServerSideProps = withPageAuthRequired({
+  async getServerSideProps(context) {
+    const session = await getSession(context.req, context.res);
+    // const user = ;
+    const userId = session?.user.sub;
+    let { data: agency, agencyError } = await supabase
+      .from("users")
+      .select("agencyName")
+      .eq("userId", userId);
+    if (agencyError) {
+      console.log("agencyError");
+    }
+    console.log("agency");
+    console.log(agency);
+    if (!agency || agency.length === 0) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/agency/create-agency",
+        },
+        props: {},
+      };
+    }
+    return {
+      props: { userId },
+    };
+  },
+});
+const CreateAgent = ({ userId }) => {
   const [parentReportTitle, setParentReportTitle] = useState("");
   const [parentReportId, setParentReportId] = useState("");
   const [parentReportSlug, setParentReportSlug] = useState("");
   const router = useRouter();
+  // const user = useUser();
+  const firebaseSaveData = useFirebaseListener(
+    `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/addAgent/context/`
+  );
+
+  useEffect(() => {
+    if (firebaseSaveData) {
+      console.log("firebase save data");
+      console.log(firebaseSaveData);
+      if (firebaseSaveData.agentId) {
+        clearPreviousAgent();
+        const agentId = firebaseSaveData.agentId;
+        async function clearPreviousAgent() {
+          const clearWriteDraftReportTask = {
+            type: "addAgent",
+            status: "cleared",
+            userId,
+            context: {},
+            createdAt: new Date().toISOString(),
+          };
+          try {
+            await saveTask(clearWriteDraftReportTask);
+          } catch (error) {
+            console.log(error);
+          }
+        }
+        goToAgentProfile({ agentId });
+      }
+    }
+  }, [firebaseSaveData]); // Added folderId as a dependency
 
   useEffect(() => {
     if (router.query.parentReportTitle) {
@@ -465,7 +526,7 @@ const CreateAgent = ({ existingAgentNames }) => {
           <i className={`bi bi-person-badge`}></i>+ Add Agent
         </BreadcrumbItem>
       </Breadcrumb>
-      <CreateAgentForm existingAgentNames={existingAgentNames} />
+      <CreateAgentForm userId={userId} />
     </>
   );
 };
