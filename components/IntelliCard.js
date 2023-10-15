@@ -10,6 +10,7 @@ import {
   CardTitle,
   CardSubtitle,
   Table,
+  CardImg,
 } from "reactstrap";
 import getCloudinaryImageUrlForHeight from "../utils/getCloudinaryImageUrlForHeight";
 
@@ -19,6 +20,7 @@ const IntelliCard = ({
   datumsType,
   handleCardClick,
   index,
+  folderLikesByFolderId,
 }) => {
   // console.log("intelli card group row");
   // console.log("Intellicard handleCardClick");
@@ -28,10 +30,10 @@ const IntelliCard = ({
   // console.log(index);
   const imageStyle = {};
   // if (index === 0) {
-  imageStyle.borderTopLeftRadius = "25px";
+  imageStyle.borderTopLeftRadius = "16px";
   // }
   // if (index === 2) {
-  imageStyle.borderTopRightRadius = "25px";
+  imageStyle.borderTopRightRadius = "16px";
   // }
   // const imageStyle = {
   //   borderTopLeftRadius: "7px",
@@ -39,6 +41,7 @@ const IntelliCard = ({
   // };
   let titleClassName = "";
   let icon;
+  let likes;
   const displayDatums = { ...datums };
   if (datumsType === "agents") {
     displayDatums.title = `Agent ${datums.agentName}`;
@@ -56,6 +59,9 @@ const IntelliCard = ({
     displayDatums.title = datums.folderName;
     titleClassName = "reportFont";
     icon = "bi bi-folder";
+    if (folderLikesByFolderId) {
+      likes = folderLikesByFolderId[datums.folderId];
+    }
   }
   if (imageSize === "small") {
     imageStyle.height = "337px";
@@ -90,81 +96,99 @@ const IntelliCard = ({
   return (
     <>
       <Card
-        style={{ background: "black", borderRadius: "25px", cursor: "pointer" }}
+        onClick={handleClick}
+        style={{ background: "black", cursor: "pointer" }}
         className="cardShadow text-white"
       >
-        <img
-          onClick={handleClick}
-          src={displayDatums.picUrl} // insert image transformations based on imageSize here
-          style={imageStyle}
-          alt="Card image cap"
-        />
-
+        <div style={{ position: "relative" }}>
+          <CardImg
+            // onClick={handleClick}
+            src={displayDatums.picUrl} // insert image transformations based on imageSize here
+            style={imageStyle}
+            alt="Card image cap"
+          />
+          {/* <div onClick={handleClick} className="overlay"></div> */}
+        </div>
         <CardBody
           style={{
             display: "flex",
-            background: "black",
+            backgroundColor: "black",
+            borderBottomLeftRadius: "16px",
+            borderBottomRightRadius: "16px",
             flexDirection: "column",
-            justifyContent: "center",
+            justifyContent: "space-between",
+            marginBottom: "20px",
+            // marginTop: "-60px",
+            // padding: "20px",
+            padding: "20px 20px 0 20px",
+
+            boxShadow: `
+            0 8px 0 -2px black, 
+            0 8px 0 0 grey,
+            0 16px 0 -2px black, 
+            0 16px 0 0 grey,
+            0 24px 0 -2px black, 
+            0 24px 0 0 black
+        `,
           }}
         >
           <div
             style={{
-              fontWeight: "800",
-              color: "white",
-              marginBottom: "16px",
-              fontSize: "1.3rem",
-              // height: "100px", // specify a fixed height
-              overflow: "hidden", // hide the overflow content
-              display: "-webkit-box",
-              WebkitBoxOrient: "vertical",
-              WebkitLineClamp: 2, // limit the content to 2 lines at most
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start", // Align items to the top
+              marginBottom: "0px",
             }}
-            className={titleClassName}
           >
-            {icon && <i className={icon}></i>} {displayDatums.title}
-          </div>
-          <CardSubtitle
-            className="mb-2 text-muted"
-            // style={{ marginTop: "-50px" }}
-            tag="h6"
-          >
-            <Badge color="info" className="ms-3 expertiseBadge">
-              {datums.expertise1}
-            </Badge>
-            <Badge color="info" className="ms-3 expertiseBadge">
-              {datums.expertise2}
-            </Badge>
-            <Badge color="info" className="ms-3 expertiseBadge">
-              {datums.expertise3}
-            </Badge>
-          </CardSubtitle>
-          {/* <div onClick={handleClick}>
-            
             <div
               style={{
                 fontWeight: "800",
                 color: "white",
-                marginBottom: "16px",
                 fontSize: "1.3rem",
+                height: "80px",
+                marginTop: "16px",
+                display: "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 2,
+                overflow: "hidden",
               }}
               className={titleClassName}
             >
               {icon && <i className={icon}></i>} {displayDatums.title}
             </div>
-            
-            <CardSubtitle className="mb-2 text-muted" tag="h6">
-              <Badge color="info" className="ms-3 expertiseBadge">
-                {datums.expertise1}
+          </div>
+
+          <CardSubtitle className="mb-2 text-muted" tag="h6">
+            {["expertise1", "expertise2", "expertise3"].map((expertise, i) => (
+              <Badge key={i} color="info" className="ms-3 expertiseBadge">
+                {datums[expertise]}
               </Badge>
-              <Badge color="info" className="ms-3 expertiseBadge">
-                {datums.expertise2}
-              </Badge>
-              <Badge color="info" className="ms-3 expertiseBadge">
-                {datums.expertise3}
-              </Badge>
-            </CardSubtitle>
-          </div> */}
+            ))}
+          </CardSubtitle>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              fontSize: "1rem",
+            }}
+          >
+            {likes && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  color: "#1C69E7",
+                }}
+                // className="section-title"
+              >
+                {likes > 1 && <span>{likes}&nbsp;</span>}
+                <i className="bi bi-star-fill" />
+              </div>
+            )}
+          </div>
         </CardBody>
       </Card>
     </>
@@ -172,3 +196,52 @@ const IntelliCard = ({
 };
 
 export default IntelliCard;
+
+{
+  /* <CardBody
+style={{
+  display: "flex",
+  background: "black",
+  flexDirection: "column",
+  justifyContent: "center",
+  marginBottom: "12px",
+  marginTop: "-6px",
+}}
+>
+<div
+  style={{
+    fontWeight: "800",
+    color: "white",
+    marginBottom: "16px",
+    fontSize: "1.3rem",
+    height: "100px", // specify a fixed height
+    // overflow: "hidden", // hide the overflow content
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: 2, // limit the content to 2 lines at most
+  }}
+  className={titleClassName}
+>
+  {icon && <i className={icon}></i>} {displayDatums.title}
+</div>
+<CardSubtitle tag="h6" className="mb-2 text-muted">
+  <i className="bi bi-star-fill" /> 723
+</CardSubtitle>
+<CardSubtitle
+  className="mb-2 text-muted"
+  // style={{ marginTop: "-50px" }}
+  tag="h6"
+>
+  <Badge color="info" className="ms-3 expertiseBadge">
+    {datums.expertise1}
+  </Badge>
+  <Badge color="info" className="ms-3 expertiseBadge">
+    {datums.expertise2}
+  </Badge>
+  <Badge color="info" className="ms-3 expertiseBadge">
+    {datums.expertise3}
+  </Badge>
+</CardSubtitle>
+
+</CardBody> */
+}

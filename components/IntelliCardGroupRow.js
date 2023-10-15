@@ -12,7 +12,12 @@ import {
 } from "reactstrap";
 import IntelliCard from "./IntelliCard";
 
-const IntelliCardGroupRow = ({ cols, handleCardClick, datumsType }) => {
+const IntelliCardGroupRow = ({
+  cols,
+  handleCardClick,
+  datumsType,
+  folderLikesByFolderId,
+}) => {
   //   const router = useRouter();
   //   console.log(router);
   //   function goToPage(name) {
@@ -28,11 +33,13 @@ const IntelliCardGroupRow = ({ cols, handleCardClick, datumsType }) => {
   return (
     <CardGroup
       className="intelliReveal"
-      style={{
-        // borderBottomLeftRadius: "25px",
-        // borderBottomRightRadius: "25px",
-        borderRadius: "25px",
-      }}
+      style={
+        {
+          // borderBottomLeftRadius: "25px",
+          // borderBottomRightRadius: "25px",
+          // borderRadius: "25px",
+        }
+      }
     >
       {Array.apply(null, { length: colLenth }).map((e, i) =>
         colLenth > 2 ? (
@@ -42,12 +49,14 @@ const IntelliCardGroupRow = ({ cols, handleCardClick, datumsType }) => {
             datums={cols[i]}
             key={i}
             index={i}
+            folderLikesByFolderId={folderLikesByFolderId}
             datumsType={datumsType}
           ></IntelliCard>
         ) : (
           <IntelliCard
             handleCardClick={handleCardClick}
             imageSize="big"
+            folderLikesByFolderId={folderLikesByFolderId}
             datums={cols[i]}
             datumsType={datumsType}
             key={i}

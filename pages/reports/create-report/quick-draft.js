@@ -56,12 +56,22 @@ const CreateMission = ({}) => {
   const [folderId, setFolderId] = useState("");
   const firebaseDraftData = useFirebaseListener(
     user
-      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/quickDraft/context/`
+      ? `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/quickDraft/context/`
       : null
   );
   const firebaseSaveData = useFirebaseListener(
     user
-      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/finalizeAndVisualizeReport/context/`
+      ? `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${
+          process.env.NEXT_PUBLIC_serverUid
+        }/${userId}/finalizeAndVisualizeReport/context/`
       : null
   );
   useEffect(() => {

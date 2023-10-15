@@ -38,26 +38,85 @@ export const getServerSideProps = withPageAuthRequired({
       };
     }
 
+    // let { data: folders, error } = await supabase
+    //   .from("folders")
+    //   .select("*")
+    //   .eq("userId", userId)
+    //   .filter("folderName", "neq", null)
+    //   .filter("folderPicUrl", "neq", null)
+    //   .limit(PAGE_COUNT)
+    //   .order("folderId", { ascending: false });
+    // console.log("folders");
+    // console.log(folders);
+
+    // other pages will redirect here if they're empty
+    // If no agency, go to create agency page
+    // If no missions, go to crete report page
+    // let agency;
     let { data: folders, error } = await supabase
       .from("folders")
       .select("*")
       .eq("userId", userId)
       .filter("folderName", "neq", null)
       .filter("folderPicUrl", "neq", null)
+      // .filter("availability", "neq", "DELETED")
       .limit(PAGE_COUNT)
       .order("folderId", { ascending: false });
+
     console.log("folders");
     console.log(folders);
-    // other pages will redirect here if they're empty
-    // If no agency, go to create agency page
-    // If no missions, go to crete report page
-    // let agency;
+
+    // Extract folderIds from the obtained folders data
+    const folderIds = folders.map((folder) => folder.folderId);
+
+    let folderLikes = [];
+
+    // Check if there are any folderIds to avoid unnecessary query
+    if (folderIds.length > 0) {
+      let { data, folderLikesError } = await supabase
+        .from("folderLikes")
+        .select()
+        .in("folderId", folderIds); // Filter folderLikes by folderIds from the first query
+
+      if (!folderLikesError) {
+        folderLikes = data;
+        console.log("folderLikes");
+        console.log(folderLikes);
+      } else {
+        console.error("Error fetching folder likes:", folderLikesError);
+      }
+    } else {
+      console.log("No folders found for the given criteria");
+    }
+
+    const _folderLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
+      if (!acc[folderLike.folderId]) {
+        acc[folderLike.folderId] = 0;
+      }
+
+      acc[folderLike.folderId] += folderLike.likeValue; // Updated to sum the likeValue
+      return acc;
+    }, {});
+
+    console.log("_folderLikesByFolderId");
+    console.log(_folderLikesByFolderId);
+
     return {
-      props: { folders, userId, agencyName: agency[0].agencyName },
+      props: {
+        folders,
+        userId,
+        agencyName: agency[0].agencyName,
+        _folderLikesByFolderId,
+      },
     };
   },
 });
-const ViewReports = ({ folders, userId, agencyName }) => {
+const ViewReports = ({
+  folders,
+  userId,
+  agencyName,
+  _folderLikesByFolderId,
+}) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(2);
@@ -174,7 +233,7 @@ const ViewReports = ({ folders, userId, agencyName }) => {
     };
 
     // const newTaskRef = await saveToFirebase(
-    //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+    //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
     //   newTask
     // );
     try {
@@ -258,6 +317,10 @@ const ViewReports = ({ folders, userId, agencyName }) => {
     router.push(name);
   }
 
+  const [folderLikesByFolderId, setFolderLikesByFolderId] = useState(
+    _folderLikesByFolderId
+  ); // Step 1: New state variable
+
   useEffect(() => {
     if (!isLast && !searchInput) {
       const loadMoreReports = async () => {
@@ -265,27 +328,50 @@ const ViewReports = ({ folders, userId, agencyName }) => {
         const to = from + PAGE_COUNT - 1;
         setOffset((prev) => prev + 1);
 
-        const { data } = await supabase
+        let { data: folders } = await supabase
           .from("folders")
           .select("*")
           .range(from, to)
           .order("createdAt", { ascending: false });
-        console.log("load more missions data");
 
-        console.log(data);
-        return data;
+        // Extract folderIds from the obtained folders data
+        const folderIds = folders.map((folder) => folder.folderId);
+
+        let folderLikes = [];
+
+        if (folderIds.length > 0) {
+          let { data } = await supabase
+            .from("folderLikes")
+            .select()
+            .in("folderId", folderIds);
+
+          folderLikes = data;
+        }
+
+        const newLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
+          if (!acc[folderLike.folderId]) {
+            acc[folderLike.folderId] = 0;
+          }
+
+          acc[folderLike.folderId] += folderLike.likeValue;
+          return acc;
+        }, {});
+
+        // Update the folderLikesByFolderId state with the new data
+        setFolderLikesByFolderId((prev) => ({
+          ...prev,
+          ...newLikesByFolderId,
+        }));
+
+        return folders;
       };
 
-      if (isInView) {
-        console.log(`LOAD MORE FOLDERS ${offset}`);
+      if (isInView && !isLast && !searchInput) {
         loadMoreReports().then((moreReports) => {
-          console.log("moreReports");
-          console.log(moreReports);
-          setLoadedReports([...loadedReports, ...moreReports]);
+          setLoadedReports((prev) => [...prev, ...moreReports]);
           if (moreReports.length < PAGE_COUNT) {
             setIsLast(true);
           }
-          // setLoadedReports((prev) => [...prev, ...moreReports]);
         });
       }
     }
@@ -298,7 +384,7 @@ const ViewReports = ({ folders, userId, agencyName }) => {
         <BreadcrumbItem className="text-white">{agencyName}</BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
           <i className={`bi bi-folder`}></i>
-          &nbsp; Reports
+          &nbsp;Reports
         </BreadcrumbItem>
       </Breadcrumb>
       <div id="quickDraftBriefingInput">
@@ -321,11 +407,11 @@ const ViewReports = ({ folders, userId, agencyName }) => {
             }}
           />
         </div>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", justifyContent: "flex-start" }}>
           <Button
             onClick={handleQuickDraftClick}
             style={{
-              textAlign: "right",
+              textAlign: "left",
               borderColor: "green",
               borderWidth: "2px",
               alignContent: "right",
@@ -361,13 +447,14 @@ const ViewReports = ({ folders, userId, agencyName }) => {
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
-      {/* <div>{JSON.stringify(loadedReports)}</div> */}
+      {/* <div>{JSON.stringify(_folderLikesByFolderId)}</div> */}
       <div ref={containerRef}>
         <Row className="text-primary">
           <IntelliCardGroup
             offset={offset}
             handleCardClick={handleCardClick}
             datums={loadedReports}
+            folderLikesByFolderId={folderLikesByFolderId}
             datumsType={"folders"}
           ></IntelliCardGroup>
         </Row>

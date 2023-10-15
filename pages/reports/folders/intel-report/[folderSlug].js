@@ -20,6 +20,7 @@ import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
 
 import Router from "next/router";
+import _ from "lodash";
 
 // import { child } from "@firebase/database";
 export const getServerSideProps = withPageAuthRequired({
@@ -27,7 +28,10 @@ export const getServerSideProps = withPageAuthRequired({
     const folderId = context.params.folderSlug.split("-")[0];
     const session = await getSession(context.req, context.res);
     const user = session?.user;
-
+    if (!folderId) {
+      console.log("Error! No folder Id");
+      return {};
+    }
     let { data: agency, agencyError } = await supabase
       .from("users")
       .select("agencyName")
@@ -46,6 +50,11 @@ export const getServerSideProps = withPageAuthRequired({
         props: {},
       };
     }
+    //   folderLikes:folderId (
+    //     userId,
+    //     folderId,
+    // ),
+
     let { data: missionsResponse, error } = await supabase
       .from("reportFolders")
       .select(
@@ -56,7 +65,8 @@ export const getServerSideProps = withPageAuthRequired({
             folderName,
             folderDescription,
             folderPicUrl,
-            folderPicUrls
+            folderPicUrls,
+            availability
         ),
         reports:reports (
             reportTitle,
@@ -77,11 +87,20 @@ export const getServerSideProps = withPageAuthRequired({
     `
       )
       .eq("folderId", folderId);
-    // .limit(3);  // You can uncomment this and adjust as needed
 
-    // Log the results and errors for debugging
-    console.log(missionsResponse);
-    console.error(error);
+    // Get the list fo users who have liked this folder
+    let { data: _folderLikes, folderLikesError } = await supabase
+      .from("folderLikes")
+      .select()
+      .eq("folderId", folderId);
+
+    if (!_folderLikes) {
+      _folderLikes = [];
+    }
+    if (folderLikesError) {
+      console.error("folderLikesError");
+      console.error(folderLikesError);
+    }
 
     // let { data: missionsResponse, error } = await supabase
     //   .from("reportFolders")
@@ -102,6 +121,7 @@ export const getServerSideProps = withPageAuthRequired({
     let expertises = [];
     let agentId = 0;
     let specializedTraining = "";
+
     if (missionsResponse[0].reports.agent) {
       agentId = missionsResponse[0].reports.agent.agentId;
 
@@ -135,6 +155,8 @@ export const getServerSideProps = withPageAuthRequired({
     let _folderDescription = "";
     let _folderPicUrl = "";
     let _folderPicUrls = "";
+
+    let _availability = "";
     missionsResponse.forEach((mission) => {
       _loadedReports.push(mission.reports);
       // console.log("mission.folders");
@@ -146,10 +168,14 @@ export const getServerSideProps = withPageAuthRequired({
       if (_folderPicUrls) {
         _folderPicUrls = JSON.parse(_folderPicUrls);
       }
+
+      _availability = mission.folders.availability;
     });
     // console.log("missions");
     // console.log(missions);
-
+    const _currentfolderPicUrlIndex = _folderPicUrls
+      ? Math.floor(Math.random() * _folderPicUrls.length)
+      : 0;
     return {
       props: {
         _loadedReports,
@@ -161,7 +187,9 @@ export const getServerSideProps = withPageAuthRequired({
         agentId,
         expertises,
         specializedTraining,
-        // structuredData,
+        _currentfolderPicUrlIndex,
+        _folderLikes,
+        _availability,
       },
     };
   },
@@ -176,6 +204,9 @@ const ViewReports = ({
   agentId,
   expertises,
   specializedTraining,
+  _currentfolderPicUrlIndex,
+  _folderLikes,
+  _availability,
 }) => {
   // console.log("useUser");
   // console.log(useUser);
@@ -213,7 +244,13 @@ const ViewReports = ({
   const [loadedAgentId, setLoadedAgentId] = useState(agentId);
   const firebaseSaveData = useFirebaseListener(
     user
-      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/finalizeAndVisualizeReport/context/`
+      ? `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${
+          process.env.NEXT_PUBLIC_serverUid
+        }/${userId}/finalizeAndVisualizeReport/context/`
       : null
   );
   const [folderPicUrls, setFolderPicUrls] = useState(_folderPicUrls);
@@ -225,20 +262,30 @@ const ViewReports = ({
   //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png",
   // ];
   const [currentfolderPicUrlIndex, setCurrentfolderPicUrlIndex] = useState(
-    folderPicUrls ? Math.floor(Math.random() * folderPicUrls.length) : 0
+    _currentfolderPicUrlIndex
   );
   const firebaseFolderData = useFirebaseListener(
     user
-      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/regenerateFolder/context`
+      ? `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${
+          process.env.NEXT_PUBLIC_serverUid
+        }/${userId}/regenerateFolder/context`
       : null
   );
   const firebaseDraftData = useFirebaseListener(
     user
-      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/continuum/`
+      ? `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/continuum/`
       : null
   );
   // const firebaseContinuumStatus = useFirebaseListener(
-  //   user ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
+  //   user ? `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
   // );
   async function fetchUpdatedReports() {
     console.log("FETCH UPDATED REPORTS");
@@ -338,7 +385,7 @@ const ViewReports = ({
         firebaseSaveData.reportPicUrl
       ) {
         fetchUpdatedReports();
-        updateReports();
+        // updateReports();
       }
       if (firebaseSaveData.agentId && !agentId) {
         setLoadedAgentId(firebaseSaveData.agentId);
@@ -759,7 +806,7 @@ const ViewReports = ({
                   onClick={() => console.log(`Navigating to report ${item.id}`)}
                 >
                   {loadedReports.find((report) => report.reportId === item.id)
-                    ?.reportTitle || `Report ID: ${item.id}`}
+                    ?.reportTitle || `Loading Report ID: ${item.id}`}
                 </a>
               )}
               {item.children && (
@@ -868,6 +915,61 @@ const ViewReports = ({
   // };
   // console.log("process.env.NEXT_PUBLIC_serverUid");
   // console.log(process.env.NEXT_PUBLIC_serverUid);
+  const [likes, setLikes] = useState(
+    _folderLikes.map((like) => like.likeValue).reduce((a, b) => a + b, 0)
+  );
+  async function handleLike() {
+    console.log("handleLike");
+    console.log("_folderLikes");
+    console.log(_folderLikes);
+    console.log("likes");
+    console.log(likes);
+    let _likes = likes;
+    let likeValue = 0;
+    if (likes === 0) {
+      likeValue = 1;
+    } else {
+      likeValue = -1;
+    }
+    _likes += likeValue;
+    if (likes < 0) {
+      _likes = 0;
+    }
+    setLikes(_likes);
+    // update supabase likes table
+
+    const { error } = await supabase
+      .from("folderLikes")
+      .insert({ folderId, userId, likeValue });
+    if (error) {
+      console.error("Error updating likes", error);
+      return;
+    }
+  }
+  const [availability, setAvailability] = useState(_availability);
+  async function handleGlobeClick() {
+    console.log("handleGlobeClick");
+    let _availability = availability;
+    if (availability === "") {
+      // setAvailability("GLOBAL");
+      _availability = "GLOBAL";
+    } else {
+      // setAvailability("");
+      _availability = "";
+    }
+    setAvailability(_availability);
+    console.log("availability");
+    console.log(_availability);
+    // update supabase likes table
+    const { error } = await supabase
+      .from("folders")
+      .update({ availability: _availability })
+      .eq("folderId", folderId);
+    if (error) {
+      console.error("Error updating availability", error);
+      return;
+    }
+  }
   return (
     <div style={{ maxWidth: "90%" }}>
       <Breadcrumb style={{ marginTop: "65px" }}>
@@ -888,10 +990,19 @@ const ViewReports = ({
             <div
               style={{
                 // backgroundImage: `url(${folderPicUrls[currentfolderPicUrlIndex]})`,
-                height: "500px",
+                height: "700px",
               }}
+              className="image-container"
             >
-              <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
+              <a
+                href={folderPicUrls[currentfolderPicUrlIndex]}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
+              </a>
+              <div className="overlay" />
+
               {!folderPicUrl && (
                 <LoadingDots style={{ position: "absolute", top: "125px" }} />
               )}
@@ -933,6 +1044,42 @@ const ViewReports = ({
           </div>
         )}
       </div>
+      <div style={{ marginTop: "-33px", marginBottom: "20px" }}>
+        <Row>
+          <Col>
+            <span style={{ marginRight: "20px", color: "#1C69E7" }}>
+              <i
+                style={{
+                  color: `${likes > 0 ? "#1C69E7" : "white"}`,
+                }}
+                onClick={handleLike}
+                className={`bi bi-star${
+                  likes === 0 ? "bi bi-star" : "bi bi-star-fill"
+                }`}
+              />{" "}
+              {likes < 2 ? "" : likes}
+            </span>
+            <span>
+              <i
+                onClick={handleGlobeClick}
+                className="bi bi-globe"
+                style={{
+                  color: `${availability === "GLOBAL" ? "#1C69E7" : "white"}`,
+                }}
+              />
+              {/* {availability} */}
+            </span>
+          </Col>
+
+          <Col>
+            <div style={{ marginLeft: "auto", textAlign: "right" }}>
+              <i style={{ color: "grey" }} className="bi bi-trash" />
+              {/* &nbsp; Delete? Yes / No */}
+            </div>
+          </Col>
+        </Row>
+      </div>
+
       <div> {folderDescription}</div>
       <div
         className="reportTitle reportFont section-title"
@@ -1007,13 +1154,14 @@ const ViewReports = ({
                 <div className="reportTitle reportFont section-title">
                   {reportTitle}
                 </div>
+
                 {index !== 0 && (
                   <a href="#top" className="top-button text-white">
                     {/* 🔝 */}⇧
                   </a>
                 )}
               </div>
-              <div style={{ height: "500px" }}>
+              <div style={{ height: "700px" }} className="image-container">
                 {!report.reportPicUrl && <LoadingDots />}
                 {report.reportPicUrl && (
                   <a
@@ -1027,9 +1175,11 @@ const ViewReports = ({
                       className="report-image"
                       style={{ borderRadius: "10px" }}
                     />
+                    <div className="overlay"></div>
                   </a>
                 )}
               </div>
+
               <div
                 id={`reportRoot${index}`}
                 onMouseUp={(e) => handleTextHighlight(e, report)}
@@ -1039,12 +1189,16 @@ const ViewReports = ({
               <div style={{ display: "flex" }}>
                 <div
                   className="btn btn-primary"
-                  style={{ marginLeft: "auto", textAlign: "right" }}
+                  style={{ marginRight: "auto", textAlign: "left" }}
                   onClick={() => {
                     handleContinuumClick(report);
                   }}
                 >
                   <i className="bi bi-link"></i> Continuum
+                </div>
+                <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                  <i style={{ color: "grey" }} className="bi bi-trash" />
+                  {/* &nbsp; Delete? Yes / No */}
                 </div>
               </div>
             </div>

@@ -101,17 +101,29 @@ const CreateMission = ({ agent }) => {
 
   const firebaseDraftData = useFirebaseListener(
     user
-      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport/context/draft`
+      ? `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${process.env.NEXT_PUBLIC_serverUid}/${
+          user.sub
+        }/writeDraftReport/context/draft`
       : null
   );
   const firebaseFolderIdData = useFirebaseListener(
     user
-      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport/context/folderId`
+      ? `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${process.env.NEXT_PUBLIC_serverUid}/${
+          user.sub
+        }/saveReport/context/folderId`
       : null
   );
   const [hasSubmitted, setHasSubmitted] = useState(false);
   // const firebaseDraftCompletedAt = useFirebaseListener(
-  //   user ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport/context/draft` : null
+  //   user ? `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport/context/draft` : null
   // );
   // // const [draftResponseContent, setDraftResponseContent] = useState(null);
 
@@ -246,16 +258,16 @@ const CreateMission = ({ agent }) => {
       };
       await saveTask(clearSaveReportTask);
       // const clearOldDraftRef = await saveToFirebase(
-      //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+      //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
       //   {}
       // );
       // const clearOldSaveRef = await saveToFirebase(
-      //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
+      //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
       //   {}
       // );
       const newTaskRef = await saveTask(newTask);
       // const newTaskRef = await saveToFirebase(
-      //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+      //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
       //   newTask
       // );
 
@@ -402,8 +414,8 @@ const CreateMission = ({ agent }) => {
           userId: user.sub,
           currentGeneration: 1,
           maxGenerations: 1,
-          // maxGenerations: generationsCount,
-          maxGenerations: 1,
+          maxGenerations: generationsCount,
+          // maxGenerations: 1,
         },
         createdAt: new Date().toISOString(),
       };
@@ -413,7 +425,7 @@ const CreateMission = ({ agent }) => {
       console.log(newTaskRef);
 
       // const saveReportTaskRef = await saveToFirebase(
-      //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
+      //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
       //   saveReportTask
       // );
 
@@ -714,7 +726,7 @@ const CreateMission = ({ agent }) => {
                     onChange={(e) => setBriefing(e.target.value)}
                   />
 
-                  <div style={{ textAlign: "right", paddingTop: "8px" }}>
+                  <div style={{ textAlign: "left", paddingTop: "8px" }}>
                     <Button
                       color="primary"
                       style={{ border: "1px solid green" }}
@@ -787,6 +799,10 @@ const CreateMission = ({ agent }) => {
                     </Badge>
                   </CardSubtitle>
                   <div>
+                    <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                      <i style={{ color: "grey" }} className="bi bi-trash" />
+                      {/* &nbsp; Delete? Yes / No */}
+                    </div>
                     <div>
                       <h4>Bio</h4>
                     </div>

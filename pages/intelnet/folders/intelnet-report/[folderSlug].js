@@ -20,11 +20,19 @@ import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
 
 import Router from "next/router";
+import _ from "lodash";
 
 // import { child } from "@firebase/database";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
+    console.log("context.params.folderSlug");
+    console.log(context.params.folderSlug);
+    console.log(context.params);
     const folderId = context.params.folderSlug.split("-")[0];
+    if (!folderId) {
+      console.log("Error! No folder Id");
+      return {};
+    }
     const session = await getSession(context.req, context.res);
     const user = session?.user;
 
@@ -79,8 +87,25 @@ export const getServerSideProps = withPageAuthRequired({
       .eq("folderId", folderId);
     // .limit(3);  // You can uncomment this and adjust as needed
 
+    // Get the list fo users who have liked this folder
+    // Get the list fo users who have liked this folder
+    let { data: _folderLikes, folderLikesError } = await supabase
+      .from("folderLikes")
+      .select()
+      .eq("folderId", folderId);
+
+    if (!_folderLikes) {
+      _folderLikes = [];
+    }
+    if (folderLikesError) {
+      console.error("folderLikesError");
+      console.error(folderLikesError);
+    }
     // Log the results and errors for debugging
+    console.log("missionsResponse");
     console.log(missionsResponse);
+    console.log("folderId");
+    console.log(folderId);
     console.error(error);
 
     // let { data: missionsResponse, error } = await supabase
@@ -135,6 +160,7 @@ export const getServerSideProps = withPageAuthRequired({
     let _folderDescription = "";
     let _folderPicUrl = "";
     let _folderPicUrls = "";
+
     missionsResponse.forEach((mission) => {
       _loadedReports.push(mission.reports);
       // console.log("mission.folders");
@@ -161,6 +187,7 @@ export const getServerSideProps = withPageAuthRequired({
         agentId,
         expertises,
         specializedTraining,
+        _folderLikes,
         // structuredData,
       },
     };
@@ -176,6 +203,7 @@ const ViewReports = ({
   agentId,
   expertises,
   specializedTraining,
+  _folderLikes,
 }) => {
   // console.log("useUser");
   // console.log(useUser);
@@ -213,7 +241,13 @@ const ViewReports = ({
   const [loadedAgentId, setLoadedAgentId] = useState(agentId);
   const firebaseSaveData = useFirebaseListener(
     user
-      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/finalizeAndVisualizeReport/context/`
+      ? `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${
+          process.env.NEXT_PUBLIC_serverUid
+        }/${userId}/finalizeAndVisualizeReport/context/`
       : null
   );
   const [folderPicUrls, setFolderPicUrls] = useState(_folderPicUrls);
@@ -229,17 +263,34 @@ const ViewReports = ({
   );
   const firebaseFolderData = useFirebaseListener(
     user
-      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/regenerateFolder/context`
+      ? `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${
+          process.env.NEXT_PUBLIC_serverUid
+        }/${userId}/regenerateFolder/context`
       : null
   );
   const firebaseDraftData = useFirebaseListener(
     user
-      ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/continuum/`
+      ? `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/continuum/`
       : null
   );
   // const firebaseContinuumStatus = useFirebaseListener(
-  //   user ? `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
+  //   user ? `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
   // );
+  const [likes, setLikes] = useState(
+    _folderLikes.map((like) => like.likeValue).reduce((a, b) => a + b, 0)
+  ); // const [hasLiked, setHasLiked] = useState(likes === 0 ? false : true);
+  console.log("_folderLikes");
+  console.log(_folderLikes);
+  console.log("likes");
+  console.log(likes);
   async function fetchUpdatedReports() {
     console.log("FETCH UPDATED REPORTS");
     // Fetch the updated data from the database using the folderId
@@ -670,7 +721,7 @@ const ViewReports = ({
         console.log("parentReportId");
         const childReports = parentChildIdMap[parentReportId];
         console.log(parentReportId);
-
+        // if (!childReports) continue;
         if (!seenReportIds.includes(parentReportId)) {
           seenReportIds.push(parentReportId);
           if (!resultParentChildMap[parentReportId]) {
@@ -703,6 +754,7 @@ const ViewReports = ({
       //   1204: [],
       //   1286: [],
       // };
+
       function buildTree(data) {
         const recurse = (key) => {
           console.log("Processing key:", key);
@@ -759,7 +811,7 @@ const ViewReports = ({
                   onClick={() => console.log(`Navigating to report ${item.id}`)}
                 >
                   {loadedReports.find((report) => report.reportId === item.id)
-                    ?.reportTitle || `Report ID: ${item.id}`}
+                    ?.reportTitle || `Loading Report ID: ${item.id}`}
                 </a>
               )}
               {item.children && (
@@ -868,6 +920,34 @@ const ViewReports = ({
   // };
   // console.log("process.env.NEXT_PUBLIC_serverUid");
   // console.log(process.env.NEXT_PUBLIC_serverUid);
+  async function handleLike() {
+    console.log("handleLike");
+    console.log("_folderLikes");
+    console.log(_folderLikes);
+    console.log("likes");
+    console.log(likes);
+    let _likes = likes;
+    let likeValue = 0;
+    if (likes === 0) {
+      likeValue = 1;
+    } else {
+      likeValue = -1;
+    }
+    _likes += likeValue;
+    if (likes < 0) {
+      _likes = 0;
+    }
+    setLikes(_likes);
+    // update supabase likes table
+
+    const { error } = await supabase
+      .from("folderLikes")
+      .insert({ folderId, userId, likeValue });
+    if (error) {
+      console.error("Error updating likes", error);
+      return;
+    }
+  }
   return (
     <div style={{ maxWidth: "90%" }}>
       <Breadcrumb style={{ marginTop: "65px" }}>
@@ -883,11 +963,41 @@ const ViewReports = ({
         {/* {folderPicUrl} */}
         {/* ["http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png"] */}
         {/* {folderPicUrls} */}
+
         {folderPicUrls && (
+          <div
+            style={{
+              height: "700px",
+            }}
+            className="image-container"
+          >
+            <a
+              href={folderPicUrls[currentfolderPicUrlIndex]}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
+            </a>
+            <div className="overlay"></div>
+          </div>
+          // <div>
+          //   <div
+          //     style={{
+          //       height: "500px",
+          //     }}
+          //   >
+          //     <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
+          //     {!folderPicUrl && (
+          //       <LoadingDots style={{ position: "absolute", top: "125px" }} />
+          //     )}
+          //   </div>
+          // </div>
+        )}
+        {/* works */}
+        {/* {folderPicUrls && (
           <div>
             <div
               style={{
-                // backgroundImage: `url(${folderPicUrls[currentfolderPicUrlIndex]})`,
                 height: "500px",
               }}
             >
@@ -897,12 +1007,12 @@ const ViewReports = ({
               )}
             </div>
           </div>
-        )}
+        )} */}
         {/* {JSON.stringify(folderPicUrls)} */}
         {!folderPicUrls && (
           <div
             style={{
-              height: "500px",
+              height: "700px",
             }}
           >
             {!folderPicUrl && (
@@ -923,15 +1033,33 @@ const ViewReports = ({
                     />
                   </div>
                 </a>
-
-                {/* <div
-                  className="report text-white reportFont folder-description"
-                  dangerouslySetInnerHTML={{ __html: folderDescription }}
-                /> */}
               </div>
             )}
           </div>
         )}
+      </div>
+      <div style={{ marginTop: "-36px", marginBottom: "20px" }}>
+        <Row>
+          <Col>
+            <span style={{ marginRight: "20px", color: "#1C69E7" }}>
+              <i
+                onClick={handleLike}
+                style={{
+                  color: `${likes > 0 ? "#1C69E7" : "white"}`,
+                }}
+                className={`bi bi-star${
+                  likes === 0 ? "bi bi-star" : "bi bi-star-fill"
+                }`}
+              />{" "}
+              {likes == 0 ? "" : likes}
+            </span>
+            <span>
+              <i className="bi bi-send" />
+            </span>
+          </Col>
+          {/* <Col> */}
+          {/* </Col> */}
+        </Row>
       </div>
       <div> {folderDescription}</div>
       <div
@@ -1013,7 +1141,7 @@ const ViewReports = ({
                   </a>
                 )}
               </div>
-              <div style={{ height: "500px" }}>
+              <div style={{ height: "700px" }} className="image-container">
                 {!report.reportPicUrl && <LoadingDots />}
                 {report.reportPicUrl && (
                   <a
@@ -1027,6 +1155,7 @@ const ViewReports = ({
                       className="report-image"
                       style={{ borderRadius: "10px" }}
                     />
+                    <div className="overlay" />
                   </a>
                 )}
               </div>

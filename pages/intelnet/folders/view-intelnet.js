@@ -37,27 +37,60 @@ export const getServerSideProps = withPageAuthRequired({
         props: {},
       };
     }
-
     let { data: folders, error } = await supabase
       .from("folders")
       .select("*")
       .eq("userId", userId)
       .filter("folderName", "neq", null)
       .filter("folderPicUrl", "neq", null)
+      .filter("availability", "eq", "GLOBAL")
       .limit(PAGE_COUNT)
       .order("folderId", { ascending: false });
+
     console.log("folders");
     console.log(folders);
-    // other pages will redirect here if they're empty
-    // If no agency, go to create agency page
-    // If no missions, go to crete report page
-    // let agency;
+
+    // Extract folderIds from the obtained folders data
+    const folderIds = folders.map((folder) => folder.folderId);
+
+    let folderLikes = [];
+
+    // Check if there are any folderIds to avoid unnecessary query
+    if (folderIds.length > 0) {
+      let { data, folderLikesError } = await supabase
+        .from("folderLikes")
+        .select()
+        .in("folderId", folderIds); // Filter folderLikes by folderIds from the first query
+
+      if (!folderLikesError) {
+        folderLikes = data;
+        console.log("folderLikes");
+        console.log(folderLikes);
+      } else {
+        console.error("Error fetching folder likes:", folderLikesError);
+      }
+    } else {
+      console.log("No folders found for the given criteria");
+    }
+
+    const folderLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
+      if (!acc[folderLike.folderId]) {
+        acc[folderLike.folderId] = 0;
+      }
+
+      acc[folderLike.folderId] += folderLike.likeValue; // Updated to sum the likeValue
+      return acc;
+    }, {});
+
+    console.log("folderLikesByFolderId");
+    console.log(folderLikesByFolderId);
+
     return {
-      props: { folders, userId },
+      props: { folders, userId, folderLikesByFolderId },
     };
   },
 });
-const ViewReports = ({ folders, userId }) => {
+const ViewReports = ({ folders, userId, folderLikesByFolderId }) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(2);
@@ -174,7 +207,7 @@ const ViewReports = ({ folders, userId }) => {
     };
 
     // const newTaskRef = await saveToFirebase(
-    //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+    //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
     //   newTask
     // );
     try {
@@ -249,6 +282,7 @@ const ViewReports = ({ folders, userId }) => {
     console.log("ViewReports HandleCardClick Clicked!");
     // setSelectedReport(report);
     const folderSlug = slugify(`${folderId}-${folderName}`);
+
     goToPage(`/intelnet/folders/intelnet-report/${folderSlug}`);
   };
   const router = useRouter;
@@ -269,7 +303,8 @@ const ViewReports = ({ folders, userId }) => {
           .from("folders")
           .select("*")
           .range(from, to)
-          .order("createdAt", { ascending: false });
+          .order("createdAt", { ascending: false })
+          .eq("availability", "GLOBAL");
         console.log("load more missions data");
 
         console.log(data);
@@ -281,9 +316,13 @@ const ViewReports = ({ folders, userId }) => {
         loadMoreReports().then((moreReports) => {
           console.log("moreReports");
           console.log(moreReports);
-          setLoadedReports([...loadedReports, ...moreReports]);
-          if (moreReports.length < PAGE_COUNT) {
+          if (moreReports.length === 0) {
             setIsLast(true);
+          } else {
+            setLoadedReports([...loadedReports, ...moreReports]);
+            if (moreReports.length < PAGE_COUNT) {
+              setIsLast(true);
+            }
           }
           // setLoadedReports((prev) => [...prev, ...moreReports]);
         });
@@ -296,8 +335,8 @@ const ViewReports = ({ folders, userId }) => {
     <>
       <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white" active>
-          <i className={`bi bi-columns`}></i>
-          &nbsp; Intelnet
+          <i className={`bi bi-globe`}></i>
+          &nbsp; Intel-Net
         </BreadcrumbItem>
       </Breadcrumb>
 
@@ -328,6 +367,7 @@ const ViewReports = ({ folders, userId }) => {
             offset={offset}
             handleCardClick={handleCardClick}
             datums={loadedReports}
+            folderLikesByFolderId={folderLikesByFolderId}
             datumsType={"folders"}
           ></IntelliCardGroup>
         </Row>

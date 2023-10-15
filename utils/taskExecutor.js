@@ -172,7 +172,7 @@
 // //     };
 
 // //     await saveToFirebase(
-// //       `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${context.userId}/${taskName}`,
+// //       `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${context.userId}/${taskName}`,
 // //       nextGenerationTask
 // //     );
 // //   }
@@ -185,7 +185,7 @@
 // // //     };
 
 // // //     await saveToFirebase(
-// // //       `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${context.userId}/${taskName}`,
+// // //       `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${context.userId}/${taskName}`,
 // // //       nextGenerationTask
 // // //     );
 // // //   }
@@ -280,7 +280,7 @@
 // // //       context: accumulatedContext, // Update context here directly
 // // //     };
 // // //     await saveToFirebase(
-// // //       `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${accumulatedContext.userId}/${taskName}`,
+// // //       `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${accumulatedContext.userId}/${taskName}`,
 // // //       nextGenerationTask
 // // //     );
 // // //   }

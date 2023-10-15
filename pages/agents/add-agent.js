@@ -58,7 +58,11 @@ export const CreateAgentForm = ({ userId }) => {
   useEffect(() => {
     if (taskId) {
       const taskRef = db.ref(
-        `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/taskType/${taskId}`
+        `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/taskType/${taskId}`
       );
 
       taskRef.on("value", (snapshot) => {
@@ -101,7 +105,7 @@ export const CreateAgentForm = ({ userId }) => {
 
       const newTaskRef = await saveTask(newTask);
       // const newTaskRef = await saveToFirebase(
-      //   `asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/addAgent`,
+      //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/addAgent`,
       //   newTask
       // );
 
@@ -424,7 +428,9 @@ const CreateAgent = ({ userId }) => {
   const router = useRouter();
   // const user = useUser();
   const firebaseSaveData = useFirebaseListener(
-    `/asyncTasks/${process.env.NEXT_PUBLIC_serverUid}/${userId}/addAgent/context/`
+    `/${
+      process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"
+    }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/addAgent/context/`
   );
 
   useEffect(() => {

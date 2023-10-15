@@ -1,7 +1,13 @@
 import { motion } from "framer-motion";
 import IntelliCardGroupRow from "./IntelliCardGroupRow";
 
-const IntelliCardGroup = ({ datums, handleCardClick, datumsType, offset }) => {
+const IntelliCardGroup = ({
+  datums,
+  handleCardClick,
+  datumsType,
+  offset,
+  folderLikesByFolderId,
+}) => {
   // const [cardsModel, setCardsModel] = useState(datums);
   const cardsModel = datums;
   // console.log("cardsModel");
@@ -47,6 +53,7 @@ const IntelliCardGroup = ({ datums, handleCardClick, datumsType, offset }) => {
                 handleCardClick={handleCardClick}
                 cols={cols}
                 datumsType={datumsType}
+                folderLikesByFolderId={folderLikesByFolderId}
               />
             </div>
           </motion.div>

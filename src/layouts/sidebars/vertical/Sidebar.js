@@ -37,9 +37,9 @@ const navigation = [
   //   icon: "bi bi-link",
   // },
   {
-    title: "Intelnet",
+    title: "Intel-Net",
     href: "/intelnet/folders/view-intelnet",
-    icon: "bi bi-columns",
+    icon: "bi bi-globe2",
   },
 
   // {
