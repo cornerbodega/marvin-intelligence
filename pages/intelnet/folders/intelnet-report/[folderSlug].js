@@ -1111,8 +1111,14 @@ const ViewReports = ({
           className="reportTitle reportFont section-title"
           style={{ marginTop: "30px" }}
         >
-          Table of Contents [{loadedReports.length}{" "}
-          <i className="bi bi-body-text"></i>]
+          <Row>
+            <Col>Table of Contents </Col>
+            <Col>
+              <span>
+                [{loadedReports.length} <i className="bi bi-body-text"></i>]
+              </span>
+            </Col>
+          </Row>
         </div>
         {/* {JSON.stringify(parentChildIdMap)} */}
         {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
