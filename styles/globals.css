@@ -1,3 +1,36 @@
+.report {
+  color: white;
+  background-color: #000000; /* Adjust as necessary to ensure contrast */
+  padding: 20px;
+  font-size: 20px; /* Increased font size */
+  line-height: 1.6; 
+  max-width: 800px; 
+  margin: auto;
+}
+
+/* Further increase font size for larger screens */
+@media (min-width: 768px) {
+  .report {
+    font-size: 22px; /* Adjust as necessary */
+  }
+}
+
+/* Adjust padding for smaller screens */
+@media (max-width: 768px) {
+  .report {
+    padding: 15px;
+  }
+}
+
+.reportFont {
+   font-family: 'ComputerModern', serif;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-size: larger;
+}
+
 
 .card-img {
   border-radius: 0px;
@@ -128,7 +161,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 50%; /* adjust as needed */
+  height: 20%; /* adjust as needed */
   background: linear-gradient(transparent, black);
   z-index: 1; }
 

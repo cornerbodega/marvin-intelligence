@@ -60,6 +60,7 @@ export const getServerSideProps = withPageAuthRequired({
       .filter("folderName", "neq", null)
       .filter("folderPicUrl", "neq", null)
       // .filter("availability", "neq", "DELETED")
+      .or(`availability.neq.DELETED,availability.is.null`)
       .limit(PAGE_COUNT)
       .order("folderId", { ascending: false });
 
@@ -80,8 +81,8 @@ export const getServerSideProps = withPageAuthRequired({
 
       if (!folderLikesError) {
         folderLikes = data;
-        console.log("folderLikes");
-        console.log(folderLikes);
+        // console.log("folderLikes");
+        // console.log(folderLikes);
       } else {
         console.error("Error fetching folder likes:", folderLikesError);
       }
@@ -332,6 +333,8 @@ const ViewReports = ({
           .from("folders")
           .select("*")
           .range(from, to)
+          .or(`availability.neq.DELETED,availability.is.null`)
+          .eq("userId", userId)
           .order("createdAt", { ascending: false });
 
         // Extract folderIds from the obtained folders data

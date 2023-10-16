@@ -64,8 +64,8 @@ export const getServerSideProps = withPageAuthRequired({
 
       if (!folderLikesError) {
         folderLikes = data;
-        console.log("folderLikes");
-        console.log(folderLikes);
+        // console.log("folderLikes");
+        // console.log(folderLikes);
       } else {
         console.error("Error fetching folder likes:", folderLikesError);
       }

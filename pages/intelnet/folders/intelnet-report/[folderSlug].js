@@ -18,57 +18,60 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import LoadingDots from "../../../../components/LoadingDots";
 import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
-
+import Head from "next/head";
 import Router from "next/router";
 import _ from "lodash";
 
 // import { child } from "@firebase/database";
-export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps(context) {
-    console.log("context.params.folderSlug");
-    console.log(context.params.folderSlug);
-    console.log(context.params);
-    const folderId = context.params.folderSlug.split("-")[0];
-    if (!folderId) {
-      console.log("Error! No folder Id");
-      return {};
-    }
-    const session = await getSession(context.req, context.res);
-    const user = session?.user;
+// export const getServerSideProps = withPageAuthRequired({
+// export const getServerSideProps = withPageAuthRequired({
+export async function getServerSideProps(context) {
+  console.log("context.params.folderSlug");
+  console.log(context.params.folderSlug);
+  console.log(context.params);
+  const folderId = context.params.folderSlug.split("-")[0];
+  if (!folderId) {
+    console.log("Error! No folder Id");
+    return {};
+  }
+  // const session = await getSession(context.req, context.res);
+  // const user = session?.user;
 
-    let { data: agency, agencyError } = await supabase
-      .from("users")
-      .select("agencyName")
-      .eq("userId", user.sub);
-    if (agencyError) {
-      console.log("agencyError");
-    }
-    console.log("agency");
-    console.log(agency);
-    if (!agency || agency.length === 0) {
-      return {
-        redirect: {
-          permanent: false,
-          destination: "/agency/create-agency",
-        },
-        props: {},
-      };
-    }
-    let { data: missionsResponse, error } = await supabase
-      .from("reportFolders")
-      .select(
-        `
+  // let { data: agency, agencyError } = await supabase
+  //   .from("users")
+  //   .select("agencyName")
+  //   .eq("userId", user.sub);
+  // if (agencyError) {
+  //   console.log("agencyError");
+  // }
+  // console.log("agency");
+  // console.log(agency);
+  // if (!agency || agency.length === 0) {
+  //   return {
+  //     redirect: {
+  //       permanent: false,
+  //       destination: "/agency/create-agency",
+  //     },
+  //     props: {},
+  //   };
+  // }
+  let { data: missionsResponse, error } = await supabase
+    .from("reportFolders")
+    .select(
+      `
         reportId,
         folderId,
         folders:folders (
             folderName,
             folderDescription,
+            folderPicDescription,
             folderPicUrl,
             folderPicUrls
         ),
         reports:reports (
             reportTitle,
             reportPicUrl,
+            reportPicDescription,
             reportId,
             reportContent,
             agentId,
@@ -83,121 +86,125 @@ export const getServerSideProps = withPageAuthRequired({
             )
         )
     `
-      )
-      .eq("folderId", folderId);
-    // .limit(3);  // You can uncomment this and adjust as needed
+    )
+    .eq("folderId", folderId);
+  // .limit(3);  // You can uncomment this and adjust as needed
 
-    // Get the list fo users who have liked this folder
-    // Get the list fo users who have liked this folder
-    let { data: _folderLikes, folderLikesError } = await supabase
-      .from("folderLikes")
-      .select()
-      .eq("folderId", folderId);
+  // Get the list fo users who have liked this folder
+  // Get the list fo users who have liked this folder
+  let { data: _folderLikes, folderLikesError } = await supabase
+    .from("folderLikes")
+    .select()
+    .eq("folderId", folderId);
 
-    if (!_folderLikes) {
-      _folderLikes = [];
+  if (!_folderLikes) {
+    _folderLikes = [];
+  }
+  if (folderLikesError) {
+    console.error("folderLikesError");
+    console.error(folderLikesError);
+  }
+  // Log the results and errors for debugging
+  console.log("missionsResponse");
+  console.log(missionsResponse);
+  console.log("folderId");
+  console.log(folderId);
+  console.error(error);
+
+  // let { data: missionsResponse, error } = await supabase
+  //   .from("reportFolders")
+  //   .select(
+  //     `
+  //   folders (folderName, folderDescription, folderPicUrl),
+  //   reports (reportTitle, reportPicUrl, reportId, reportContent, agentId)
+  //   ))
+  // `
+  //   )
+  //   .eq("folderId", folderId);
+  // // .limit(3);
+  console.log("missionsResponse");
+  console.log(missionsResponse);
+  if (!missionsResponse || missionsResponse.length === 0) {
+    return console.log("No missions found");
+  }
+  let expertises = [];
+  let agentId = 0;
+  let specializedTraining = "";
+  if (missionsResponse[0].reports.agent) {
+    agentId = missionsResponse[0].reports.agent.agentId;
+
+    if (missionsResponse[0].reports.agent.expertise1) {
+      expertises.push(missionsResponse[0].reports.agent.expertise1);
     }
-    if (folderLikesError) {
-      console.error("folderLikesError");
-      console.error(folderLikesError);
+    if (missionsResponse[0].reports.agent.expertise2) {
+      expertises.push(missionsResponse[0].reports.agent.expertise2);
     }
-    // Log the results and errors for debugging
-    console.log("missionsResponse");
-    console.log(missionsResponse);
-    console.log("folderId");
-    console.log(folderId);
+    if (missionsResponse[0].reports.agent.expertise3) {
+      expertises.push(missionsResponse[0].reports.agent.expertise3);
+    }
+
+    if (missionsResponse[0].reports.agent.specializedTraining) {
+      specializedTraining =
+        missionsResponse[0].reports.agent.specializedTraining;
+    }
+  }
+  let { data: linksResponse, error: linksError } = await supabase
+    .from("links")
+    .select("parentReportId, childReportId");
+
+  if (error || linksError) {
+    // handle errors
     console.error(error);
+    console.error(linksError);
+  }
 
-    // let { data: missionsResponse, error } = await supabase
-    //   .from("reportFolders")
-    //   .select(
-    //     `
-    //   folders (folderName, folderDescription, folderPicUrl),
-    //   reports (reportTitle, reportPicUrl, reportId, reportContent, agentId)
-    //   ))
-    // `
-    //   )
-    //   .eq("folderId", folderId);
-    // // .limit(3);
-    console.log("missionsResponse");
-    console.log(missionsResponse);
-    if (!missionsResponse || missionsResponse.length === 0) {
-      return console.log("No missions found");
+  const _loadedReports = [];
+  let _folderName = "";
+  let _folderDescription = "";
+  let _folderPicDescription = "";
+  let _folderPicUrl = "";
+  let _folderPicUrls = "";
+
+  missionsResponse.forEach((mission) => {
+    _loadedReports.push(mission.reports);
+    // console.log("mission.folders");
+    // console.log(mission.folders);
+    _folderName = mission.folders.folderName;
+    _folderDescription = mission.folders.folderDescription;
+    _folderPicDescription = mission.folders.folderPicDescription;
+    _folderPicUrl = mission.folders.folderPicUrl;
+    _folderPicUrls = mission.folders.folderPicUrls;
+    if (_folderPicUrls) {
+      _folderPicUrls = JSON.parse(_folderPicUrls);
     }
-    let expertises = [];
-    let agentId = 0;
-    let specializedTraining = "";
-    if (missionsResponse[0].reports.agent) {
-      agentId = missionsResponse[0].reports.agent.agentId;
+  });
+  // console.log("missions");
+  // console.log(missions);
 
-      if (missionsResponse[0].reports.agent.expertise1) {
-        expertises.push(missionsResponse[0].reports.agent.expertise1);
-      }
-      if (missionsResponse[0].reports.agent.expertise2) {
-        expertises.push(missionsResponse[0].reports.agent.expertise2);
-      }
-      if (missionsResponse[0].reports.agent.expertise3) {
-        expertises.push(missionsResponse[0].reports.agent.expertise3);
-      }
+  return {
+    props: {
+      _loadedReports,
+      _folderName,
+      folderId,
+      _folderDescription,
+      _folderPicDescription,
+      _folderPicUrl,
+      _folderPicUrls,
+      agentId,
+      expertises,
+      specializedTraining,
+      _folderLikes,
+      // structuredData,
+    },
+  };
+}
 
-      if (missionsResponse[0].reports.agent.specializedTraining) {
-        specializedTraining =
-          missionsResponse[0].reports.agent.specializedTraining;
-      }
-    }
-    let { data: linksResponse, error: linksError } = await supabase
-      .from("links")
-      .select("parentReportId, childReportId");
-
-    if (error || linksError) {
-      // handle errors
-      console.error(error);
-      console.error(linksError);
-    }
-
-    const _loadedReports = [];
-    let _folderName = "";
-    let _folderDescription = "";
-    let _folderPicUrl = "";
-    let _folderPicUrls = "";
-
-    missionsResponse.forEach((mission) => {
-      _loadedReports.push(mission.reports);
-      // console.log("mission.folders");
-      // console.log(mission.folders);
-      _folderName = mission.folders.folderName;
-      _folderDescription = mission.folders.folderDescription;
-      _folderPicUrl = mission.folders.folderPicUrl;
-      _folderPicUrls = mission.folders.folderPicUrls;
-      if (_folderPicUrls) {
-        _folderPicUrls = JSON.parse(_folderPicUrls);
-      }
-    });
-    // console.log("missions");
-    // console.log(missions);
-
-    return {
-      props: {
-        _loadedReports,
-        _folderName,
-        folderId,
-        _folderDescription,
-        _folderPicUrl,
-        _folderPicUrls,
-        agentId,
-        expertises,
-        specializedTraining,
-        _folderLikes,
-        // structuredData,
-      },
-    };
-  },
-});
 const ViewReports = ({
   _loadedReports,
   _folderName,
   folderId,
   _folderDescription,
+  _folderPicDescription,
   _folderPicUrl,
   _folderPicUrls,
   agentId,
@@ -232,6 +239,9 @@ const ViewReports = ({
   const [folderName, setFolderName] = useState(_folderName);
   const [folderDescription, setFolderDescription] =
     useState(_folderDescription);
+  const [folderPicDescription, setFolderPicDescription] = useState(
+    _folderPicDescription
+  );
   const [folderPicUrl, setFolderPicUrl] = useState(_folderPicUrl);
   const [reportLinksMap, setReportLinksMap] = useState({});
   const [reportPicUrl, setReportPicUrl] = useState("");
@@ -287,10 +297,10 @@ const ViewReports = ({
   const [likes, setLikes] = useState(
     _folderLikes.map((like) => like.likeValue).reduce((a, b) => a + b, 0)
   ); // const [hasLiked, setHasLiked] = useState(likes === 0 ? false : true);
-  console.log("_folderLikes");
-  console.log(_folderLikes);
-  console.log("likes");
-  console.log(likes);
+  // console.log("_folderLikes");
+  // console.log(_folderLikes);
+  // console.log("likes");
+  // console.log(likes);
   async function fetchUpdatedReports() {
     console.log("FETCH UPDATED REPORTS");
     // Fetch the updated data from the database using the folderId
@@ -299,7 +309,7 @@ const ViewReports = ({
       .select(
         `
               folders (folderName, folderDescription, folderPicUrl),
-              reports (reportTitle, reportPicUrl, reportId, reportContent)
+              reports (reportTitle, reportPicUrl, reportId, reportContent, reportPicDescription)
           `
       )
       .eq("folderId", folderId);
@@ -921,11 +931,11 @@ const ViewReports = ({
   // console.log("process.env.NEXT_PUBLIC_serverUid");
   // console.log(process.env.NEXT_PUBLIC_serverUid);
   async function handleLike() {
-    console.log("handleLike");
-    console.log("_folderLikes");
-    console.log(_folderLikes);
-    console.log("likes");
-    console.log(likes);
+    // console.log("handleLike");
+    // console.log("_folderLikes");
+    // console.log(_folderLikes);
+    // console.log("likes");
+    // console.log(likes);
     let _likes = likes;
     let likeValue = 0;
     if (likes === 0) {
@@ -949,52 +959,89 @@ const ViewReports = ({
     }
   }
   return (
-    <div style={{ maxWidth: "90%" }}>
-      <Breadcrumb style={{ marginTop: "65px" }}>
-        <BreadcrumbItem
-          className="text-white reportFont"
-          style={{ fontWeight: "800", fontSize: "2em" }}
-          active
-        >
-          {folderName}
-        </BreadcrumbItem>
-      </Breadcrumb>
-      <div className="folder-section report-section">
-        {/* {folderPicUrl} */}
-        {/* ["http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png"] */}
-        {/* {folderPicUrls} */}
+    <>
+      {folderPicUrls && (
+        <Head>
+          <title>{folderName}</title>
 
-        {folderPicUrls && (
-          <div
-            style={{
-              height: "700px",
-            }}
-            className="image-container"
+          {/* General tags */}
+          <meta name="title" content={folderName} />
+          <meta name="description" content={folderDescription} />
+          <meta
+            name="image"
+            content={folderPicUrls[currentfolderPicUrlIndex]}
+          />
+
+          {/* Open Graph tags */}
+          <meta property="og:title" content={folderName} />
+          <meta property="og:description" content={folderDescription} />
+          <meta
+            property="og:image"
+            content={folderPicUrls[currentfolderPicUrlIndex]}
+          />
+          <meta
+            property="og:url"
+            content={folderPicUrls[currentfolderPicUrlIndex]}
+          />
+
+          {/* Twitter Card tags */}
+          <meta name="twitter:title" content={folderName} />
+          <meta name="twitter:description" content={folderDescription} />
+          <meta
+            name="twitter:image"
+            content={folderPicUrls[currentfolderPicUrlIndex]}
+          />
+          <meta name="twitter:card" content="summary_large_image" />
+        </Head>
+      )}
+      <div style={{ maxWidth: "90%" }}>
+        <Breadcrumb style={{ marginTop: "65px" }}>
+          <BreadcrumbItem
+            className="text-white reportFont"
+            style={{ fontWeight: "800", fontSize: "2em" }}
+            active
           >
-            <a
-              href={folderPicUrls[currentfolderPicUrlIndex]}
-              target="_blank"
-              rel="noopener noreferrer"
+            {folderName}
+          </BreadcrumbItem>
+        </Breadcrumb>
+        <div className="folder-section report-section">
+          {/* {folderPicUrl} */}
+          {/* ["http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png"] */}
+          {/* {folderPicUrls} */}
+
+          {folderPicUrls && (
+            <div
+              style={{
+                height: "700px",
+              }}
+              className="image-container"
             >
-              <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
-            </a>
-            <div className="overlay"></div>
-          </div>
-          // <div>
-          //   <div
-          //     style={{
-          //       height: "500px",
-          //     }}
-          //   >
-          //     <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
-          //     {!folderPicUrl && (
-          //       <LoadingDots style={{ position: "absolute", top: "125px" }} />
-          //     )}
-          //   </div>
-          // </div>
-        )}
-        {/* works */}
-        {/* {folderPicUrls && (
+              <a
+                href={folderPicUrls[currentfolderPicUrlIndex]}
+                target="_blank"
+                rel="noopener noreferrer"
+                alt={folderPicDescription}
+                title={folderPicDescription}
+              >
+                <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
+              </a>
+              <div className="overlay"></div>
+            </div>
+            // <div>
+            //   <div
+            //     style={{
+            //       height: "500px",
+            //     }}
+            //   >
+            //     <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
+            //     {!folderPicUrl && (
+            //       <LoadingDots style={{ position: "absolute", top: "125px" }} />
+            //     )}
+            //   </div>
+            // </div>
+          )}
+          {/* works */}
+          {/* {folderPicUrls && (
           <div>
             <div
               style={{
@@ -1008,164 +1055,164 @@ const ViewReports = ({
             </div>
           </div>
         )} */}
-        {/* {JSON.stringify(folderPicUrls)} */}
-        {!folderPicUrls && (
-          <div
-            style={{
-              height: "700px",
-            }}
-          >
-            {!folderPicUrl && (
-              <LoadingDots style={{ position: "absolute", top: "125px" }} />
-            )}
-            {folderPicUrl && (
-              <div className="content-container">
-                <a
-                  href={folderPicUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="image-container">
-                    <img
-                      src={folderPicUrl}
-                      className="middle-image "
-                      alt="Folder"
-                    />
-                  </div>
-                </a>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-      <div style={{ marginTop: "-36px", marginBottom: "20px" }}>
-        <Row>
-          <Col>
-            <span style={{ marginRight: "20px", color: "#1C69E7" }}>
-              <i
-                onClick={handleLike}
-                style={{
-                  color: `${likes > 0 ? "#1C69E7" : "white"}`,
-                }}
-                className={`bi bi-star${
-                  likes === 0 ? "bi bi-star" : "bi bi-star-fill"
-                }`}
-              />{" "}
-              {likes == 0 ? "" : likes}
-            </span>
-            <span>
-              <i className="bi bi-send" />
-            </span>
-          </Col>
-          {/* <Col> */}
-          {/* </Col> */}
-        </Row>
-      </div>
-      <div> {folderDescription}</div>
-      <div
-        className="reportTitle reportFont section-title"
-        style={{ marginTop: "30px" }}
-      >
-        Table of Contents [{loadedReports.length}{" "}
-        <i className="bi bi-body-text"></i>]
-      </div>
-      {/* {JSON.stringify(parentChildIdMap)} */}
-      {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
-      {parentChildIdMap.id && (
-        <ul>
-          <li key={parentChildIdMap.id}>
-            <a
+          {/* {JSON.stringify(folderPicUrls)} */}
+          {!folderPicUrls && (
+            <div
               style={{
-                color: "#B52572",
-                textDecoration: "none",
-                cursor: "pointer",
-                fontWeight: 400,
+                height: "700px",
               }}
-              href={`#${parentChildIdMap.id}`}
-              onClick={() => console.log("Navigating to parent report")}
             >
-              {loadedReports.find(
-                (report) => report.reportId === parentChildIdMap.id
-              )?.reportTitle || `Report ID: ${parentChildIdMap.id}`}
-            </a>
-            <NestedList
-              // children={parentChildIdMap.children}
-              loadedReports={loadedReports}
-            >
-              {parentChildIdMap.children}
-            </NestedList>
-          </li>
-        </ul>
-      )}
-      {/* <ul>
+              {!folderPicUrl && (
+                <LoadingDots style={{ position: "absolute", top: "125px" }} />
+              )}
+              {folderPicUrl && (
+                <div className="content-container">
+                  <a
+                    href={folderPicUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className="image-container">
+                      <img
+                        src={folderPicUrl}
+                        className="middle-image "
+                        alt="Folder"
+                      />
+                    </div>
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <div style={{ marginTop: "-36px", marginBottom: "20px" }}>
+          <Row>
+            <Col>
+              <span style={{ marginRight: "20px", color: "#1C69E7" }}>
+                <i
+                  onClick={handleLike}
+                  style={{
+                    color: `${likes > 0 ? "#1C69E7" : "white"}`,
+                  }}
+                  className={`bi bi-star${
+                    likes === 0 ? "bi bi-star" : "bi bi-star-fill"
+                  }`}
+                />{" "}
+                {likes == 0 ? "" : likes}
+              </span>
+              <span>{/* <i className="bi bi-send" /> */}</span>
+            </Col>
+            {/* <Col> */}
+            {/* </Col> */}
+          </Row>
+        </div>
+        <div> {folderDescription}</div>
+        <div
+          className="reportTitle reportFont section-title"
+          style={{ marginTop: "30px" }}
+        >
+          Table of Contents [{loadedReports.length}{" "}
+          <i className="bi bi-body-text"></i>]
+        </div>
+        {/* {JSON.stringify(parentChildIdMap)} */}
+        {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
+        {parentChildIdMap.id && (
+          <ul>
+            <li key={parentChildIdMap.id}>
+              <a
+                style={{
+                  color: "#B52572",
+                  textDecoration: "none",
+                  cursor: "pointer",
+                  fontWeight: 400,
+                }}
+                href={`#${parentChildIdMap.id}`}
+                onClick={() => console.log("Navigating to parent report")}
+              >
+                {loadedReports.find(
+                  (report) => report.reportId === parentChildIdMap.id
+                )?.reportTitle || `Report ID: ${parentChildIdMap.id}`}
+              </a>
+              <NestedList
+                // children={parentChildIdMap.children}
+                loadedReports={loadedReports}
+              >
+                {parentChildIdMap.children}
+              </NestedList>
+            </li>
+          </ul>
+        )}
+        {/* <ul>
         <li key={parentChildIdMap.id}>
           {parentChildIdMap.id}
           <NestedList children={parentChildIdMap.children} />
         </li>
       </ul> */}
-      {/* {Object.keys(parentChildIdMap)} */}
+        {/* {Object.keys(parentChildIdMap)} */}
 
-      {loadedReports &&
-        loadedReports.map((cols, index) => {
-          const report = loadedReports[index];
-          const reportId = loadedReports[index].reportId;
-          if (
-            !loadedReports[index].reportContent.includes(
-              `<h2 id="reportTitle">`
-            )
-          ) {
-            return;
-          }
-          const reportTitle = loadedReports[index].reportContent
-            .split(`<h2 id="reportTitle">`)[1]
-            .split(`</h2>`)[0];
-          const __html = `<div className="report">${
-            loadedReports[index].reportContent
+        {loadedReports &&
+          loadedReports.map((cols, index) => {
+            const report = loadedReports[index];
+            const reportId = loadedReports[index].reportId;
+            if (
+              !loadedReports[index].reportContent.includes(
+                `<h2 id="reportTitle">`
+              )
+            ) {
+              return;
+            }
+            const reportTitle = loadedReports[index].reportContent
               .split(`<h2 id="reportTitle">`)[1]
-              .split(`</h2>`)[1]
-          }`;
+              .split(`</h2>`)[0];
+            const __html = `<div className="report">${
+              loadedReports[index].reportContent
+                .split(`<h2 id="reportTitle">`)[1]
+                .split(`</h2>`)[1]
+            }`;
 
-          // console.log("reportTitle");
-          // console.log(reportTitle);
-          // console.log("__html");
-          // console.log(__html);
-          return (
-            <div key={index} id={reportId} className="report-section">
-              <div className="title-container">
-                <div className="reportTitle reportFont section-title">
-                  {reportTitle}
+            // console.log("reportTitle");
+            // console.log(reportTitle);
+            // console.log("__html");
+            // console.log(__html);
+            return (
+              <div key={index} id={reportId} className="report-section">
+                <div className="title-container">
+                  <div className="reportTitle reportFont section-title">
+                    {reportTitle}
+                  </div>
+                  {index !== 0 && (
+                    <a href="#top" className="top-button text-white">
+                      {/* 🔝 */}⇧
+                    </a>
+                  )}
                 </div>
-                {index !== 0 && (
-                  <a href="#top" className="top-button text-white">
-                    {/* 🔝 */}⇧
-                  </a>
-                )}
-              </div>
-              <div style={{ height: "700px" }} className="image-container">
-                {!report.reportPicUrl && <LoadingDots />}
-                {report.reportPicUrl && (
-                  <a
-                    href={report.reportPicUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img
-                      src={report.reportPicUrl}
-                      alt="Report Image"
-                      className="report-image"
-                      style={{ borderRadius: "10px" }}
-                    />
-                    <div className="overlay" />
-                  </a>
-                )}
-              </div>
-              <div
-                id={`reportRoot${index}`}
-                onMouseUp={(e) => handleTextHighlight(e, report)}
-                className="report text-primary reportFont"
-                dangerouslySetInnerHTML={{ __html }}
-              />
-              <div style={{ display: "flex" }}>
+                <div style={{ height: "700px" }} className="image-container">
+                  {/* {report.reportPicDescription} */}
+                  {!report.reportPicUrl && <LoadingDots />}
+                  {report.reportPicUrl && (
+                    <a
+                      href={report.reportPicUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={report.reportPicUrl}
+                        alt={report.reportPicDescription}
+                        title={report.reportPicDescription}
+                        className="report-image"
+                        style={{ borderRadius: "10px" }}
+                      />
+                      <div className="overlay" />
+                    </a>
+                  )}
+                </div>
+                <div
+                  id={`reportRoot${index}`}
+                  // onMouseUp={(e) => handleTextHighlight(e, report)}
+                  className="report text-primary reportFont"
+                  dangerouslySetInnerHTML={{ __html }}
+                />
+                {/* <div style={{ display: "flex" }}>
                 <div
                   className="btn btn-primary"
                   style={{ marginLeft: "auto", textAlign: "right" }}
@@ -1175,14 +1222,14 @@ const ViewReports = ({
                 >
                   <i className="bi bi-link"></i> Continuum
                 </div>
+              </div> */}
               </div>
-            </div>
-          );
-        })}
-      {/* Draft */}
-      {/* Is streaming{JSON.stringify(isStreaming)} */}
-      {/* {JSON.stringify(loadedReports)} */}
-      {isStreaming && (
+            );
+          })}
+        {/* Draft */}
+        {/* Is streaming{JSON.stringify(isStreaming)} */}
+        {/* {JSON.stringify(loadedReports)} */}
+        {/* {isStreaming && (
         <div id="draft">
           <div className="reportTitle reportFont section-title">Draft</div>
           <div
@@ -1190,46 +1237,49 @@ const ViewReports = ({
             dangerouslySetInnerHTML={{ __html: draft }}
           ></div>
         </div>
-      )}
-      {/* {JSON.stringify(agent)} */}
-      {agent && !isStreaming && (
-        <div
-          style={{ textAlign: "center" }}
-          onClick={() => goToAgentProfile({ agentId: agent.agentId })}
-        >
+      )} */}
+        {/* {JSON.stringify(agent)} */}
+        {agent && !isStreaming && (
           <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              height: "237px",
-              objectFit: "cover",
-              textAlign: "center",
-            }}
+            style={{ textAlign: "center" }}
+            // onClick={() => goToAgentProfile({ agentId: agent.agentId })}
           >
-            <img
-              src={`${agent.profilePicUrl}`}
-              style={{ borderRadius: "50%", cursor: "pointer" }}
-              alt="agent"
-            />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                height: "237px",
+                objectFit: "cover",
+                textAlign: "center",
+              }}
+            >
+              <img
+                src={`${agent.profilePicUrl}`}
+                style={{ borderRadius: "50%" }} //cursor: "pointer"
+                alt="agent"
+              />
+            </div>
+            <div
+              style={
+                {
+                  // marginTop: "8px",
+                  // fontWeight: 800,
+                  // color: "#B52572",
+                  // fontWeight: "200",
+                  // textDecoration: "none",
+                  // cursor: "pointer",
+                }
+              }
+            >
+              Agent {agent.agentName}
+            </div>
           </div>
-          <a
-            style={{
-              marginTop: "8px",
-              fontWeight: 800,
-              color: "#B52572",
-              fontWeight: "200",
-              textDecoration: "none",
-              cursor: "pointer",
-            }}
-          >
-            Agent {agent.agentName}
-          </a>
-        </div>
-      )}
-      {highlight.text && loadedAgentId != 0 && (
+        )}
+        {/* {highlight.text && loadedAgentId != 0 && (
         <IntelliFab onClick={handleFabClick} icon="+" fabType="report" />
-      )}
-    </div>
+      )} */}
+      </div>
+    </>
   );
 };
 

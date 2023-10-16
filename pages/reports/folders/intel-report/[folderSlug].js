@@ -54,7 +54,7 @@ export const getServerSideProps = withPageAuthRequired({
     //     userId,
     //     folderId,
     // ),
-
+    // const missionsResponse = "";
     let { data: missionsResponse, error } = await supabase
       .from("reportFolders")
       .select(
@@ -69,6 +69,7 @@ export const getServerSideProps = withPageAuthRequired({
             availability
         ),
         reports:reports (
+            availability,
             reportTitle,
             reportPicUrl,
             reportId,
@@ -81,7 +82,6 @@ export const getServerSideProps = withPageAuthRequired({
                 expertise2,
                 expertise3,
                 specializedTraining
-
             )
         )
     `
@@ -158,7 +158,11 @@ export const getServerSideProps = withPageAuthRequired({
 
     let _availability = "";
     missionsResponse.forEach((mission) => {
+      if (mission.reports.availability == "DELETED") {
+        return;
+      }
       _loadedReports.push(mission.reports);
+
       // console.log("mission.folders");
       // console.log(mission.folders);
       _folderName = mission.folders.folderName;
@@ -287,6 +291,7 @@ const ViewReports = ({
   // const firebaseContinuumStatus = useFirebaseListener(
   //   user ? `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
   // );
+
   async function fetchUpdatedReports() {
     console.log("FETCH UPDATED REPORTS");
     // Fetch the updated data from the database using the folderId
@@ -295,10 +300,12 @@ const ViewReports = ({
       .select(
         `
               folders (folderName, folderDescription, folderPicUrl),
-              reports (reportTitle, reportPicUrl, reportId, reportContent)
+              reports (reportTitle, reportPicUrl, reportId, reportContent, availability)
           `
       )
       .eq("folderId", folderId);
+    // .filter("reports.availability", "neq", "DELETED")
+    // .or("reports.availability.is.null");
     console.log("updatedMissionsResponse");
     console.log(updatedMissionsResponse);
     if (updatedError) {
@@ -308,6 +315,9 @@ const ViewReports = ({
 
     const updatedMissions = [];
     updatedMissionsResponse.forEach((mission) => {
+      if (mission.reports.availability == "DELETED") {
+        return;
+      }
       updatedMissions.push({ ...mission.reports });
       // console.log("mission.folders");
       // console.log(mission.folders);
@@ -789,6 +799,7 @@ const ViewReports = ({
   const NestedList = ({ children, loadedReports }) => {
     return (
       <ul>
+        {/* {JSON.stringify(loadedReports)} */}
         {children &&
           children.map((item) => (
             <li key={item.id}>
@@ -919,11 +930,11 @@ const ViewReports = ({
     _folderLikes.map((like) => like.likeValue).reduce((a, b) => a + b, 0)
   );
   async function handleLike() {
-    console.log("handleLike");
-    console.log("_folderLikes");
-    console.log(_folderLikes);
-    console.log("likes");
-    console.log(likes);
+    // console.log("handleLike");
+    // console.log("_folderLikes");
+    // console.log(_folderLikes);
+    // console.log("likes");
+    // console.log(likes);
     let _likes = likes;
     let likeValue = 0;
     if (likes === 0) {
@@ -969,6 +980,66 @@ const ViewReports = ({
       console.error("Error updating availability", error);
       return;
     }
+  }
+
+  const [showFolderDeleteQuestion, setShowFolderDeleteQuestion] =
+    useState(false);
+
+  const [showReportDeleteQuestion, setShowReportDeleteQuestion] =
+    useState(false);
+  function handleFolderDeleteClick() {
+    console.log("handleFolderDeleteClick");
+    setShowFolderDeleteQuestion(!showFolderDeleteQuestion);
+  }
+  async function handleFolderDeleteYes() {
+    console.log("handleFolderDeleteYes");
+    console.log("folderId");
+    console.log(folderId);
+    // update supbase availability column in the folders table to "DELETED"
+    const { error } = await supabase
+      .from("folders")
+      .update({ availability: "DELETED" })
+      .eq("folderId", folderId);
+    if (error) {
+      console.error("Error updating availability", error);
+      return;
+    } else {
+      console.log("DELTEED");
+      goToPage("/reports/folders/view-folders");
+    }
+  }
+  function handleFolderDeleteNo() {
+    console.log("handleFolderDeleteNo");
+    setShowFolderDeleteQuestion(false);
+  }
+  function handleReportDeleteClick() {
+    console.log("handleReportDeleteClick");
+    setShowReportDeleteQuestion(!showReportDeleteQuestion);
+  }
+  async function handleReportDeleteYes(reportId) {
+    console.log("handleFolderDeleteYes");
+    console.log("reportId");
+    console.log(reportId);
+    // update supbase availability column in the folders table to "DELETED"
+    const { error } = await supabase
+      .from("reports")
+      .update({ availability: "DELETED" })
+      .eq("reportId", reportId);
+    if (error) {
+      console.error("Error updating availability", error);
+      return;
+    } else {
+      console.log("DELTEED reportId");
+      // router.replace(router.asPath);
+
+      setShowReportDeleteQuestion(false);
+      fetchUpdatedReports();
+      // goToPage("/reports/folders/view-folders");
+    }
+  }
+  function handleReportDeleteNo() {
+    console.log("handleFolderDeleteNo");
+    setShowReportDeleteQuestion(false);
   }
   return (
     <div style={{ maxWidth: "90%" }}>
@@ -1073,8 +1144,33 @@ const ViewReports = ({
 
           <Col>
             <div style={{ marginLeft: "auto", textAlign: "right" }}>
-              <i style={{ color: "grey" }} className="bi bi-trash" />
-              {/* &nbsp; Delete? Yes / No */}
+              <i
+                style={{
+                  color: `${showFolderDeleteQuestion ? "white" : "grey"}`,
+                  cursor: "pointer",
+                }}
+                className="bi bi-trash"
+                onClick={handleFolderDeleteClick}
+              />
+              &nbsp;
+              {showFolderDeleteQuestion && (
+                <>
+                  Delete Folder?{" "}
+                  <span
+                    style={{ color: "white", cursor: "pointer" }}
+                    onClick={handleFolderDeleteYes}
+                  >
+                    Yes
+                  </span>{" "}
+                  /{" "}
+                  <span
+                    style={{ color: "white", cursor: "pointer" }}
+                    onClick={handleFolderDeleteNo}
+                  >
+                    No
+                  </span>
+                </>
+              )}
             </div>
           </Col>
         </Row>
@@ -1196,10 +1292,44 @@ const ViewReports = ({
                 >
                   <i className="bi bi-link"></i> Continuum
                 </div>
+                {/* Report Delete Button */}
                 <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                  <i style={{ color: "grey" }} className="bi bi-trash" />
-                  {/* &nbsp; Delete? Yes / No */}
+                  <i
+                    style={{
+                      color: `${showReportDeleteQuestion ? "white" : "grey"}`,
+                      cursor: "pointer",
+                    }}
+                    className="bi bi-trash"
+                    onClick={handleReportDeleteClick}
+                  />
+                  &nbsp;
+                  {showReportDeleteQuestion}
+                  {showReportDeleteQuestion && (
+                    <>
+                      Delete Report?{" "}
+                      <span
+                        style={{ color: "white", cursor: "pointer" }}
+                        onClick={() => {
+                          handleReportDeleteYes(reportId);
+                        }}
+                      >
+                        Yes
+                      </span>{" "}
+                      /{" "}
+                      <span
+                        style={{ color: "white", cursor: "pointer" }}
+                        onClick={handleReportDeleteNo}
+                      >
+                        No
+                      </span>
+                    </>
+                  )}
                 </div>
+                {/* <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                  <i style={{ color: "grey" }} className="bi bi-trash" />
+        
+        
+                </div> */}
               </div>
             </div>
           );
