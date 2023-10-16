@@ -1,3 +1,10 @@
+.table-of-contents {
+  padding: 20px;
+  font-size: 20px; /* Increased font size */
+  line-height: 1.6; 
+  max-width: 800px; 
+  margin: auto;
+}
 .report {
   color: white;
   background-color: #000000; /* Adjust as necessary to ensure contrast */

@@ -1178,7 +1178,7 @@ const ViewReports = ({
 
       <div> {folderDescription}</div>
       <div
-        className="reportTitle reportFont section-title"
+        className="reportTitle reportFont section-title table-of-contents"
         style={{ marginTop: "30px" }}
       >
         Table of Contents [{loadedReports.length}{" "}
