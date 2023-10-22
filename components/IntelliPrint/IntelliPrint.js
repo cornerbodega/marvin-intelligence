@@ -1,5 +1,5 @@
 import React from "react";
-import "./IntelliPrint.css"; // Import the CSS file
+import "./IntelliPrint.module.css"; // Import the CSS file
 
 const IntelliPrint = ({ loadedReports }) => {
   const handlePrintClick = () => {

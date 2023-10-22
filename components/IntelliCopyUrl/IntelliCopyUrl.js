@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./IntelliCopyUrl.css";
+import "./IntelliCopyUrl.module.css";
 
 const IntelliCopyUrl = () => {
   const [copied, setCopied] = useState(false);
