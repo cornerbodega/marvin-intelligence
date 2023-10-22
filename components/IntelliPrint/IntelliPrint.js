@@ -31,7 +31,7 @@ const IntelliPrint = ({ loadedReports }) => {
           .split(`</h2>`)[1];
 
         return `
-        <div class="intelli-report">
+        <div className="intelli-report">
           <h1>${reportTitle}</h1>
           <img style="height: 16%;" src="${report.reportPicUrl}" alt="${report.reportPicDescription}" className="intelli-report-image">
           <div className="intelli-report-content">${reportContent}</div>
