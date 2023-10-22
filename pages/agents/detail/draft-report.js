@@ -712,7 +712,7 @@ const CreateMission = ({ agent }) => {
                           cursor: "pointer",
                         }}
                       >
-                        🚫
+                        <i className="bi bi-x-circle"></i>
                       </div>
                     </Col>
                   </Row>
@@ -800,7 +800,7 @@ const CreateMission = ({ agent }) => {
                   </CardSubtitle>
                   <div>
                     <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                      <i style={{ color: "grey" }} className="bi bi-trash" />
+                      {/* <i style={{ color: "grey" }} className="bi bi-trash" /> */}
                       {/* &nbsp; Delete? Yes / No */}
                     </div>
                     <div>
@@ -901,7 +901,7 @@ const CreateMission = ({ agent }) => {
                     value={feedbackInput}
                     onChange={(e) => setFeedbackInput(e.target.value)}
                   />
-                  <div style={{ textAlign: "left", paddingTop: "8px" }}>
+                  <div style={{ textAlign: "right", paddingTop: "8px" }}>
                     <Button
                       color="primary"
                       style={{ border: "1px solid yellow" }}
@@ -950,7 +950,7 @@ const CreateMission = ({ agent }) => {
                 <div></div>
               </div>
               <Form>
-                <div style={{ textAlign: "right" }}>
+                <div style={{ textAlign: "left" }}>
                   {!continuumEnabled && (
                     <Button
                       color="primary"

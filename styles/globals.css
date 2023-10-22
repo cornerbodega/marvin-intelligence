@@ -1,3 +1,43 @@
+
+
+.scroll-downs {
+  position: fixed;
+  bottom: 5%;
+  right: 7%;
+  transform: translateX(-50%);
+  text-align: center;
+  font-size: 20px;
+}
+
+.mousey {
+  display: block;
+  width: 30px;
+  height: 45px;
+  border: 2px solid #B52571;
+  border-radius: 15px;
+  position: relative;
+  animation: bounce 1s infinite;
+}
+
+.mousey .scroller {
+  width: 8px;
+  height: 10px;
+  border-radius: 4px;
+  background:#B52571;
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
 .table-of-contents {
   padding: 20px;
   font-size: 20px; /* Increased font size */
@@ -5,6 +45,10 @@
   max-width: 800px; 
   margin: auto;
 }
+
+
+
+
 .report {
   color: white;
   background-color: #000000; /* Adjust as necessary to ensure contrast */
@@ -154,7 +198,7 @@ body {
 .image-container {
   position: relative;
   overflow: hidden; /* or any desired width */
-  height: 700px; /* or any desired height */
+  max-height: 700px; /* or any desired height */
 }
 
 .image-container img {

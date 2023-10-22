@@ -21,6 +21,8 @@ import saveTask from "../../../../utils/saveTask";
 import Head from "next/head";
 import Router from "next/router";
 import _ from "lodash";
+import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
+import IntelliCopyUrl from "../../../../components/IntelliCopyUrl/IntelliCopyUrl";
 
 // import { child } from "@firebase/database";
 // export const getServerSideProps = withPageAuthRequired({
@@ -65,8 +67,7 @@ export async function getServerSideProps(context) {
             folderName,
             folderDescription,
             folderPicDescription,
-            folderPicUrl,
-            folderPicUrls
+            folderPicUrl
         ),
         reports:reports (
             reportTitle,
@@ -173,10 +174,13 @@ export async function getServerSideProps(context) {
     _folderDescription = mission.folders.folderDescription;
     _folderPicDescription = mission.folders.folderPicDescription;
     _folderPicUrl = mission.folders.folderPicUrl;
-    _folderPicUrls = mission.folders.folderPicUrls;
-    if (_folderPicUrls) {
-      _folderPicUrls = JSON.parse(_folderPicUrls);
-    }
+    // _folderPicUrls = mission.folders.folderPicUrls;
+    // if (_folderPicUrls) {
+    //   _folderPicUrls = JSON.parse(_folderPicUrls);
+    // }
+    // if (_folderPicUrls) {
+    //   _folderPicUrls = JSON.parse(_folderPicUrls);
+    // }
   });
   // console.log("missions");
   // console.log(missions);
@@ -189,7 +193,7 @@ export async function getServerSideProps(context) {
       _folderDescription,
       _folderPicDescription,
       _folderPicUrl,
-      _folderPicUrls,
+      // _folderPicUrls,
       agentId,
       expertises,
       specializedTraining,
@@ -206,7 +210,7 @@ const ViewReports = ({
   _folderDescription,
   _folderPicDescription,
   _folderPicUrl,
-  _folderPicUrls,
+  // _folderPicUrls,
   agentId,
   expertises,
   specializedTraining,
@@ -260,7 +264,7 @@ const ViewReports = ({
         }/${userId}/finalizeAndVisualizeReport/context/`
       : null
   );
-  const [folderPicUrls, setFolderPicUrls] = useState(_folderPicUrls);
+  // const [folderPicUrls, setFolderPicUrls] = useState(_folderPicUrls);
   const [agent, setAgent] = useState({});
   // const folderPicUrls = [
   //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png",
@@ -268,9 +272,9 @@ const ViewReports = ({
   //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png",
   //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png",
   // ];
-  const [currentfolderPicUrlIndex, setCurrentfolderPicUrlIndex] = useState(
-    folderPicUrls ? Math.floor(Math.random() * folderPicUrls.length) : 0
-  );
+  // const [currentfolderPicUrlIndex, setCurrentfolderPicUrlIndex] = useState(
+  //   folderPicUrls ? Math.floor(Math.random() * folderPicUrls.length) : 0
+  // );
   const firebaseFolderData = useFirebaseListener(
     user
       ? `/${
@@ -309,7 +313,7 @@ const ViewReports = ({
       .select(
         `
               folders (folderName, folderDescription, folderPicUrl),
-              reports (reportTitle, reportPicUrl, reportId, reportContent, reportPicDescription)
+              reports (reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, reportPicDescription)
           `
       )
       .eq("folderId", folderId);
@@ -381,10 +385,10 @@ const ViewReports = ({
         setFolderName(firebaseFolderData.folderName);
         setFolderDescription(firebaseFolderData.folderDescription);
         setFolderPicUrl(firebaseFolderData.folderPicUrl);
-        if (firebaseFolderData.folderPicUrls) {
-          setFolderPicUrls(firebaseFolderData.folderPicUrls);
-          setCurrentfolderPicUrlIndex(folderPicUrls.length - 1);
-        }
+        // if (firebaseFolderData.folderPicUrls) {
+        // setFolderPicUrls(firebaseFolderData.folderPicUrls);
+        // setCurrentfolderPicUrlIndex(folderPicUrls.length - 1);
+        // }
       }
     }
   }, [firebaseFolderData, folderId]); // Added folderId as a dependency
@@ -445,105 +449,10 @@ const ViewReports = ({
   //     }
   //   }
   // }, [firebaseSaveData]);
-  async function handleContinuumClick(parentReport) {
-    // "parentReportId",
-    // "userId",
-    // "parentReportContent",
-    // "agentId",
-    // "expertises",
-    // "specializedTraining",
-    // console.log("parentReport");
-    // console.log(parentReport.reportId);
-    // console.log("reportLinksMap");
-    // console.log(reportLinksMap);
-    // console.log("reportLinksMap[parentReport.reportId]");
-    // console.log(reportLinksMap[parentReport.reportId]);
-    const existingHyperlinks = await getLinksForContinuum(
-      parentReport.reportId
-    );
-    console.log("existingHyperlinks");
-    console.log(existingHyperlinks);
-    setHasStartedContinuum(true);
-    setIsStreaming(true);
-    const parentReportId = parentReport.reportId;
-    const parentReportContent = parentReport.reportContent;
-    await saveTask({
-      type: "continuum",
-      status: "queued",
-      userId,
-      context: {
-        parentReportId,
-        userId,
-        parentReportContent,
-        agentId,
-        expertises,
-        specializedTraining,
-        existingHyperlinks,
-      },
-      createdAt: new Date().toISOString(),
-    });
-    console.log("Handle Continuum Click");
-  }
 
   useEffect(() => {
     console.log("Updated highlight.text", highlight);
   }, [highlight]);
-  const handleTextHighlight = (event, report) => {
-    console.log("handleTextHighlight");
-    const selection = window.getSelection();
-    console.log("selection", selection);
-
-    if (selection.toString().trim().length === 0) {
-      setHighlight({ text: "", range: null });
-      return;
-    }
-
-    const range = selection.getRangeAt(0);
-    const startIndex = range.startOffset;
-    const endIndex = range.endOffset;
-
-    if (range.startContainer.parentNode !== range.endContainer.parentNode) {
-      selection.removeAllRanges();
-      setHighlight({ text: "", startIndex, endIndex });
-      return;
-    }
-
-    let parentNode = range.startContainer.parentNode;
-    while (parentNode && !parentNode.id && parentNode !== document.body) {
-      parentNode = parentNode.parentNode;
-    }
-
-    const elementId = parentNode ? parentNode.id : null;
-
-    setHighlight({
-      text: selection.toString(),
-      // startIndex,
-      // endIndex,
-      elementId,
-      parentReportId: report.reportId,
-      parentReportTitle: report.reportTitle,
-    });
-  };
-
-  const handleFabClick = () => {
-    console.log("handleFabClick");
-    const highlightedText = highlight.highlightedText;
-    const elementId = highlight.elementId;
-    const parentReportId = highlight.parentReportId;
-    const parentReportTitle = JSON.stringify(highlight.parentReportTitle);
-    console.log("ViewReports HandleClick Clicked!");
-    Router.push({
-      pathname: "/agents/detail/draft-report",
-      query: {
-        ...Router.query,
-        agentId: loadedAgentId,
-        parentReportId,
-        parentReportTitle,
-        highlightedText,
-        elementId,
-      },
-    });
-  };
 
   const router = useRouter;
   function goToPage(name) {
@@ -960,42 +869,30 @@ const ViewReports = ({
   }
   return (
     <>
-      {folderPicUrls && (
+      {folderPicUrl && (
         <Head>
           <title>{folderName}</title>
 
           {/* General tags */}
           <meta name="title" content={folderName} />
           <meta name="description" content={folderDescription} />
-          <meta
-            name="image"
-            content={folderPicUrls[currentfolderPicUrlIndex]}
-          />
+          <meta name="image" content={folderPicUrl} />
 
           {/* Open Graph tags */}
           <meta property="og:title" content={folderName} />
           <meta property="og:description" content={folderDescription} />
-          <meta
-            property="og:image"
-            content={folderPicUrls[currentfolderPicUrlIndex]}
-          />
-          <meta
-            property="og:url"
-            content={folderPicUrls[currentfolderPicUrlIndex]}
-          />
+          <meta property="og:image" content={folderPicUrl} />
+          <meta property="og:url" content={folderPicUrl} />
 
           {/* Twitter Card tags */}
           <meta name="twitter:title" content={folderName} />
           <meta name="twitter:description" content={folderDescription} />
-          <meta
-            name="twitter:image"
-            content={folderPicUrls[currentfolderPicUrlIndex]}
-          />
+          <meta name="twitter:image" content={folderPicUrl} />
           <meta name="twitter:card" content="summary_large_image" />
         </Head>
       )}
       <div style={{ maxWidth: "90%" }}>
-        <Breadcrumb style={{ marginTop: "65px" }}>
+        <Breadcrumb>
           <BreadcrumbItem
             className="text-white reportFont"
             style={{ fontWeight: "800", fontSize: "2em" }}
@@ -1009,21 +906,30 @@ const ViewReports = ({
           {/* ["http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png"] */}
           {/* {folderPicUrls} */}
 
-          {folderPicUrls && (
+          {folderPicUrl && (
             <div
               style={{
-                height: "700px",
+                // height: "700px",
+                position: "relative",
               }}
               className="image-container"
             >
               <a
-                href={folderPicUrls[currentfolderPicUrlIndex]}
+                href={folderPicUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 alt={folderPicDescription}
                 title={folderPicDescription}
               >
-                <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
+                <img
+                  // className="report-image"
+                  src={`${folderPicUrl}`}
+                  style={{
+                    // objectFit: "contain",
+                    width: "auto",
+                    // objectPosition: "top",
+                  }}
+                />
               </a>
               <div className="overlay"></div>
             </div>
@@ -1033,7 +939,7 @@ const ViewReports = ({
             //       height: "500px",
             //     }}
             //   >
-            //     <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
+            //     <img src={`${folderPicUrl}`} />
             //     {!folderPicUrl && (
             //       <LoadingDots style={{ position: "absolute", top: "125px" }} />
             //     )}
@@ -1048,7 +954,7 @@ const ViewReports = ({
                 height: "500px",
               }}
             >
-              <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
+              <img src={`${folderPicUrl}`} />
               {!folderPicUrl && (
                 <LoadingDots style={{ position: "absolute", top: "125px" }} />
               )}
@@ -1056,7 +962,7 @@ const ViewReports = ({
           </div>
         )} */}
           {/* {JSON.stringify(folderPicUrls)} */}
-          {!folderPicUrls && (
+          {/* {!folderPicUrls && (
             <div
               style={{
                 height: "700px",
@@ -1083,24 +989,30 @@ const ViewReports = ({
                 </div>
               )}
             </div>
-          )}
+          )} */}
         </div>
         <div style={{ marginTop: "-36px", marginBottom: "20px" }}>
           <Row>
             <Col>
-              <span style={{ marginRight: "20px", color: "#1C69E7" }}>
+              <span style={{ marginRight: "20px", color: "gold" }}>
                 <i
                   onClick={handleLike}
                   style={{
-                    color: `${likes > 0 ? "#1C69E7" : "white"}`,
+                    color: `${likes > 0 ? "gold" : "white"}`,
                   }}
                   className={`bi bi-star${
                     likes === 0 ? "bi bi-star" : "bi bi-star-fill"
                   }`}
-                />{" "}
+                />
                 {likes == 0 ? "" : likes}
               </span>
-              <span>{/* <i className="bi bi-send" /> */}</span>
+              <span style={{ marginRight: "20px" }}>
+                <IntelliPrint loadedReports={loadedReports} />
+              </span>
+              <span>
+                {/* <i className="bi bi-send" /> */}
+                <IntelliCopyUrl />
+              </span>
             </Col>
             {/* <Col> */}
             {/* </Col> */}
@@ -1108,14 +1020,15 @@ const ViewReports = ({
         </div>
         <div> {folderDescription}</div>
         <div
-          className="reportTitle reportFont section-title table-of-contents"
+          className="reportTitle reportFont section-title"
           style={{ marginTop: "30px" }}
         >
           <Row>
-            <Col>Table of Contents </Col>
             <Col>
-              <span>
-                [{loadedReports.length} <i className="bi bi-body-text"></i>]
+              Table of Contents
+              <span style={{ whiteSpace: "nowrap" }}>
+                &nbsp;[{loadedReports.length}{" "}
+                <i className="bi bi-body-text"></i>]
               </span>
             </Col>
           </Row>

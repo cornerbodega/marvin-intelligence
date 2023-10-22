@@ -170,17 +170,16 @@ const IntelliCard = ({
             style={{
               display: "flex",
               flexDirection: "column",
-              alignItems: "flex-start",
+              alignItems: "flex-end",
               fontSize: "1rem",
             }}
           >
-            {likes && (
+            {likes > 0 && (
               <div
                 style={{
                   display: "flex",
                   flexDirection: "row",
-                  alignItems: "center",
-                  color: "#1C69E7",
+                  color: "gold",
                 }}
                 // className="section-title"
               >

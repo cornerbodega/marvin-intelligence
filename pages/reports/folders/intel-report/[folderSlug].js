@@ -21,6 +21,8 @@ import saveTask from "../../../../utils/saveTask";
 
 import Router from "next/router";
 import _ from "lodash";
+import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
+import { current } from "@reduxjs/toolkit";
 
 // import { child } from "@firebase/database";
 export const getServerSideProps = withPageAuthRequired({
@@ -64,14 +66,15 @@ export const getServerSideProps = withPageAuthRequired({
         folders:folders (
             folderName,
             folderDescription,
+            folderPicDescription,
             folderPicUrl,
-            folderPicUrls,
             availability
         ),
         reports:reports (
             availability,
             reportTitle,
             reportPicUrl,
+            reportPicDescription,
             reportId,
             reportContent,
             agentId,
@@ -153,8 +156,9 @@ export const getServerSideProps = withPageAuthRequired({
     const _loadedReports = [];
     let _folderName = "";
     let _folderDescription = "";
+    let _folderPicDescription = "";
     let _folderPicUrl = "";
-    let _folderPicUrls = "";
+    // let _folderPicUrls = "";
 
     let _availability = "";
     missionsResponse.forEach((mission) => {
@@ -167,31 +171,33 @@ export const getServerSideProps = withPageAuthRequired({
       // console.log(mission.folders);
       _folderName = mission.folders.folderName;
       _folderDescription = mission.folders.folderDescription;
+      _folderPicDescription = mission.folders.folderPicDescription;
       _folderPicUrl = mission.folders.folderPicUrl;
-      _folderPicUrls = mission.folders.folderPicUrls;
-      if (_folderPicUrls) {
-        _folderPicUrls = JSON.parse(_folderPicUrls);
-      }
+      // _folderPicUrls = mission.folders.folderPicUrls;
+      // if (_folderPicUrls) {
+      //   _folderPicUrls = JSON.parse(_folderPicUrls);
+      // }
 
       _availability = mission.folders.availability;
     });
     // console.log("missions");
     // console.log(missions);
-    const _currentfolderPicUrlIndex = _folderPicUrls
-      ? Math.floor(Math.random() * _folderPicUrls.length)
-      : 0;
+    // const _currentfolderPicUrlIndex = _folderPicUrls
+    //   ? Math.floor(Math.random() * _folderPicUrls.length)
+    //   : 0;
     return {
       props: {
         _loadedReports,
         _folderName,
         folderId,
         _folderDescription,
+        _folderPicDescription,
         _folderPicUrl,
-        _folderPicUrls,
+        // _folderPicUrls,
         agentId,
         expertises,
         specializedTraining,
-        _currentfolderPicUrlIndex,
+        // _currentfolderPicUrlIndex,
         _folderLikes,
         _availability,
       },
@@ -203,8 +209,9 @@ const ViewReports = ({
   _folderName,
   folderId,
   _folderDescription,
+  _folderPicDescription,
   _folderPicUrl,
-  _folderPicUrls,
+  // _folderPicUrls,
   agentId,
   expertises,
   specializedTraining,
@@ -239,6 +246,9 @@ const ViewReports = ({
   const [folderName, setFolderName] = useState(_folderName);
   const [folderDescription, setFolderDescription] =
     useState(_folderDescription);
+  const [folderPicDescription, setFolderPicDescription] = useState(
+    _folderPicDescription
+  );
   const [folderPicUrl, setFolderPicUrl] = useState(_folderPicUrl);
   const [reportLinksMap, setReportLinksMap] = useState({});
   const [reportPicUrl, setReportPicUrl] = useState("");
@@ -257,7 +267,7 @@ const ViewReports = ({
         }/${userId}/finalizeAndVisualizeReport/context/`
       : null
   );
-  const [folderPicUrls, setFolderPicUrls] = useState(_folderPicUrls);
+  // const [folderPicUrls, setFolderPicUrls] = useState(_folderPicUrls);
   const [agent, setAgent] = useState({});
   // const folderPicUrls = [
   //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png",
@@ -288,6 +298,15 @@ const ViewReports = ({
         }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/continuum/`
       : null
   );
+  const firebaseDoContinuumData = useFirebaseListener(
+    user
+      ? `/${
+          process.env.VERCEL_ENV === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/doContinuum/`
+      : null
+  );
   // const firebaseContinuumStatus = useFirebaseListener(
   //   user ? `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
   // );
@@ -300,7 +319,7 @@ const ViewReports = ({
       .select(
         `
               folders (folderName, folderDescription, folderPicUrl),
-              reports (reportTitle, reportPicUrl, reportId, reportContent, availability)
+              reports (reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, availability)
           `
       )
       .eq("folderId", folderId);
@@ -343,6 +362,40 @@ const ViewReports = ({
       query: { ...Router.query, agentId: agentId },
     });
   }
+  const [currentGeneration, setCurrentGeneration] = useState(0);
+  useEffect(() => {
+    if (firebaseDoContinuumData) {
+      console.log("firebaseDoContinuumData");
+      console.log(firebaseDoContinuumData);
+
+      if (firebaseDoContinuumData.status == "complete" || "in-progress") {
+        // if (hasStartedContinuum) {
+        if (firebaseDoContinuumData.context) {
+          if (
+            firebaseDoContinuumData.context.currentGeneration !=
+            currentGeneration
+          ) {
+            setCurrentGeneration(
+              firebaseDoContinuumData.context.currentGeneration
+            );
+            setDraft(
+              firebaseDoContinuumData.context[
+                `draft${currentGeneration == 1 ? "" : currentGeneration - 1}`
+              ]
+            );
+          }
+          fetchUpdatedReports();
+          if (firebaseDoContinuumData.status == "complete") {
+            // setHasStartedContinuum(false);
+            setIsStreaming(false);
+            setContinuumCompleted(true);
+          }
+          // }
+        }
+      }
+    }
+  }, [firebaseDoContinuumData]);
+
   useEffect(() => {
     if (firebaseDraftData) {
       // console.log("firebaseDraftData");
@@ -377,10 +430,10 @@ const ViewReports = ({
         setFolderName(firebaseFolderData.folderName);
         setFolderDescription(firebaseFolderData.folderDescription);
         setFolderPicUrl(firebaseFolderData.folderPicUrl);
-        if (firebaseFolderData.folderPicUrls) {
-          setFolderPicUrls(firebaseFolderData.folderPicUrls);
-          setCurrentfolderPicUrlIndex(folderPicUrls.length - 1);
-        }
+        // if (firebaseFolderData.folderPicUrls) {
+        //   setFolderPicUrls(firebaseFolderData.folderPicUrls);
+        //   setCurrentfolderPicUrlIndex(folderPicUrls.length - 1);
+        // }
       }
     }
   }, [firebaseFolderData, folderId]); // Added folderId as a dependency
@@ -1043,7 +1096,7 @@ const ViewReports = ({
   }
   return (
     <div style={{ maxWidth: "90%" }}>
-      <Breadcrumb style={{ marginTop: "65px" }}>
+      <Breadcrumb>
         <BreadcrumbItem
           className="text-white reportFont"
           style={{ fontWeight: "800", fontSize: "2em" }}
@@ -1056,134 +1109,91 @@ const ViewReports = ({
         {/* {folderPicUrl} */}
         {/* ["http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png"] */}
         {/* {folderPicUrls} */}
-        {folderPicUrls && (
-          <div>
-            <div
-              style={{
-                // backgroundImage: `url(${folderPicUrls[currentfolderPicUrlIndex]})`,
-                height: "700px",
-              }}
-              className="image-container"
-            >
-              <a
-                href={folderPicUrls[currentfolderPicUrlIndex]}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img src={`${folderPicUrls[currentfolderPicUrlIndex]}`} />
-              </a>
-              <div className="overlay" />
-
-              {!folderPicUrl && (
-                <LoadingDots style={{ position: "absolute", top: "125px" }} />
-              )}
-            </div>
-          </div>
-        )}
-        {/* {JSON.stringify(folderPicUrls)} */}
-        {!folderPicUrls && (
+        {folderPicUrl && (
           <div
             style={{
-              height: "500px",
-            }}
-          >
-            {!folderPicUrl && (
-              <LoadingDots style={{ position: "absolute", top: "125px" }} />
-            )}
-            {folderPicUrl && (
-              <div className="content-container">
-                <a
-                  href={folderPicUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="image-container">
-                    <img
-                      src={folderPicUrl}
-                      className="middle-image "
-                      alt="Folder"
-                    />
-                  </div>
-                </a>
+              maxHeight: "700px",
 
-                {/* <div
-                  className="report text-white reportFont folder-description"
-                  dangerouslySetInnerHTML={{ __html: folderDescription }}
-                /> */}
-              </div>
-            )}
+              position: "relative",
+            }}
+            className="image-container"
+          >
+            <a
+              href={folderPicUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              alt={folderPicDescription}
+              title={folderPicDescription}
+            >
+              <img
+                // className="report-image"
+                src={`${folderPicUrl}`}
+                style={{
+                  // objectFit: "contain",
+                  width: "auto",
+                  objectPosition: "top",
+                }}
+              />
+            </a>
+            <div className="overlay"></div>
           </div>
+          // <div>
+          //   <div
+          //     style={{
+          //       height: "500px",
+          //     }}
+          //   >
+          //     <img src={`${folderPicUrl}`} />
+          //     {!folderPicUrl && (
+          //       <LoadingDots style={{ position: "absolute", top: "125px" }} />
+          //     )}
+          //   </div>
+          // </div>
         )}
+        {/* {JSON.stringify(folderPicUrls)} */}
       </div>
       <div style={{ marginTop: "-33px", marginBottom: "20px" }}>
         <Row>
           <Col>
-            <span style={{ marginRight: "20px", color: "#1C69E7" }}>
+            <span style={{ marginRight: "20px", color: "gold" }}>
               <i
                 style={{
-                  color: `${likes > 0 ? "#1C69E7" : "white"}`,
+                  color: `${likes > 0 ? "gold" : "white"}`,
                 }}
                 onClick={handleLike}
                 className={`bi bi-star${
                   likes === 0 ? "bi bi-star" : "bi bi-star-fill"
                 }`}
-              />{" "}
+              />
               {likes < 2 ? "" : likes}
             </span>
-            <span>
+            <span style={{ marginRight: "20px" }}>
               <i
                 onClick={handleGlobeClick}
                 className="bi bi-globe"
                 style={{
-                  color: `${availability === "GLOBAL" ? "#1C69E7" : "white"}`,
+                  color: `${availability === "GLOBAL" ? "gold" : "white"}`,
                 }}
               />
               {/* {availability} */}
             </span>
+            <span>
+              <IntelliPrint loadedReports={loadedReports} />
+            </span>
           </Col>
 
-          <Col>
-            <div style={{ marginLeft: "auto", textAlign: "right" }}>
-              <i
-                style={{
-                  color: `${showFolderDeleteQuestion ? "white" : "grey"}`,
-                  cursor: "pointer",
-                }}
-                className="bi bi-trash"
-                onClick={handleFolderDeleteClick}
-              />
-              &nbsp;
-              {showFolderDeleteQuestion && (
-                <>
-                  Delete Folder?{" "}
-                  <span
-                    style={{ color: "white", cursor: "pointer" }}
-                    onClick={handleFolderDeleteYes}
-                  >
-                    Yes
-                  </span>{" "}
-                  /{" "}
-                  <span
-                    style={{ color: "white", cursor: "pointer" }}
-                    onClick={handleFolderDeleteNo}
-                  >
-                    No
-                  </span>
-                </>
-              )}
-            </div>
-          </Col>
+          <Col></Col>
         </Row>
       </div>
-
       <div> {folderDescription}</div>
       <div
-        className="reportTitle reportFont section-title table-of-contents"
+        className="reportTitle reportFont section-title "
         style={{ marginTop: "30px" }}
       >
         Table of Contents [{loadedReports.length}{" "}
         <i className="bi bi-body-text"></i>]
       </div>
+
       {/* {JSON.stringify(parentChildIdMap)} */}
       {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
       {parentChildIdMap.id && (
@@ -1212,6 +1222,35 @@ const ViewReports = ({
           </li>
         </ul>
       )}
+      <div style={{ marginLeft: "auto", textAlign: "right" }}>
+        <i
+          style={{
+            color: `${showFolderDeleteQuestion ? "white" : "grey"}`,
+            cursor: "pointer",
+          }}
+          className="bi bi-trash"
+          onClick={handleFolderDeleteClick}
+        />
+        &nbsp;
+        {showFolderDeleteQuestion && (
+          <>
+            Delete Folder?{" "}
+            <span
+              style={{ color: "white", cursor: "pointer" }}
+              onClick={handleFolderDeleteYes}
+            >
+              Yes
+            </span>{" "}
+            /{" "}
+            <span
+              style={{ color: "white", cursor: "pointer" }}
+              onClick={handleFolderDeleteNo}
+            >
+              No
+            </span>
+          </>
+        )}
+      </div>
       {/* <ul>
         <li key={parentChildIdMap.id}>
           {parentChildIdMap.id}
@@ -1219,7 +1258,6 @@ const ViewReports = ({
         </li>
       </ul> */}
       {/* {Object.keys(parentChildIdMap)} */}
-
       {loadedReports &&
         loadedReports.map((cols, index) => {
           const report = loadedReports[index];
@@ -1264,6 +1302,8 @@ const ViewReports = ({
                     href={report.reportPicUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    alt={report.reportPicDescription}
+                    title={report.reportPicDescription}
                   >
                     <img
                       src={report.reportPicUrl}
@@ -1283,25 +1323,29 @@ const ViewReports = ({
                 dangerouslySetInnerHTML={{ __html }}
               />
               <div style={{ display: "flex" }}>
-                <div
+                <Button
                   className="btn btn-primary"
                   style={{ marginRight: "auto", textAlign: "left" }}
                   onClick={() => {
                     handleContinuumClick(report);
                   }}
+                  disabled={isStreaming}
                 >
                   <i className="bi bi-link"></i> Continuum
-                </div>
+                </Button>
                 {/* Report Delete Button */}
                 <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                  <i
-                    style={{
-                      color: `${showReportDeleteQuestion ? "white" : "grey"}`,
-                      cursor: "pointer",
-                    }}
-                    className="bi bi-trash"
-                    onClick={handleReportDeleteClick}
-                  />
+                  <Button disabled={isStreaming}>
+                    <i
+                      style={{
+                        color: `${showReportDeleteQuestion ? "white" : "grey"}`,
+                        cursor: "pointer",
+                      }}
+                      className="bi bi-trash"
+                      disabled={isStreaming}
+                      onClick={handleReportDeleteClick}
+                    />
+                  </Button>
                   &nbsp;
                   {showReportDeleteQuestion}
                   {showReportDeleteQuestion && (
@@ -1344,10 +1388,15 @@ const ViewReports = ({
             className="report text-primary reportFont"
             dangerouslySetInnerHTML={{ __html: draft }}
           ></div>
+          <div class="scroll-downs">
+            <div class="mousey">
+              <div class="scroller"></div>
+            </div>
+          </div>
         </div>
       )}
       {/* {JSON.stringify(agent)} */}
-      {agent && !isStreaming && (
+      {agent.profilePicUrl && !isStreaming && (
         <div
           style={{ textAlign: "center" }}
           onClick={() => goToAgentProfile({ agentId: agent.agentId })}
