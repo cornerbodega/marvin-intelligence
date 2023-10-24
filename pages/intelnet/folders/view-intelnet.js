@@ -207,7 +207,7 @@ const ViewReports = ({ folders, userId, folderLikesByFolderId }) => {
     };
 
     // const newTaskRef = await saveToFirebase(
-    //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+    //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
     //   newTask
     // );
     try {

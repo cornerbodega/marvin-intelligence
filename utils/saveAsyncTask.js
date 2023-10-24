@@ -5,7 +5,7 @@
 // import { getSupabase } from "./supabase";
 
 // async function saveAsyncTask({ userId, taskType, payload }) {
-//   return await saveToFirebase(`/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/${taskType}`, {
+//   return await saveToFirebase(`/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/${taskType}`, {
 //     payload,
 //   });
 // }

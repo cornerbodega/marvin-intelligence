@@ -259,7 +259,7 @@ const ViewReports = ({
   const firebaseSaveData = useFirebaseListener(
     user
       ? `/${
-          process.env.VERCEL_ENV === "production"
+          process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${
@@ -281,7 +281,7 @@ const ViewReports = ({
   const firebaseFolderData = useFirebaseListener(
     user
       ? `/${
-          process.env.VERCEL_ENV === "production"
+          process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${
@@ -292,7 +292,7 @@ const ViewReports = ({
   const firebaseDraftData = useFirebaseListener(
     user
       ? `/${
-          process.env.VERCEL_ENV === "production"
+          process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/continuum/`
@@ -301,14 +301,14 @@ const ViewReports = ({
   const firebaseDoContinuumData = useFirebaseListener(
     user
       ? `/${
-          process.env.VERCEL_ENV === "production"
+          process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/doContinuum/`
       : null
   );
   // const firebaseContinuumStatus = useFirebaseListener(
-  //   user ? `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
+  //   user ? `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
   // );
 
   async function fetchUpdatedReports() {

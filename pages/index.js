@@ -102,7 +102,7 @@ export default function Home({ title, content }) {
                       >
                         Start your Free Trial
                       </Button>
-                      <span className="text-white" style={{ margin: "10px" }}>
+                      {/* <span className="text-white" style={{ margin: "10px" }}>
                         or
                       </span>
                       <Button
@@ -110,7 +110,7 @@ export default function Home({ title, content }) {
                         href="/agents/view-agents"
                       >
                         Meet your AI Team
-                      </Button>
+                      </Button> */}
                     </div>
                   </div>
                   <div className="hero-figure anime-element">

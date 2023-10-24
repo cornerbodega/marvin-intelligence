@@ -57,7 +57,7 @@ const CreateMission = ({}) => {
   const firebaseDraftData = useFirebaseListener(
     user
       ? `/${
-          process.env.VERCEL_ENV === "production"
+          process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/quickDraft/context/`
@@ -66,7 +66,7 @@ const CreateMission = ({}) => {
   const firebaseSaveData = useFirebaseListener(
     user
       ? `/${
-          process.env.VERCEL_ENV === "production"
+          process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${

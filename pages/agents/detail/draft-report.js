@@ -45,6 +45,7 @@ import saveTask from "../../../utils/saveTask";
 // bring in content of link from original report
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
 import LoadingDots from "../../../components/LoadingDots";
+// import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     // const agentId = context.params.agentId;
@@ -102,7 +103,7 @@ const CreateMission = ({ agent }) => {
   const firebaseDraftData = useFirebaseListener(
     user
       ? `/${
-          process.env.VERCEL_ENV === "production"
+          process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${process.env.NEXT_PUBLIC_serverUid}/${
@@ -113,7 +114,7 @@ const CreateMission = ({ agent }) => {
   const firebaseFolderIdData = useFirebaseListener(
     user
       ? `/${
-          process.env.VERCEL_ENV === "production"
+          process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${process.env.NEXT_PUBLIC_serverUid}/${
@@ -123,7 +124,7 @@ const CreateMission = ({ agent }) => {
   );
   const [hasSubmitted, setHasSubmitted] = useState(false);
   // const firebaseDraftCompletedAt = useFirebaseListener(
-  //   user ? `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport/context/draft` : null
+  //   user ? `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport/context/draft` : null
   // );
   // // const [draftResponseContent, setDraftResponseContent] = useState(null);
 
@@ -258,16 +259,16 @@ const CreateMission = ({ agent }) => {
       };
       await saveTask(clearSaveReportTask);
       // const clearOldDraftRef = await saveToFirebase(
-      //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+      //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
       //   {}
       // );
       // const clearOldSaveRef = await saveToFirebase(
-      //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
+      //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
       //   {}
       // );
       const newTaskRef = await saveTask(newTask);
       // const newTaskRef = await saveToFirebase(
-      //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+      //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
       //   newTask
       // );
 
@@ -425,7 +426,7 @@ const CreateMission = ({ agent }) => {
       console.log(newTaskRef);
 
       // const saveReportTaskRef = await saveToFirebase(
-      //   `/${process.env.VERCEL_ENV === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
+      //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
       //   saveReportTask
       // );
 
@@ -913,7 +914,16 @@ const CreateMission = ({ agent }) => {
                   </div>
                 </FormGroup>
               </Form>
-              <h3>
+              <Button
+                color="primary"
+                style={{ border: "3px solid green" }}
+                disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
+                onClick={(e) => handleAcceptReport(e)}
+              >
+                <i className="bi bi-folder"></i> Save Report
+              </Button>
+              {isSaving && isSubmitting && "Savinng Report..."}
+              {/* <h3>
                 <i className="bi bi-link"></i> Continuum
               </h3>
 
@@ -926,10 +936,9 @@ const CreateMission = ({ agent }) => {
                   />
                   Enable Continuum
                 </Label>
-              </FormGroup>
-              <div
+              </FormGroup> */}
+              {/* <div
                 style={{
-                  // fontFamily: "Arial, sans-serif",
                   fontSize: "1em",
                   color: "#333",
                   cursor: "pointer",
@@ -948,8 +957,8 @@ const CreateMission = ({ agent }) => {
               </div>
               <div>
                 <div></div>
-              </div>
-              <Form>
+              </div> */}
+              {/* <Form>
                 <div style={{ textAlign: "left" }}>
                   {!continuumEnabled && (
                     <Button
@@ -972,7 +981,7 @@ const CreateMission = ({ agent }) => {
                     </Button>
                   )}
                 </div>
-              </Form>
+              </Form> */}
             </>
           )}
         </Col>
