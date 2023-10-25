@@ -22,6 +22,7 @@ import IntelliFab from "../../../components/IntelliFab";
 // rest of component
 import { slugify } from "../../../utils/slugify";
 import IntelliCardGroup from "../../../components/IntelliCardGroup";
+import Link from "next/link";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
@@ -429,9 +430,9 @@ const ViewReports = ({
     <>
       <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white">
-          <a style={{ color: "white" }} href="/account/tokens/get-tokens">
+          <Link style={{ color: "white" }} href="/account/tokens/get-tokens">
             {agencyName}
-          </a>
+          </Link>
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
           <i className={`bi bi-folder`}></i>
