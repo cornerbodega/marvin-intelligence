@@ -11,7 +11,12 @@ const FullLayout = ({ children }) => {
 
   return (
     <main>
-      <div className="pageWrapper d-md-block d-lg-flex text-white">
+      <div
+        style={{
+          backgroundColor: "black",
+        }}
+        className="pageWrapper d-md-block d-lg-flex text-white"
+      >
         {/******** Sidebar **********/}
         <aside
           style={{ zIndex: "100" }}
@@ -24,8 +29,12 @@ const FullLayout = ({ children }) => {
         {/********Content Area**********/}
 
         <div
-          className="contentArea gradient-background"
-          style={{ maxWidth: "100%", overflowX: "hidden" }}
+          // className="contentArea gradient-background"
+          className=""
+          style={{
+            maxWidth: "100%",
+            overflowX: "hidden",
+          }}
         >
           {/********header**********/}
           <Header showMobmenu={() => showMobilemenu()} />

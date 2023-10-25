@@ -272,16 +272,13 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
         {/* <BreadcrumbItem className="text-white">
           <i className={`bi-folder`}></i>+ Create Report
         </BreadcrumbItem> */}
-        <BreadcrumbItem className="text-white" active>
+        {/* <BreadcrumbItem className="text-white" active>
           <i className={`bi bi-person-badge`}></i>
           &nbsp;
-          {/* <Link */}
-          {/* href="/missions/create-mission/agents/view-agents" */}
-          {/* style={{ textDecoration: "none", color: "white" }} */}
-          {/* > */}
+          
           Select Agent
-          {/* </Link> */}
-        </BreadcrumbItem>
+          
+        </BreadcrumbItem> */}
       </Breadcrumb>
       <div style={{ marginBottom: "32px", textAlign: "right" }}>
         <Button style={{ border: "1px solid white" }} onClick={handleFabClick}>

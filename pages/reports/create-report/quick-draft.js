@@ -94,7 +94,7 @@ const CreateMission = ({}) => {
       // console.log("isStreaming");
       // console.log(isStreaming);
 
-      setBriefingInput(firebaseDraftData.briefingInput);
+      // setBriefingInput(firebaseDraftData.briefingInput);
       setDraft(firebaseDraftData.draft);
       setExpertiseOutput(firebaseDraftData.expertiseOutput);
       // setSpecializedTraining(firebaseDraftData.);
@@ -156,9 +156,13 @@ const CreateMission = ({}) => {
     if (feedbackInput) {
       draftData.feedback = feedbackInput;
       draftData.draft = draft;
-      setBriefingInput(`${briefingInput} ${feedbackInput}`);
-      console.log("briefingInput");
-      console.log(briefingInput);
+      // const newBriefingInput = `${briefingInput} ${draftData.feedback}`;
+      const newBriefingInput = briefingInput + "\n" + draftData.feedback;
+      setBriefingInput(newBriefingInput);
+      console.log("draftData.feedback");
+      console.log(draftData.feedback);
+      console.log("newBriefingInput");
+      console.log(newBriefingInput);
       setFeedbackInput("");
     }
 
@@ -184,6 +188,7 @@ const CreateMission = ({}) => {
         <BreadcrumbItem>Reports</BreadcrumbItem>
         <BreadcrumbItem>Quick Draft</BreadcrumbItem>
       </Breadcrumb>
+
       <div id="quickDraftBriefingInput">
         <div>
           <textarea

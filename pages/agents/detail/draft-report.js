@@ -194,6 +194,7 @@ const CreateMission = ({ agent }) => {
       e.preventDefault();
     }
     setIsSubmitting(true);
+    // setBriefing(`${briefing} ${feedbackInput}`);
     setFeedbackInput("");
     setHasSubmitted(true);
 
