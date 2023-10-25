@@ -1,4 +1,14 @@
-import { Button, Row, Breadcrumb, BreadcrumbItem } from "reactstrap";
+import {
+  Button,
+  Row,
+  Breadcrumb,
+  BreadcrumbItem,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  Col,
+} from "reactstrap";
 import useRouter from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
@@ -127,6 +137,7 @@ const ViewReports = ({
   const [searchInput, setSearchInput] = useState("");
   console.log("loadedReports");
   console.log(loadedReports);
+
   async function loadPagedResults() {
     console.log("Loading paged results");
 
@@ -371,7 +382,9 @@ const ViewReports = ({
 
       if (isInView && !isLast && !searchInput) {
         loadMoreReports().then((moreReports) => {
-          setLoadedReports((prev) => [...prev, ...moreReports]);
+          setLoadedReports((prev) =>
+            getUniqueFolders([...prev, ...moreReports])
+          );
           if (moreReports.length < PAGE_COUNT) {
             setIsLast(true);
           }
@@ -379,12 +392,47 @@ const ViewReports = ({
       }
     }
   }, [isInView, isLast]);
+  function getUniqueFolders(folders) {
+    const seenIds = new Set();
+    const uniqueFolders = [];
 
+    for (const folder of folders) {
+      if (!seenIds.has(folder.folderId)) {
+        seenIds.add(folder.folderId);
+        uniqueFolders.push(folder);
+      }
+    }
+
+    return uniqueFolders;
+  }
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(1); // Default to 1 for "Short"
+
+  const toggle = () => setDropdownOpen((prevState) => !prevState);
+
+  const tokenToWords = 200;
+  const tokenToCost = 0.38;
+  const getOptionName = (tokenValue) => {
+    switch (tokenValue) {
+      case 1:
+        return "Short (1 token)";
+      case 2:
+        return "Standard (2 tokens)";
+      case 4:
+        return "Super (4 tokens)";
+      default:
+        return "";
+    }
+  };
   // }
   return (
     <>
       <Breadcrumb style={{ fontFamily: "monospace" }}>
-        <BreadcrumbItem className="text-white">{agencyName}</BreadcrumbItem>
+        <BreadcrumbItem className="text-white">
+          <a style={{ color: "white" }} href="#">
+            {agencyName}
+          </a>
+        </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
           <i className={`bi bi-folder`}></i>
           &nbsp;Reports
@@ -410,25 +458,55 @@ const ViewReports = ({
             }}
           />
         </div>
-        <div style={{ display: "flex", justifyContent: "flex-start" }}>
-          <Button
-            onClick={handleQuickDraftClick}
-            style={{
-              textAlign: "left",
-              borderColor: "green",
-              borderWidth: "2px",
-              alignContent: "right",
-              marginBottom: "40px",
-              marginRight: "10px",
-              cursor: "pointer",
-            }}
-            disabled={briefingInput.length === 0}
-            className="btn btn-primary section-title"
-          >
-            {/* ↳ */}
-            <i className="bi bi-folder"></i>+ Quick Draft
-          </Button>
-        </div>
+        <Row>
+          <Col>
+            <div style={{ display: "flex", justifyContent: "flex-start" }}>
+              <Button
+                onClick={handleQuickDraftClick}
+                style={{
+                  textAlign: "left",
+                  borderColor: "green",
+                  borderWidth: "2px",
+                  alignContent: "right",
+                  marginBottom: "40px",
+                  marginRight: "10px",
+                  cursor: "pointer",
+                }}
+                disabled={briefingInput.length === 0}
+                className="btn btn-primary section-title"
+              >
+                {/* ↳ */}
+                <i className="bi bi-folder"></i>+ Quick Draft
+              </Button>
+            </div>
+          </Col>
+          <Col>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Dropdown isOpen={dropdownOpen} toggle={toggle}>
+                {/* Displaying the currently selected option in the DropdownToggle */}
+                <DropdownToggle caret>
+                  <i className="bi bi-coin"></i> {getOptionName(selectedOption)}
+                </DropdownToggle>
+                <DropdownMenu>
+                  <DropdownItem onClick={() => setSelectedOption(1)}>
+                    <i className="bi bi-coin"></i> Short (1 token)
+                  </DropdownItem>
+                  <DropdownItem onClick={() => setSelectedOption(2)}>
+                    <i className="bi bi-coin"></i> Standard (2 tokens)
+                  </DropdownItem>
+                  <DropdownItem onClick={() => setSelectedOption(4)}>
+                    <i className="bi bi-coin"></i> Super (4 tokens)
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+
+              {/* <p>{selectedOption * tokenToWords} words</p>
+            <p>${(selectedOption * tokenToCost).toFixed(2)}</p> */}
+            </div>
+          </Col>
+        </Row>
+
+        {/* <div>Super</div> */}
       </div>
       <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
         <input

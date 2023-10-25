@@ -924,11 +924,13 @@ const ViewReports = ({
                 <img
                   // className="report-image"
                   src={`${folderPicUrl}`}
-                  style={{
-                    // objectFit: "contain",
-                    width: "auto",
-                    // objectPosition: "top",
-                  }}
+                  style={
+                    {
+                      // objectFit: "contain",
+                      // width: "auto",
+                      // objectPosition: "top",
+                    }
+                  }
                 />
               </a>
               <div className="overlay"></div>
@@ -1004,7 +1006,7 @@ const ViewReports = ({
                     likes === 0 ? "bi bi-star" : "bi bi-star-fill"
                   }`}
                 />
-                {likes == 0 ? "" : likes}
+                {likes == 0 ? "" : ` ${likes}`}
               </span>
               <span style={{ marginRight: "20px" }}>
                 <IntelliPrint loadedReports={loadedReports} />

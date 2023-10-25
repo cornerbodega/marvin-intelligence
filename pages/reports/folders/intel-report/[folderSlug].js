@@ -1130,7 +1130,7 @@ const ViewReports = ({
                 src={`${folderPicUrl}`}
                 style={{
                   // objectFit: "contain",
-                  width: "auto",
+                  // width: "auto",
                   objectPosition: "top",
                 }}
               />
