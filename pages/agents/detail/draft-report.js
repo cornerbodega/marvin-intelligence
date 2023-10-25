@@ -834,7 +834,7 @@ const CreateMission = ({ agent }) => {
                                     // fontStyle: "italic",
                                     fontWeight: 300,
                                     color: "#0645ad",
-                                    // color: "#B52572",
+                                    // color: "#E7007C",
 
                                     cursor: "pointer",
                                   }}

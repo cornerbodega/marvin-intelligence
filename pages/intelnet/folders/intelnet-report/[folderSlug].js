@@ -721,7 +721,7 @@ const ViewReports = ({
                 <a
                   style={{
                     fontWeight: 800,
-                    color: "#B52572",
+                    color: "#E7007C",
                     fontWeight: "200",
                     textDecoration: "none",
                     cursor: "pointer",
@@ -1042,7 +1042,7 @@ const ViewReports = ({
             <li key={parentChildIdMap.id}>
               <a
                 style={{
-                  color: "#B52572",
+                  color: "#E7007C",
                   textDecoration: "none",
                   cursor: "pointer",
                   fontWeight: 400,
@@ -1185,7 +1185,7 @@ const ViewReports = ({
                 {
                   // marginTop: "8px",
                   // fontWeight: 800,
-                  // color: "#B52572",
+                  // color: "#E7007C",
                   // fontWeight: "200",
                   // textDecoration: "none",
                   // cursor: "pointer",

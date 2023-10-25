@@ -160,7 +160,7 @@ const IntelliCard = ({
 
           <CardSubtitle className="mb-2 text-muted" tag="h6">
             {["expertise1", "expertise2", "expertise3"].map((expertise, i) => (
-              <Badge key={i} color="info" className="ms-3 expertiseBadge">
+              <Badge key={i} className="ms-3 expertiseBadge">
                 {datums[expertise]}
               </Badge>
             ))}

@@ -101,9 +101,9 @@ export default function Home({ title, content }) {
                       <Button
                         // className="button btn-primary text-white"
                         href="/account/log-in"
-                        style={{ color: "white" }}
+                        style={{ color: "white", border: "3px solid green" }}
                       >
-                        Start your Free Trial
+                        25 Free Tokens
                       </Button>
                       {/* <span className="text-white" style={{ margin: "10px" }}>
                         or
@@ -333,12 +333,13 @@ export default function Home({ title, content }) {
                           <Button
                             style={{
                               color: "white",
+                              border: "3px solid green",
                               // textDecoration: "none",
                               // fontSize: "1.5em",
                             }}
                             href="/account/log-in"
                           >
-                            Start your Free Trial Now
+                            25 Free Tokens
                           </Button>
                         </p>
                       </div>
