@@ -32,7 +32,7 @@ const FullLayout = ({ children }) => {
           // className="contentArea gradient-background"
           className=""
           style={{
-            maxWidth: "100%",
+            width: "100%",
             overflowX: "hidden",
           }}
         >
