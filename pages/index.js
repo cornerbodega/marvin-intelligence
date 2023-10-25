@@ -541,7 +541,7 @@ export default function Home({ title, content }) {
                 </div>
               </div>
             </section> */}
-            <section className="cta section">
+            {/* <section className="cta section">
               <div className="container">
                 <div
                   className="cta-inner section-inner text-white"
@@ -561,7 +561,7 @@ export default function Home({ title, content }) {
                   </div>
                 </div>
               </div>
-            </section>
+            </section> */}
           </main>
           <div style={{ height: "60px" }}></div>
           <div
@@ -613,7 +613,11 @@ export default function Home({ title, content }) {
             </div>
           </footer>
           <div
-            style={{ fontSize: "0.75em" }}
+            style={{
+              fontSize: "0.75em",
+              marginBottom: "20px",
+              padding: "10px",
+            }}
             className="footer-copyright text-white"
           >
             © 2023 Marvin.Technology
