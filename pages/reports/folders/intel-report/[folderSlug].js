@@ -1211,7 +1211,7 @@ const ViewReports = ({
             >
               {loadedReports.find(
                 (report) => report.reportId === parentChildIdMap.id
-              )?.reportTitle || `Report ID: ${parentChildIdMap.id}`}
+              )?.reportTitle || `Loading Report ID: ${parentChildIdMap.id}`}
             </a>
             <NestedList
               // children={parentChildIdMap.children}

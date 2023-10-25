@@ -93,8 +93,9 @@ const CreateMission = ({}) => {
       }
       // console.log("isStreaming");
       // console.log(isStreaming);
-
-      // setBriefingInput(firebaseDraftData.briefingInput);
+      if (briefingInput.length != 0) {
+        setBriefingInput(firebaseDraftData.briefingInput);
+      }
       setDraft(firebaseDraftData.draft);
       setExpertiseOutput(firebaseDraftData.expertiseOutput);
       // setSpecializedTraining(firebaseDraftData.);
