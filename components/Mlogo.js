@@ -33,12 +33,15 @@ const Model = () => {
 const Mlogo = ({ onClick }) => {
   return (
     <div
-      className="m-0"
+      // className="m-0"
       style={{
         // width: "80%",
+        // display: "flex",
 
-        // background: "red",
+        borderRadius: "50%",
+        // background: "black",
         height: "400px",
+        width: "400px",
       }}
     >
       <Canvas>

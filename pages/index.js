@@ -1,45 +1,11 @@
 import Head from "next/head";
-import Image from "next/image";
-import Script from "next/script";
-import HomeAnimations from "../src/js/main";
-import Link from "next/link";
+
 import Mlogo from "../components/Mlogo";
-// // export const getServerSideProps = async () => {};
-import {
-  Canvas,
-  useFrame,
-  ThreeElements,
-  useThree,
-  useLoader,
-} from "@react-three/fiber";
 import { Button } from "reactstrap";
-import { Environment, OrbitControls } from "@react-three/drei";
-// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import React, { useRef, useState, useEffect, use } from "react";
+import React from "react";
 
-const Model = () => {
-  // Load the model from glTF 2.0 (.glb or .gltf) file in /public
-  const gltf = useLoader(GLTFLoader, "/3d/m-tree-pink.gltf");
-  const ref = useRef();
-
-  // Set initial camera position
-  useThree(({ camera }) => {
-    camera.position.x = -20;
-    camera.position.y = 20;
-    camera.position.z = 30;
-    camera.lookAt(0, 0, 0);
-  });
-
-  return (
-    <>
-      <primitive scale={0.2} ref={ref} object={gltf.scene} />
-    </>
-  );
-};
-
-export default function Home({ title, content }) {
+export default function Home() {
   return (
     <div
       style={{ background: "black" }}
@@ -105,6 +71,7 @@ export default function Home({ title, content }) {
                       >
                         25 Free Tokens
                       </Button>
+
                       {/* <span className="text-white" style={{ margin: "10px" }}>
                         or
                       </span>
@@ -114,83 +81,10 @@ export default function Home({ title, content }) {
                       >
                         Meet your AI Team
                       </Button> */}
+                      <div style={{ marginTop: "20px" }}>
+                        1 Token = 200 words
+                      </div>
                     </div>
-                  </div>
-                  <div className="hero-figure anime-element">
-                    <svg
-                      className="placeholder"
-                      width={528}
-                      height={396}
-                      viewBox="0 0 528 396"
-                    >
-                      <rect
-                        width={528}
-                        height={396}
-                        style={{ fill: "transparent" }}
-                      />
-                    </svg>
-                    <div
-                      className="hero-figure-box hero-figure-box-01"
-                      data-rotation="45deg"
-                    />
-                    <div
-                      className="hero-figure-box hero-figure-box-02"
-                      data-rotation="-45deg"
-                      style={{ borderRadius: "20px" }}
-                    ></div>
-                    <div
-                      className="hero-figure-box hero-figure-box-03"
-                      data-rotation="0deg"
-                    />
-                    <div
-                      className="hero-figure-box hero-figure-box-04"
-                      data-rotation="-135deg"
-                    />
-                    <div
-                      style={{ borderRadius: "20px" }}
-                      className="hero-figure-box hero-figure-box-05"
-                    >
-                      <img
-                        style={{ borderRadius: "20px" }}
-                        src="splash-boxes/6.png"
-                      />
-                    </div>
-                    <div
-                      style={{ borderRadius: "20px" }}
-                      className="hero-figure-box hero-figure-box-06"
-                    >
-                      <img
-                        style={{ borderRadius: "20px" }}
-                        src="splash-boxes/4.png"
-                      />
-                    </div>
-                    {/* <div
-                      style={{ borderRadius: "20px" }}
-                      className="hero-figure-box hero-figure-box-07"
-                    >
-                      <img
-                        style={{ borderRadius: "20px" }}
-                        src="splash-boxes/1.png"
-                      />
-                    </div> */}
-                    <div
-                      className="hero-figure-box hero-figure-box-08"
-                      data-rotation="-22deg"
-                      style={{ borderRadius: "20px" }}
-                    >
-                      <img
-                        style={{ borderRadius: "20px" }}
-                        src="splash-boxes/2.png"
-                      />
-                    </div>
-                    <div
-                      className="hero-figure-box hero-figure-box-09"
-                      data-rotation="-52deg"
-                    />
-                    <div
-                      className="hero-figure-box hero-figure-box-10"
-                      data-rotation="-50deg"
-                    />
                   </div>
                 </div>
               </div>
@@ -334,15 +228,12 @@ export default function Home({ title, content }) {
                             style={{
                               color: "white",
                               border: "3px solid green",
-                              // textDecoration: "none",
-                              // fontSize: "1.5em",
                             }}
                             href="/account/log-in"
                           >
                             25 Free Tokens
                           </Button>
                         </p>
-                        123
                       </div>
                     </div>
                   </div>
@@ -571,11 +462,26 @@ export default function Home({ title, content }) {
               width: "80%",
               marginRight: "auto",
               marginLeft: "auto",
+              // alignContent: "center",
+              justifyContent: "center",
+              // alignItems: "center",
+              // position: "relative",
+              // background: "red",
+              display: "flex",
             }}
           >
             <Mlogo />
           </div>
+          <div
+            style={{
+              display: "flex",
 
+              justifyContent: "center",
+            }}
+          >
+            {" "}
+            <div> © 2023 Marvin.Technology</div>
+          </div>
           <footer className="site-footer">
             <div className="container">
               <div className="site-footer-inner">
@@ -589,7 +495,7 @@ export default function Home({ title, content }) {
                     /> */}
                   </a>
                 </div>
-                <ul className="footer-links list-reset">
+                {/* <ul className="footer-links list-reset">
                   <li>
                     <Link href="#" className="text-white">
                       Contact
@@ -610,11 +516,11 @@ export default function Home({ title, content }) {
                       Support
                     </Link>
                   </li>
-                </ul>
+                </ul> */}
               </div>
             </div>
           </footer>
-          <div
+          {/* <div
             style={{
               fontSize: "0.75em",
               marginBottom: "20px",
@@ -622,8 +528,9 @@ export default function Home({ title, content }) {
             }}
             className="footer-copyright text-white"
           >
+            {" "}
             © 2023 Marvin.Technology
-          </div>
+          </div> */}
         </div>
       </div>
       {/* <HomeAnimations /> */}
