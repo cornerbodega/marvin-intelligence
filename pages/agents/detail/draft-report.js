@@ -45,6 +45,7 @@ import saveTask from "../../../utils/saveTask";
 // bring in content of link from original report
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
 import LoadingDots from "../../../components/LoadingDots";
+import IntelliReportLengthDropdown from "../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
 // import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
@@ -545,7 +546,7 @@ const CreateMission = ({ agent }) => {
   //     setupFirebaseListener(user);
   //   }
   // }, [user]);
-
+  function handleSelectedLength(length) {}
   useEffect(() => {
     async function fetchBriefingSuggestion() {
       // Logic to build expertiseString from agent prop
@@ -728,14 +729,23 @@ const CreateMission = ({ agent }) => {
                     onChange={(e) => setBriefing(e.target.value)}
                   />
 
-                  <div style={{ textAlign: "left", paddingTop: "8px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "flex-start",
+                      paddingTop: "8px",
+                    }}
+                  >
                     <Button
                       color="primary"
-                      style={{ border: "1px solid green" }}
+                      style={{ border: "1px solid green", marginRight: "16px" }}
                       disabled={isSubmitting || !briefing}
                     >
                       <i className="bi bi-body-text"></i> Create Draft
                     </Button>
+                    <IntelliReportLengthDropdown
+                      handleSelectedLength={handleSelectedLength}
+                    />
                   </div>
                 </FormGroup>
               </div>
@@ -749,18 +759,24 @@ const CreateMission = ({ agent }) => {
                       justifyContent: "center",
                       height: "237px",
                       objectFit: "cover",
+                      marginBottom: "16px",
+                      marginTop: "16px",
                     }}
                   >
                     <img
                       src={`${agent.profilePicUrl}`}
-                      style={{ borderRadius: "50%" }}
+                      style={{
+                        borderRadius: "20%",
+                        // border: "12px solid green",
+                      }}
                       alt="agent"
                     />
                   </div>
                   <CardTitle
                     style={{
                       display: "flex",
-                      marginTop: "10px",
+                      marginTop: "16px",
+                      marginBottom: "16px",
                       justifyContent: "center",
                       fontWeight: 800,
                       fontSize: "1.2rem",
@@ -773,6 +789,8 @@ const CreateMission = ({ agent }) => {
                     style={{
                       display: "flex",
                       flexWrap: "wrap",
+                      marginTop: "16px",
+                      marginBottom: "16px",
                       justifyContent: "center",
                     }}
                     className="mb-2 text-muted"
@@ -903,25 +921,37 @@ const CreateMission = ({ agent }) => {
                     value={feedbackInput}
                     onChange={(e) => setFeedbackInput(e.target.value)}
                   />
-                  <div style={{ textAlign: "right", paddingTop: "8px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "flex-end",
+                      paddingTop: "8px",
+                    }}
+                  >
                     <Button
                       color="primary"
-                      style={{ border: "1px solid yellow" }}
+                      style={{
+                        border: "1px solid yellow",
+                        marginRight: "16px",
+                      }}
                       disabled={isSubmitting}
                     >
                       <i className="bi bi-arrow-clockwise"></i>
                       &nbsp;Retry
                     </Button>
+                    <IntelliReportLengthDropdown
+                      handleSelectedLength={handleSelectedLength}
+                    />
                   </div>
                 </FormGroup>
               </Form>
               <Button
                 color="primary"
-                style={{ border: "3px solid green" }}
+                style={{ border: "3px solid green", marginTop: "40px" }}
                 disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
                 onClick={(e) => handleAcceptReport(e)}
               >
-                <i className="bi bi-folder"></i> Save Report
+                <i className="bi bi-floppy"></i> Save Report
               </Button>
               {isSaving && isSubmitting && "Savinng Report..."}
               {/* <h3>

@@ -933,7 +933,7 @@ const ViewReports = ({
                   }
                 />
               </a>
-              <div className="overlay"></div>
+              {/* <div className="overlay"></div> */}
             </div>
             // <div>
             //   <div
@@ -993,6 +993,7 @@ const ViewReports = ({
             </div>
           )} */}
         </div>
+        {/* <div style={{ fontSize: "0.5em" }}>{folderPicDescription}</div> */}
         <div style={{ marginTop: "-36px", marginBottom: "20px" }}>
           <Row>
             <Col>
@@ -1070,7 +1071,6 @@ const ViewReports = ({
         </li>
       </ul> */}
         {/* {Object.keys(parentChildIdMap)} */}
-
         {loadedReports &&
           loadedReports.map((cols, index) => {
             const report = loadedReports[index];
@@ -1123,7 +1123,7 @@ const ViewReports = ({
                         className="report-image"
                         style={{ borderRadius: "10px" }}
                       />
-                      <div className="overlay" />
+                      {/* <div className="overlay" /> */}
                     </a>
                   )}
                 </div>
@@ -1181,16 +1181,14 @@ const ViewReports = ({
               />
             </div>
             <div
-              style={
-                {
-                  // marginTop: "8px",
-                  // fontWeight: 800,
-                  // color: "#E7007C",
-                  // fontWeight: "200",
-                  // textDecoration: "none",
-                  // cursor: "pointer",
-                }
-              }
+              style={{
+                marginTop: "16px",
+                // fontWeight: 800,
+                // color: "#E7007C",
+                // fontWeight: "200",
+                // textDecoration: "none",
+                // cursor: "pointer",
+              }}
             >
               Agent {agent.agentName}
             </div>

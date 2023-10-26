@@ -280,11 +280,11 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
           
         </BreadcrumbItem> */}
       </Breadcrumb>
-      <div style={{ marginBottom: "32px", textAlign: "right" }}>
+      {/* <div style={{ marginBottom: "32px", textAlign: "right" }}>
         <Button style={{ border: "1px solid white" }} onClick={handleFabClick}>
           <i className="bi bi-person-badge"></i>+ Add Agent
         </Button>
-      </div>
+      </div> */}
       <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
         <input
           type="text"
@@ -314,7 +314,7 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
             datums={loadedAgents}
             datumsType={"agents"}
           ></IntelliCardGroup>
-          <IntelliFab onClick={handleFabClick} icon="+" fabType="agent" />
+          {/* <IntelliFab onClick={handleFabClick} icon="+" fabType="agent" /> */}
 
           {/* </Col> */}
         </Row>

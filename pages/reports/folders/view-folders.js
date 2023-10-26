@@ -23,6 +23,7 @@ import IntelliFab from "../../../components/IntelliFab";
 import { slugify } from "../../../utils/slugify";
 import IntelliCardGroup from "../../../components/IntelliCardGroup";
 import Link from "next/link";
+import IntelliReportLengthDropdown from "../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
@@ -138,7 +139,7 @@ const ViewReports = ({
   const [searchInput, setSearchInput] = useState("");
   console.log("loadedReports");
   console.log(loadedReports);
-
+  function handleSelectedLength() {}
   async function loadPagedResults() {
     console.log("Loading paged results");
 
@@ -263,7 +264,11 @@ const ViewReports = ({
         // Process the response if needed
         const data = await response.json();
         console.log(data);
-        goToPage("/reports/create-report/quick-draft");
+        // goToPage("/reports/create-report/quick-draft");
+        router.push({
+          pathname: "/reports/create-report/quick-draft",
+          query: { ...router.query, briefingInput },
+        });
       } else {
         console.error("Failed to save the task");
       }
@@ -406,26 +411,7 @@ const ViewReports = ({
 
     return uniqueFolders;
   }
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(1); // Default to 1 for "Short"
 
-  const toggle = () => setDropdownOpen((prevState) => !prevState);
-
-  const tokenToWords = 200;
-  const tokenToCost = 0.38;
-  const getOptionName = (tokenValue) => {
-    switch (tokenValue) {
-      case 1:
-        return "Short (1 token)";
-      case 2:
-        return "Standard (2 tokens)";
-      case 4:
-        return "Super (4 tokens)";
-      default:
-        return "";
-    }
-  };
-  // }
   return (
     <>
       <Breadcrumb style={{ fontFamily: "monospace" }}>
@@ -476,34 +462,15 @@ const ViewReports = ({
                 disabled={briefingInput.length === 0}
                 className="btn btn-primary section-title"
               >
-                {/* ↳ */}
                 <i className="bi bi-folder"></i>+ Quick Draft
               </Button>
+              <IntelliReportLengthDropdown
+                handleSelectedLength={handleSelectedLength}
+              />
             </div>
-          </Col>
-          <Col>
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <Dropdown isOpen={dropdownOpen} toggle={toggle}>
-                {/* Displaying the currently selected option in the DropdownToggle */}
-                <DropdownToggle caret>
-                  <i className="bi bi-coin"></i> {getOptionName(selectedOption)}
-                </DropdownToggle>
-                <DropdownMenu>
-                  <DropdownItem onClick={() => setSelectedOption(1)}>
-                    <i className="bi bi-coin"></i> Short (1 token)
-                  </DropdownItem>
-                  <DropdownItem onClick={() => setSelectedOption(2)}>
-                    <i className="bi bi-coin"></i> Standard (2 tokens)
-                  </DropdownItem>
-                  <DropdownItem onClick={() => setSelectedOption(4)}>
-                    <i className="bi bi-coin"></i> Super (4 tokens)
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-
-              {/* <p>{selectedOption * tokenToWords} words</p>
-            <p>${(selectedOption * tokenToCost).toFixed(2)}</p> */}
-            </div>
+            {/* <div style={{}}>
+            
+            </div> */}
           </Col>
         </Row>
 

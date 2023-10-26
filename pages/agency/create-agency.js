@@ -81,8 +81,8 @@ function CreateAgency() {
 
     if (res.status === 200) {
       // alert("Agent created successfully!");
-      router.push("/missions/create-mission/briefing");
-      console.log("Agent created successfully!");
+      console.log("Agency created successfully!");
+      router.push("/reports/folders/view-folders");
     } else {
       console.log(JSON.stringify(res));
       alert("An error occurred while creating the agency. Please try again.");
@@ -122,7 +122,7 @@ function CreateAgency() {
               </FormGroup>
 
               <div style={{ marginBottom: "40px" }}></div>
-              <div style={{ textAlign: "right" }}>
+              <div style={{ textAlign: "left" }}>
                 <Button color="primary" disabled={isSubmitting}>
                   Create
                 </Button>{" "}

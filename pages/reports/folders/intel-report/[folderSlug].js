@@ -23,6 +23,7 @@ import Router from "next/router";
 import _ from "lodash";
 import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
 import { current } from "@reduxjs/toolkit";
+import IntelliReportLengthDropdown from "../../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
 
 // import { child } from "@firebase/database";
 export const getServerSideProps = withPageAuthRequired({
@@ -256,6 +257,8 @@ const ViewReports = ({
   const [draft, setDraft] = useState("");
   const [hasStartedContinuum, setHasStartedContinuum] = useState(false);
   const [loadedAgentId, setLoadedAgentId] = useState(agentId);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(1); // Default to 1 for "Short"
   const firebaseSaveData = useFirebaseListener(
     user
       ? `/${
@@ -494,6 +497,7 @@ const ViewReports = ({
   //     }
   //   }
   // }, [firebaseSaveData]);
+  function handleSelectedLength() {}
   async function handleContinuumClick(parentReport) {
     // "parentReportId",
     // "userId",
@@ -870,7 +874,7 @@ const ViewReports = ({
                   onClick={() => console.log(`Navigating to report ${item.id}`)}
                 >
                   {loadedReports.find((report) => report.reportId === item.id)
-                    ?.reportTitle || `Loading Report ID: ${item.id}`}
+                    ?.reportTitle || `Generating Report Artwork`}
                 </a>
               )}
               {item.children && (
@@ -1094,6 +1098,7 @@ const ViewReports = ({
     console.log("handleFolderDeleteNo");
     setShowReportDeleteQuestion(false);
   }
+
   return (
     <div style={{ maxWidth: "90%" }}>
       <Breadcrumb>
@@ -1135,7 +1140,7 @@ const ViewReports = ({
                 }}
               />
             </a>
-            <div className="overlay"></div>
+            {/* <div className="overlay"></div> */}
           </div>
           // <div>
           //   <div
@@ -1192,8 +1197,7 @@ const ViewReports = ({
       >
         Table of Contents [{loadedReports.length}{" "}
         <i className="bi bi-body-text"></i>]
-      </div>
-
+      </div>{" "}
       {/* {JSON.stringify(parentChildIdMap)} */}
       {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
       {parentChildIdMap.id && (
@@ -1211,7 +1215,8 @@ const ViewReports = ({
             >
               {loadedReports.find(
                 (report) => report.reportId === parentChildIdMap.id
-              )?.reportTitle || `Loading Report ID: ${parentChildIdMap.id}`}
+              )?.reportTitle ||
+                `Generating Images for Report ID: ${parentChildIdMap.id}`}
             </a>
             <NestedList
               // children={parentChildIdMap.children}
@@ -1282,6 +1287,7 @@ const ViewReports = ({
           // console.log(reportTitle);
           // console.log("__html");
           // console.log(__html);
+
           return (
             <div key={index} id={reportId} className="report-section">
               <div className="title-container">
@@ -1311,7 +1317,7 @@ const ViewReports = ({
                       className="report-image"
                       style={{ borderRadius: "10px" }}
                     />
-                    <div className="overlay"></div>
+                    {/* <div className="overlay"></div> */}
                   </a>
                 )}
               </div>
@@ -1322,10 +1328,10 @@ const ViewReports = ({
                 className="report text-primary reportFont"
                 dangerouslySetInnerHTML={{ __html }}
               />
-              <div style={{ display: "flex" }}>
+              <div style={{ display: "flex", flexDirection: "flex-start" }}>
                 <Button
                   className="btn btn-primary"
-                  style={{ marginRight: "auto", textAlign: "left" }}
+                  style={{ marginRight: "16px", textAlign: "left" }}
                   onClick={() => {
                     handleContinuumClick(report);
                   }}
@@ -1333,6 +1339,7 @@ const ViewReports = ({
                 >
                   <i className="bi bi-link"></i> Continuum
                 </Button>
+
                 {/* Report Delete Button */}
                 <div style={{ marginLeft: "auto", textAlign: "right" }}>
                   <Button disabled={isStreaming}>
@@ -1378,6 +1385,9 @@ const ViewReports = ({
             </div>
           );
         })}
+      <IntelliReportLengthDropdown
+        handleSelectedLength={handleSelectedLength}
+      />
       {/* Draft */}
       {/* Is streaming{JSON.stringify(isStreaming)} */}
       {/* {JSON.stringify(loadedReports)} */}
@@ -1398,7 +1408,7 @@ const ViewReports = ({
       {/* {JSON.stringify(agent)} */}
       {agent.profilePicUrl && !isStreaming && (
         <div
-          style={{ textAlign: "center" }}
+          style={{ textAlign: "center", marginTop: "116px" }}
           onClick={() => goToAgentProfile({ agentId: agent.agentId })}
         >
           <div
@@ -1407,18 +1417,20 @@ const ViewReports = ({
               justifyContent: "center",
               height: "237px",
               objectFit: "cover",
+              marginBottom: "16px",
+
               textAlign: "center",
             }}
           >
             <img
               src={`${agent.profilePicUrl}`}
-              style={{ borderRadius: "50%", cursor: "pointer" }}
+              style={{ borderRadius: "20%", cursor: "pointer" }}
               alt="agent"
             />
           </div>
+
           <a
             style={{
-              marginTop: "8px",
               fontWeight: 800,
               color: "#E7007C",
               fontWeight: "200",

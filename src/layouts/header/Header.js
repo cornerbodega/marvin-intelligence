@@ -19,12 +19,12 @@ import LogoWhite from "../../../public/logo.png";
 
 const Header = ({ showMobmenu }) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  // const [dropdownOpen, setDropdownOpen] = React.useState(false);
 
-  const toggle = () => setDropdownOpen((prevState) => !prevState);
-  const Handletoggle = () => {
-    setIsOpen(!isOpen);
-  };
+  // const toggle = () => setDropdownOpen((prevState) => !prevState);
+  // const Handletoggle = () => {
+  //   setIsOpen(!isOpen);
+  // };
 
   return (
     <Navbar color="black" dark expand="md">

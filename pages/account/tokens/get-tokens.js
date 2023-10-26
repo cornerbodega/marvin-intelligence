@@ -1,4 +1,14 @@
-import { Button, Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
+import {
+  Button,
+  Row,
+  Col,
+  Breadcrumb,
+  BreadcrumbItem,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+} from "reactstrap";
 import useRouter from "next/router";
 import { useEffect, useRef, useState } from "react";
 
@@ -26,18 +36,88 @@ import IntelliPrint from "../../../components/IntelliPrint/IntelliPrint";
 import IntelliCopyUrl from "../../../components/IntelliCopyUrl/IntelliCopyUrl";
 import { getSupabase } from "../../../utils/supabase";
 
-// import { child } from "@firebase/database";
-// export const getServerSideProps = withPageAuthRequired({
-// export const getServerSideProps = withPageAuthRequired({
-export async function getServerSideProps(context) {
-  return {
-    props: {},
-  };
-}
+// import { useUser } from "@auth0/nextjs-auth0/client";
+// import { getSupabase } from "../../utils/supabase";
+// import { useRouter } from "next/router";
+// import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+// import { getSession } from "@auth0/nextjs-auth0";
+export const getServerSideProps = withPageAuthRequired({
+  async getServerSideProps(context) {
+    const supabase = getSupabase();
+    const session = await getSession(context.req, context.res);
+    const user = session?.user;
 
-const ViewReports = ({}) => {
+    let { data: agency, agencyError } = await supabase
+      .from("users")
+      .select("agencyName")
+      .eq("userId", user.sub);
+    if (agencyError) {
+      console.log("agencyError");
+    }
+    console.log("agency");
+    console.log(agency);
+    if (!agency || agency.length === 0) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/agency/create-agency",
+        },
+        props: {},
+      };
+    }
+    const _agencyName = agency[0].agencyName;
+    return { props: { user, _agencyName } };
+  },
+});
+
+const ViewReports = ({ user, _agencyName }) => {
+  const [agencyName, setAgencyName] = useState(_agencyName);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  async function handleSubmit(e) {
+    setIsSubmitting(true);
+    const res = await fetch("/api/agency/update-agency-endpoint", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ agencyName, user }),
+    });
+    setIsSubmitting(false);
+
+    if (res.status === 200) {
+    } else {
+      console.log(JSON.stringify(res));
+      alert("An error occurred while creating the agency. Please try again.");
+    }
+  }
   return (
     <>
+      <Row>
+        <Col md={{ size: 8, offset: 1 }}>
+          <Form onSubmit={handleSubmit}>
+            <h3 className="mb-4">{agencyName}</h3>
+
+            <FormGroup>
+              <Input
+                autoFocus
+                type="text"
+                name="expertise1"
+                id="expertise1"
+                value={agencyName}
+                onChange={(e) => setAgencyName(e.target.value)}
+                placeholder="Enter Agency Name"
+              />
+            </FormGroup>
+
+            <div className="text-right mt-4">
+              <Button color="primary" disabled={isSubmitting}>
+                Update
+              </Button>
+            </div>
+          </Form>
+        </Col>
+      </Row>
+
       <div className="token-description">
         <h2>Explore a World of Knowledge with Our AI-Generated Reports!</h2>
         <p>

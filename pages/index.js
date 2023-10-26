@@ -342,6 +342,7 @@ export default function Home({ title, content }) {
                             25 Free Tokens
                           </Button>
                         </p>
+                        123
                       </div>
                     </div>
                   </div>
@@ -567,7 +568,7 @@ export default function Home({ title, content }) {
           <div style={{ height: "60px" }}></div>
           <div
             style={{
-              maxWidth: "33%",
+              width: "80%",
               marginRight: "auto",
               marginLeft: "auto",
             }}

@@ -41,6 +41,7 @@ import { slugify } from "../../../utils/slugify";
 // bring in agent's memory of previous reports
 // bring in content of link from original report
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
+import IntelliReportLengthDropdown from "../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
 
 const CreateMission = ({}) => {
   const { user, error, isLoading } = useUser();
@@ -51,7 +52,9 @@ const CreateMission = ({}) => {
   const [feedbackInput, setFeedbackInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [briefingInput, setBriefingInput] = useState("");
+  const [briefingInput, setBriefingInput] = useState(
+    router.query.briefingInput || ""
+  );
   const [expertiseOutput, setExpertiseOutput] = useState("");
   const [folderId, setFolderId] = useState("");
   const firebaseDraftData = useFirebaseListener(
@@ -123,7 +126,7 @@ const CreateMission = ({}) => {
   async function handleAcceptReport() {
     setHasSubmitted(true);
     const draftData = {
-      briefingInput,
+      briefing: briefingInput,
       draft,
     };
     if (expertiseOutput) {
@@ -149,7 +152,7 @@ const CreateMission = ({}) => {
     console.log(name);
     router.push(name);
   }
-
+  function handleSelectedLength(length) {}
   async function handleQuickDraftClick() {
     const draftData = { briefingInput };
     console.log("feedbackInput");
@@ -190,7 +193,7 @@ const CreateMission = ({}) => {
         <BreadcrumbItem>Quick Draft</BreadcrumbItem>
       </Breadcrumb>
 
-      <div id="quickDraftBriefingInput">
+      {/* <div id="quickDraftBriefingInput">
         <div>
           <textarea
             autoFocus
@@ -218,11 +221,10 @@ const CreateMission = ({}) => {
             }}
             className="btn btn-primary"
           >
-            {/* ↳ */}
             Quick Draft
           </div>
         </div>
-      </div>
+      </div> */}
       {/* immediately show the report typing out. The briefing is whatever the user
       wrote. It's in a text field like the google results page and editable and
       you can hit the button to create a new draft */}
@@ -256,16 +258,25 @@ const CreateMission = ({}) => {
                 value={feedbackInput}
                 onChange={(e) => setFeedbackInput(e.target.value)}
               />
-              <div style={{ textAlign: "left", paddingTop: "8px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "flex-start",
+                  paddingTop: "8px",
+                }}
+              >
                 <Button
                   color="primary"
-                  style={{ border: "1px solid yellow" }}
+                  style={{ border: "1px solid yellow", marginRight: "16px" }}
                   disabled={!draft.endsWith(" ".repeat(3)) || !feedbackInput}
                   onClick={(e) => handleQuickDraftClick(e)}
                 >
                   <i className="bi bi-arrow-clockwise"></i>
                   &nbsp;Refine
                 </Button>
+                <IntelliReportLengthDropdown
+                  handleSelectedLength={handleSelectedLength}
+                />
               </div>
             </FormGroup>
           </Form>
@@ -273,10 +284,12 @@ const CreateMission = ({}) => {
             <Button
               color="primary"
               style={{ border: "3px solid green" }}
-              disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
+              disabled={
+                isSubmitting || hasSubmitted || !draft.endsWith(" ".repeat(3))
+              }
               onClick={(e) => handleAcceptReport(e)}
             >
-              <i className="bi bi-folder"></i> Finalize & Visualize
+              <i className="bi bi-floppy"></i> Save & Visualize
             </Button>
           </div>
         </>

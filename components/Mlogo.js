@@ -32,9 +32,17 @@ const Model = () => {
 
 const Mlogo = ({ onClick }) => {
   return (
-    <div className="m-0" style={{ width: "auto", height: "200px" }}>
+    <div
+      className="m-0"
+      style={{
+        // width: "80%",
+
+        // background: "red",
+        height: "400px",
+      }}
+    >
       <Canvas>
-        <OrbitControls minDistance={1} maxDistance={2} />
+        <OrbitControls minDistance={3.5} maxDistance={3.5} />
         <ambientLight intensity={2} />
         <pointLight position={[-30, -30, -30]} intensity={0.5} />
         <pointLight position={[20, 20, 20]} intensity={0.5} />
