@@ -26,7 +26,7 @@ export default function Home() {
         </>
       </Head>
 
-      <div className="">
+      <div>
         <div className="">
           <header className="">
             <div className=""></div>
@@ -40,7 +40,7 @@ export default function Home() {
                     marginLeft: "auto",
                     marginRight: "auto",
                     display: "flex",
-                    alignItems: "center",
+                    // alignItems: "center",
                     flexDirection: "column",
                     background: "black",
                     borderRadius: "20px",
@@ -459,6 +459,7 @@ export default function Home() {
               </div>
             </section> */}
           </main>
+
           <div style={{ height: "60px" }}></div>
           <div
             style={{
@@ -478,13 +479,17 @@ export default function Home() {
           <div
             style={{
               display: "flex",
-
+              flexDirection: "column",
               justifyContent: "center",
             }}
           >
             {" "}
-            <div> © 2023 Marvin.Technology</div>
+            <div> © 2024 Marvin.Technology</div>
+            <div className="reportFont">
+              H-T-T-P-S-<i>so-fresh</i> colon slash slash Marvin dot technology
+            </div>
           </div>
+
           <footer className="site-footer">
             <div className="container">
               <div className="site-footer-inner">
