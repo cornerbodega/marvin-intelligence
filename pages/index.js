@@ -50,7 +50,7 @@ export default function Home() {
                     <img
                       src="/brain.jpg"
                       style={{
-                        height: "400px",
+                        maxHeight: "400px",
                         width: "auto",
                         borderRadius: "20%",
                       }}
