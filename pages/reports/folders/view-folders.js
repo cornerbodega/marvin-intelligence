@@ -469,7 +469,7 @@ const ViewReports = ({
                   <i className="bi bi-folder"></i>+ Quick Draft
                 </Button>
               </div>
-              <div style={{ marginBottom: "40px" }}>
+              <div style={{ marginBottom: "20px" }}>
                 <IntelliReportLengthDropdown
                   handleSelectedLength={handleSelectedLength}
                 />
@@ -483,6 +483,7 @@ const ViewReports = ({
 
         {/* <div>Super</div> */}
       </div>
+      <div style={{ marginBottom: "20px" }} className="section-title" />
       <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
         <input
           type="text"
@@ -500,7 +501,7 @@ const ViewReports = ({
             textIndent: "10px",
           }}
           lines="1"
-          placeholder="Search existing reports"
+          placeholder="⌕ Search existing reports"
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
