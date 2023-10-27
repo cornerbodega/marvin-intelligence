@@ -74,7 +74,7 @@ export default function Home() {
                       href="/account/log-in"
                       style={{ color: "white", border: "3px solid green" }}
                     >
-                      25 Free Tokens
+                      Get 25 Free Tokens
                     </Button>
 
                     {/* <span className="text-white" style={{ margin: "10px" }}>
