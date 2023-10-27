@@ -1192,12 +1192,18 @@ const ViewReports = ({
       </div>
       <div> {folderDescription}</div>
       <div
-        className="reportTitle reportFont section-title "
+        className="reportTitle reportFont section-title"
         style={{ marginTop: "30px" }}
       >
-        Table of Contents [{loadedReports.length}{" "}
-        <i className="bi bi-body-text"></i>]
-      </div>{" "}
+        <Row>
+          <Col>
+            Table of Contents
+            <span style={{ whiteSpace: "nowrap" }}>
+              &nbsp;[{loadedReports.length} <i className="bi bi-body-text"></i>]
+            </span>
+          </Col>
+        </Row>
+      </div>
       {/* {JSON.stringify(parentChildIdMap)} */}
       {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
       {parentChildIdMap.id && (
