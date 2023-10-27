@@ -491,7 +491,7 @@ const ViewReports = ({
             borderWidth: "0px",
             backgroundColor: "#000",
             color: "white",
-            border: "1px solid white",
+            border: "1px solid grey",
             // marginLeft: "12px",
             // width: "auto", // Make the width auto to fit the content
             // maxWidth: "100%", // Control the maximum width for larger screens
