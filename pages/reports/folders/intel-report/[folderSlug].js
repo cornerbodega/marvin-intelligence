@@ -1160,7 +1160,13 @@ const ViewReports = ({
       <div style={{ marginTop: "-33px", marginBottom: "20px" }}>
         <Row>
           <Col>
-            <span style={{ marginRight: "20px", color: "gold" }}>
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                marginRight: "20px",
+                color: "gold",
+              }}
+            >
               <i
                 style={{
                   color: `${likes > 0 ? "gold" : "white"}`,

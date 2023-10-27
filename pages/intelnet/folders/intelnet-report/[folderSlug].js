@@ -997,7 +997,13 @@ const ViewReports = ({
         <div style={{ marginTop: "-36px", marginBottom: "20px" }}>
           <Row>
             <Col>
-              <span style={{ marginRight: "20px", color: "gold" }}>
+              <span
+                style={{
+                  whiteSpace: "nowrap",
+                  marginRight: "20px",
+                  color: "gold",
+                }}
+              >
                 <i
                   onClick={handleLike}
                   style={{
