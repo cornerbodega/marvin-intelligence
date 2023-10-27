@@ -441,32 +441,39 @@ const ViewReports = ({
               height: "180px",
               color: "white",
               borderRadius: "8px",
-              backgroundColor: "#444",
+              border: "1px solid white",
+              backgroundColor: "#000",
             }}
           />
         </div>
         <Row>
           <Col>
-            <div style={{ display: "flex", justifyContent: "flex-start" }}>
-              <Button
-                onClick={handleQuickDraftClick}
-                style={{
-                  textAlign: "left",
-                  borderColor: "green",
-                  borderWidth: "2px",
-                  alignContent: "right",
-                  marginBottom: "40px",
-                  marginRight: "10px",
-                  cursor: "pointer",
-                }}
-                disabled={briefingInput.length === 0}
-                className="btn btn-primary section-title"
-              >
-                <i className="bi bi-folder"></i>+ Quick Draft
-              </Button>
-              <IntelliReportLengthDropdown
-                handleSelectedLength={handleSelectedLength}
-              />
+            {/* <div style={{ display: "flex", justifyContent: "flex-start" }}> */}
+            <div>
+              <div style={{ marginBottom: "10px" }}>
+                <Button
+                  onClick={handleQuickDraftClick}
+                  style={{
+                    textAlign: "left",
+                    borderColor: "#E7007C",
+                    borderWidth: "2px",
+                    alignContent: "right",
+
+                    marginRight: "10px",
+                    cursor: "pointer",
+                    width: "108",
+                  }}
+                  disabled={briefingInput.length === 0}
+                  className="btn btn-primary "
+                >
+                  <i className="bi bi-folder"></i>+ Quick Draft
+                </Button>
+              </div>
+              <div style={{ marginBottom: "40px" }}>
+                <IntelliReportLengthDropdown
+                  handleSelectedLength={handleSelectedLength}
+                />
+              </div>
             </div>
             {/* <div style={{}}>
             
@@ -482,8 +489,9 @@ const ViewReports = ({
           style={{
             borderRadius: "8px",
             borderWidth: "0px",
-            backgroundColor: "#444",
+            backgroundColor: "#000",
             color: "white",
+            border: "1px solid white",
             // marginLeft: "12px",
             // width: "auto", // Make the width auto to fit the content
             // maxWidth: "100%", // Control the maximum width for larger screens
@@ -492,7 +500,7 @@ const ViewReports = ({
             textIndent: "10px",
           }}
           lines="1"
-          placeholder="🔎 Existing Reports"
+          placeholder="Search existing reports"
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>

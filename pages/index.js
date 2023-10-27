@@ -63,7 +63,7 @@ export default function Home() {
                     </h1>
                     <p className="text-white hero-paragraph">
                       Empower your intellectual journey with your personal team
-                      of AI researchers. Discover, Learn, and Master any subject
+                      of AI researchers. Discover, Catalog, and Link any subject
                       matter effortlessly.
                     </p>
                   </div>

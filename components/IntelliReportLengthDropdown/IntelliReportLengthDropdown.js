@@ -24,15 +24,19 @@ const IntelliReportLengthDropdown = ({ handleSelectedLength }) => {
   };
 
   return (
-    <Dropdown isOpen={dropdownOpen} toggle={toggle}>
-      <DropdownToggle caret>{selectedOption.label}</DropdownToggle>
+    <Dropdown style={{ width: "108px" }} isOpen={dropdownOpen} toggle={toggle}>
+      <DropdownToggle caret>
+        <span style={{ fontSize: "0.75em" }}>{selectedOption.label}</span>
+      </DropdownToggle>
       <DropdownMenu>
         {reportOptions.map((option) => (
           <DropdownItem
             key={option.value}
             onClick={() => handleSelection(option)}
           >
-            <i className="bi bi-coin" /> {option.label} ({option.tokens})
+            <span style={{ fontSize: "0.75em" }}>
+              <i className="bi bi-coin" /> {option.label} ({option.tokens})
+            </span>
           </DropdownItem>
         ))}
       </DropdownMenu>
