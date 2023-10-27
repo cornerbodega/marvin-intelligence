@@ -57,7 +57,7 @@ export default function Home() {
                     />
                   </div>
 
-                  <div style={{ width: "300px" }}>
+                  <div style={{ minWidth: "300px", maxWidth: "500px" }}>
                     <h1 className="hero-title mt-0 text-white">
                       Unlock the Power of Automated Learning
                     </h1>
@@ -67,7 +67,8 @@ export default function Home() {
                       matter effortlessly.
                     </p>
                   </div>
-                  <div className="">
+                  <div>Try the Beta</div>
+                  <div className="" style={{ marginTop: "20px" }}>
                     <Button
                       // className="button btn-primary text-white"
                       href="/account/log-in"
@@ -92,7 +93,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <section className="features section">
+            {/* <section className="features section">
               <div className="container">
                 <div className="features-inner section-inner has-bottom-divider">
                   <div className="features-wrap">
@@ -226,7 +227,10 @@ export default function Home() {
                         <h4 className="feature-title mt-24 text-white">
                           Get Started
                         </h4>
-                        <p className="text-md mb-0">
+                        <p
+                          className="text-md mb-0"
+                          style={{ marginTop: "20px" }}
+                        >
                           <Button
                             style={{
                               color: "white",
@@ -242,221 +246,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </section>
-            {/* <section className="pricing section">
-              <div className="container-sm">
-                <div className="pricing-inner section-inner">
-                  <div className="pricing-header text-center">
-                    <h2 className="section-title mt-0">
-                      Free Trial Offer - Explore the World of Knowledge with Us!
-                    </h2>
-                    <div className="section-paragraph mb-0 text-white">
-                      <div>
-                        <p>
-                          At Intelligence.Marvin.Technology, we believe in the
-                          transformative power of knowledge. "But don't just
-                          take my word for it,"
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href="https://www.readingrainbow.org/"
-                          >
-                            (LeVar Burton Reading Rainbow voice)
-                          </a>
-                          . We want you to experience it firsthand, which is why
-                          we're offering you a risk-free trial of our service.
-                        </p>
-                        <p>
-                          Our free trial gives you access to the full
-                          Intelligence.Marvin.Technology experience, allowing
-                          you to create your first 100 missions absolutely free
-                          or for 14 days, whichever comes first.
-                        </p>
-                        <p>
-                          During your trial period, you'll have the opportunity
-                          to explore and utilize all our platform's
-                          capabilities, from managing your own team of agents to
-                          receiving comprehensive and curated missions. With our
-                          intuitive dashboard and innovative autonomous
-                          missions, you'll discover a new, engaging way to learn
-                          and process information.
-                        </p>
-                        <p>
-                          And the best part? No commitment. If you feel
-                          Intelligence.Marvin.Technology isn't the right fit for
-                          you, you can cancel anytime during the trial period at
-                          no cost. So why wait? Begin your knowledge exploration
-                          journey today!
-                        </p>
-                        <p>
-                          *Please note: After the free trial, your plan will
-                          automatically convert into a paid subscription unless
-                          cancelled. Details of our subscription plans can be
-                          found below.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="pricing-tables-wrap">
-                    <h2>Basic Plan</h2>
-                  </div>
-                  <div className="pricing-tables-wrap">
-                    <div className="pricing-table">
-                      <div className="pricing-table-inner is-revealing">
-                        <div className="pricing-table-main">
-                          <div className="pricing-table-header pb-24">
-                            <div className="pricing-table-price">
-                              <span className="pricing-table-price-currency h2">
-                                $
-                              </span>
-                              <span className="pricing-table-price-amount h1">
-                                10
-                              </span>
-                              <span className="text-xs">/month</span>
-                            </div>
-                          </div>
-                          <div className="pricing-table-features-title text-xs pt-24 pb-24">
-                            What you will get
-                          </div>
-                          <ul className="pricing-table-features list-reset text-xs">
-                            <li>
-                              <span>500 Missions</span>
-                            </li>
-                            <li>
-                              <span>Up to 5 Agents</span>
-                            </li>
-                            <li>
-                              <span>Unlimited Report Storage</span>
-                            </li>
-                            <li>
-                              <span>Personal Customer Service</span>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="pricing-table-cta mb-8">
-                          <a
-                            className="button button-primary button-shadow button-block"
-                            href="#"
-                          >
-                            Pre order now
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pricing-tables-wrap">
-                    <h2>Pro Plan</h2>
-                  </div>
-                  <div className="pricing-tables-wrap">
-                    <div className="pricing-table">
-                      <div className="pricing-table-inner is-revealing">
-                        <div className="pricing-table-main">
-                          <div className="pricing-table-header pb-24">
-                            <div className="pricing-table-price">
-                              <span className="pricing-table-price-currency h2">
-                                $
-                              </span>
-                              <span className="pricing-table-price-amount h1">
-                                20
-                              </span>
-                              <span className="text-xs">/month</span>
-                            </div>
-                          </div>
-                          <div className="pricing-table-features-title text-xs pt-24 pb-24">
-                            What you will get
-                          </div>
-                          <ul className="pricing-table-features list-reset text-xs">
-                            <li>
-                              <span>2000 Missions</span>
-                            </li>
-                            <li>
-                              <span>Unlimited Agents</span>
-                            </li>
-                            <li>
-                              <span>Automated Missions</span>
-                            </li>
-                            <li>
-                              <span>Personal Customer Service</span>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="pricing-table-cta mb-8">
-                          <a
-                            className="button button-primary button-shadow button-block"
-                            href="#"
-                          >
-                            Pre order now
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pricing-tables-wrap">
-                    <h2>Enterprise</h2>
-                  </div>
-                  <div className="pricing-tables-wrap">
-                    <div className="pricing-table">
-                      <div className="pricing-table-inner is-revealing">
-                        <div className="pricing-table-main">
-                          <div className="pricing-table-header pb-24">
-                            <div className="pricing-table-price">
-                              Custom Pricing
-                            </div>
-                          </div>
-                          <div className="pricing-table-features-title text-xs pt-24 pb-24">
-                            What you will get
-                          </div>
-                          <ul className="pricing-table-features list-reset text-xs">
-                            <li>
-                              <span>More API calls</span>
-                            </li>
-                            <li>
-                              <span>Automated Missions</span>
-                            </li>
-                            <li>
-                              <span>Possible API integrations</span>
-                            </li>
-                            <li>
-                              <span>Priority support</span>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="pricing-table-cta mb-8">
-                          <a
-                            className="button button-primary button-shadow button-block"
-                            href="#"
-                          >
-                            Pre order now
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section> */}
-            {/* <section className="cta section">
-              <div className="container">
-                <div
-                  className="cta-inner section-inner text-white"
-                  style={{ borderRadius: "20px" }}
-                >
-                  <h3 className="section-title mt-0 text-white">
-                    Talk to Marvin about it:
-                  </h3>
-                  <div className="cta-cta">
-                    <Button
-                      // className="button button-primary button-wide-mobile text-white"
-                      href="/agents/view-agents"
-                      style={{ color: "white" }}
-                    >
-                      Get in touch
-                    </Button>
-                  </div>
-                </div>
-              </div>
             </section> */}
           </main>
 
@@ -464,18 +253,19 @@ export default function Home() {
           <div
             style={{
               width: "80%",
-              marginRight: "auto",
-              marginLeft: "auto",
+              // marginRight: "auto",
+              // marginLeft: "auto",
               // alignContent: "center",
-              justifyContent: "center",
+              // justifyContent: "center",
               // alignItems: "center",
               // position: "relative",
               // background: "red",
-              display: "flex",
+              // display: "flex",
             }}
           >
             <Mlogo />
           </div>
+          <div style={{ height: "60px" }}></div>
           <div
             style={{
               display: "flex",
