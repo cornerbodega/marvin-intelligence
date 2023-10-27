@@ -1,4 +1,41 @@
+.textareaWrapper {
+  position: relative;
+  caret-color: transparent;
+  overflow: hidden;
+}
 
+.textareaWrapper:focus-within::after {
+  content: "";
+  position: absolute;
+  top: 16px; 
+  /* left: 10px; */
+  left: var(--cursor-pos);
+  width: 10px;
+  height: 1em;
+  background-color:#3fd000;
+  animation: blink 3s infinite;
+}
+
+
+/* textarea:focus::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 0.5em);
+  left: 0; 
+  width: 1ch;
+  height: 1em;
+  background-color: red;
+  animation: blink 1s infinite;
+} */
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
 /* CopyToClipboardButton.css */
 .copy-to-clipboard {
   /* display: flex; */

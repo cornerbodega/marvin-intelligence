@@ -107,7 +107,8 @@ const IntelliCard = ({
             style={imageStyle}
             alt="Card image cap"
           />
-          {/* <div onClick={handleClick} className="overlay"></div> */}
+          {/* <div onClick={handleClick} className="
+          "></div> */}
         </div>
         <CardBody
           style={{
@@ -160,7 +161,7 @@ const IntelliCard = ({
 
           <CardSubtitle className="mb-2 text-muted" tag="h6">
             {["expertise1", "expertise2", "expertise3"].map((expertise, i) => (
-              <Badge key={i} className="ms-3 expertiseBadge">
+              <Badge key={i} className="expertiseBadge">
                 {datums[expertise]}
               </Badge>
             ))}

@@ -411,7 +411,46 @@ const ViewReports = ({
 
     return uniqueFolders;
   }
+  const textareaRef = useRef(null);
 
+  useEffect(() => {
+    if (textareaRef.current) {
+      const textWidth = getTextWidth(
+        briefingInput,
+        window.getComputedStyle(textareaRef.current).fontSize
+      );
+      const paddingLeft = parseFloat(
+        window.getComputedStyle(textareaRef.current).paddingLeft
+      );
+      const paddingRight = parseFloat(
+        window.getComputedStyle(textareaRef.current).paddingRight
+      );
+
+      // Adjust for padding and ensure the cursor stays within bounds
+      const totalWidth = Math.min(
+        textWidth + paddingLeft,
+        textareaRef.current.offsetWidth - paddingRight - 1
+      );
+
+      textareaRef.current.parentElement.style.setProperty(
+        "--cursor-pos",
+        `${totalWidth}px`
+      );
+    }
+  }, [briefingInput]);
+
+  function getTextWidth(text, fontSize) {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    context.font = fontSize + " Arial";
+    return context.measureText(text).width;
+  }
+
+  useEffect(() => {
+    if (textareaRef && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, []);
   return (
     <>
       <Breadcrumb style={{ fontFamily: "monospace" }}>
@@ -426,14 +465,13 @@ const ViewReports = ({
         </BreadcrumbItem>
       </Breadcrumb>
       <div id="quickDraftBriefingInput">
-        <div>
+        <div className="textareaWrapper">
           <textarea
+            ref={textareaRef}
             autoFocus
             value={briefingInput}
             onChange={(e) => setBriefingInput(e.target.value)}
-            type="text"
             placeholder="What would you like to know?"
-            lines="5"
             style={{
               padding: "12px 12px 13px 13px",
               borderWidth: "0px",
@@ -443,6 +481,7 @@ const ViewReports = ({
               borderRadius: "8px",
               border: "1px solid white",
               backgroundColor: "#000",
+              "--cursor-pos": "0px", // Initial value
             }}
           />
         </div>
@@ -483,40 +522,45 @@ const ViewReports = ({
 
         {/* <div>Super</div> */}
       </div>
-      <div style={{ marginBottom: "20px" }} className="section-title" />
-      <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
-        <input
-          type="text"
-          style={{
-            borderRadius: "8px",
-            borderWidth: "0px",
-            backgroundColor: "#000",
-            color: "white",
-            border: "1px solid grey",
-            // marginLeft: "12px",
-            // width: "auto", // Make the width auto to fit the content
-            // maxWidth: "100%", // Control the maximum width for larger screens
-            height: "2em",
-            flexGrow: 1, // Let it grow to take the available space
-            textIndent: "10px",
-          }}
-          lines="1"
-          placeholder="⌕ Search existing reports"
-          onChange={(e) => handleSearch(e.target.value)}
-        />
-      </div>
-      {/* <div>{JSON.stringify(_folderLikesByFolderId)}</div> */}
-      <div ref={containerRef}>
-        <Row className="text-primary">
-          <IntelliCardGroup
-            offset={offset}
-            handleCardClick={handleCardClick}
-            datums={loadedReports}
-            folderLikesByFolderId={folderLikesByFolderId}
-            datumsType={"folders"}
-          ></IntelliCardGroup>
-        </Row>
-      </div>
+      {loadedReports.length > 0 && (
+        <>
+          <div style={{ marginBottom: "20px" }} className="section-title" />
+
+          <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
+            <input
+              type="text"
+              style={{
+                borderRadius: "8px",
+                borderWidth: "0px",
+                backgroundColor: "#000",
+                color: "white",
+                border: "1px solid grey",
+                // marginLeft: "12px",
+                // width: "auto", // Make the width auto to fit the content
+                // maxWidth: "100%", // Control the maximum width for larger screens
+                height: "2em",
+                flexGrow: 1, // Let it grow to take the available space
+                textIndent: "10px",
+              }}
+              lines="1"
+              placeholder="⌕ Search existing reports"
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </div>
+          {/* <div>{JSON.stringify(_folderLikesByFolderId)}</div> */}
+          <div ref={containerRef}>
+            <Row className="text-primary">
+              <IntelliCardGroup
+                offset={offset}
+                handleCardClick={handleCardClick}
+                datums={loadedReports}
+                folderLikesByFolderId={folderLikesByFolderId}
+                datumsType={"folders"}
+              ></IntelliCardGroup>
+            </Row>
+          </div>
+        </>
+      )}
     </>
   );
 };
