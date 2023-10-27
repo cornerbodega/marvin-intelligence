@@ -301,7 +301,7 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
             textIndent: "10px",
           }}
           lines="1"
-          placeholder="🔎 Existing Agents"
+          placeholder="⌕ Search Agents"
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>

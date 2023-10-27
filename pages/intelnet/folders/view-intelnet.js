@@ -356,7 +356,7 @@ const ViewReports = ({ folders, userId, folderLikesByFolderId }) => {
             textIndent: "10px",
           }}
           lines="1"
-          placeholder="🔎 Global Reports"
+          placeholder="⌕ Search Intel-Net"
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
