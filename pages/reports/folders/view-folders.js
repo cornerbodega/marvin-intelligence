@@ -24,6 +24,7 @@ import { slugify } from "../../../utils/slugify";
 import IntelliCardGroup from "../../../components/IntelliCardGroup";
 import Link from "next/link";
 import IntelliReportLengthDropdown from "../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
+import Head from "next/head";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 export const getServerSideProps = withPageAuthRequired({
@@ -50,21 +51,6 @@ export const getServerSideProps = withPageAuthRequired({
       };
     }
 
-    // let { data: folders, error } = await supabase
-    //   .from("folders")
-    //   .select("*")
-    //   .eq("userId", userId)
-    //   .filter("folderName", "neq", null)
-    //   .filter("folderPicUrl", "neq", null)
-    //   .limit(PAGE_COUNT)
-    //   .order("folderId", { ascending: false });
-    // console.log("folders");
-    // console.log(folders);
-
-    // other pages will redirect here if they're empty
-    // If no agency, go to create agency page
-    // If no missions, go to crete report page
-    // let agency;
     let { data: folders, error } = await supabase
       .from("folders")
       .select("*")
@@ -114,12 +100,52 @@ export const getServerSideProps = withPageAuthRequired({
     console.log("_folderLikesByFolderId");
     console.log(_folderLikesByFolderId);
 
+    // Query the reportFolders table to get the count of reports for each folderId
+    let { data: reportCountsData, error: reportCountsError } = await supabase
+      .from("folders")
+      .select(`folderId, reportFolders(count)`)
+      .in("folderId", folderIds);
+    console.log("reportCountsData");
+    console.log(reportCountsData);
+    console.log("reportCountsData[0].reportFolders[0]");
+    console.log(reportCountsData[0].reportFolders[0]);
+
+    if (reportCountsError) {
+      console.error("Error fetching report counts:", reportCountsError);
+    }
+
+    const _reportCountsByFolderId = reportCountsData.reduce((acc, item) => {
+      acc[item.folderId] = item.reportFolders[0].count || null;
+      return acc;
+    }, {});
+
+    // My Tokens
+    let { data: tokensResponse, error: tokensError } = await supabase
+      .from("tokens")
+      .select("tokens")
+      .eq("userId", userId);
+    if (tokensError) {
+      console.log("tokensError");
+    }
+    console.log("tokensResponse");
+    console.log(tokensResponse);
+    let tokensRemaining = 0;
+    if (tokensResponse) {
+      if (tokensResponse[0]) {
+        tokensRemaining = tokensResponse[0].tokens;
+      }
+    }
+    console.log("tokensRemaining");
+    console.log(tokensRemaining);
+
     return {
       props: {
         folders,
         userId,
         agencyName: agency[0].agencyName,
         _folderLikesByFolderId,
+        _reportCountsByFolderId,
+        tokensRemaining,
       },
     };
   },
@@ -129,6 +155,8 @@ const ViewReports = ({
   userId,
   agencyName,
   _folderLikesByFolderId,
+  _reportCountsByFolderId,
+  tokensRemaining,
 }) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
@@ -231,9 +259,53 @@ const ViewReports = ({
   //   // console.log(filteredReports);
   //   // setLoadedReports(filteredReports);
   // }
+  const [didClickQuickDraft, setDidClickQuickDraft] = useState(false);
   async function handleQuickDraftClick() {
-    // await queueQuickDraftTask();
-    // async function queueQuickDraftTask() {
+    if (didClickQuickDraft) {
+      return;
+    }
+    setDidClickQuickDraft(true);
+    // check if the user has enough tokens
+    // query supabase for the user's tokens
+    // check the cost of the proposed report
+    // if the user has enough tokens, proceed
+    // if the user does not have enough tokens, prompt them to buy more tokens
+    const { data: tokens, error } = await supabase
+      .from("tokens")
+      .select("tokens")
+      .eq("userId", userId);
+    if (error) {
+      console.log("error");
+      console.log(error);
+    }
+    console.log("tokens");
+    console.log(tokens);
+    let tokensRemaining = 0;
+    if (tokens) {
+      if (tokens[0]) {
+        tokensRemaining = tokens[0].tokens;
+      }
+    }
+    console.log("tokensRemaining");
+    console.log(tokensRemaining);
+    let cost = 0;
+    if (reportLength === "short") {
+      cost = 1;
+    }
+    if (reportLength === "standard") {
+      cost = 2;
+    }
+    if (reportLength === "super") {
+      cost = 4;
+    }
+    console.log("cost");
+    console.log(cost);
+    if (cost > tokensRemaining) {
+      // prompt the user to buy more tokens
+      console.log("prompt the user to buy more tokens");
+      return goToPage("/account/tokens/get-tokens");
+    }
+
     const draftData = { briefingInput };
     const newTask = {
       type: "quickDraft",
@@ -242,6 +314,7 @@ const ViewReports = ({
       context: {
         ...draftData,
         userId,
+        reportLength,
       },
       createdAt: new Date().toISOString(),
     };
@@ -337,8 +410,10 @@ const ViewReports = ({
 
   const [folderLikesByFolderId, setFolderLikesByFolderId] = useState(
     _folderLikesByFolderId
-  ); // Step 1: New state variable
-
+  );
+  const [reportCountsByFolderId, setReportCountsByFolderId] = useState(
+    _reportCountsByFolderId
+  );
   useEffect(() => {
     if (!isLast && !searchInput) {
       const loadMoreReports = async () => {
@@ -383,6 +458,25 @@ const ViewReports = ({
           ...newLikesByFolderId,
         }));
 
+        // Fetch the report counts for the new folders
+        let { data: reportCountsData } = await supabase
+          .from("folders")
+          .select(`folderId, reportFolders(count)`)
+          .in("folderId", folderIds);
+
+        const newReportCountsByFolderId = reportCountsData.reduce(
+          (acc, item) => {
+            acc[item.folderId] = item.reportFolders[0].count || null;
+            return acc;
+          },
+          {}
+        );
+
+        // Update the reportCountsByFolderId state
+        setReportCountsByFolderId((prev) => ({
+          ...prev,
+          ...newReportCountsByFolderId,
+        }));
         return folders;
       };
 
@@ -398,6 +492,66 @@ const ViewReports = ({
       }
     }
   }, [isInView, isLast]);
+
+  // useEffect(() => {
+  //   if (!isLast && !searchInput) {
+  //     const loadMoreReports = async () => {
+  //       const from = offset * PAGE_COUNT;
+  //       const to = from + PAGE_COUNT - 1;
+  //       setOffset((prev) => prev + 1);
+
+  //       let { data: folders } = await supabase
+  //         .from("folders")
+  //         .select("*")
+  //         .range(from, to)
+  //         .or(`availability.neq.DELETED,availability.is.null`)
+  //         .eq("userId", userId)
+  //         .order("createdAt", { ascending: false });
+
+  //       // Extract folderIds from the obtained folders data
+  //       const folderIds = folders.map((folder) => folder.folderId);
+
+  //       let folderLikes = [];
+
+  //       if (folderIds.length > 0) {
+  //         let { data } = await supabase
+  //           .from("folderLikes")
+  //           .select()
+  //           .in("folderId", folderIds);
+
+  //         folderLikes = data;
+  //       }
+
+  //       const newLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
+  //         if (!acc[folderLike.folderId]) {
+  //           acc[folderLike.folderId] = 0;
+  //         }
+
+  //         acc[folderLike.folderId] += folderLike.likeValue;
+  //         return acc;
+  //       }, {});
+
+  //       // Update the folderLikesByFolderId state with the new data
+  //       setFolderLikesByFolderId((prev) => ({
+  //         ...prev,
+  //         ...newLikesByFolderId,
+  //       }));
+
+  //       return folders;
+  //     };
+
+  //     if (isInView && !isLast && !searchInput) {
+  //       loadMoreReports().then((moreReports) => {
+  //         setLoadedReports((prev) =>
+  //           getUniqueFolders([...prev, ...moreReports])
+  //         );
+  //         if (moreReports.length < PAGE_COUNT) {
+  //           setIsLast(true);
+  //         }
+  //       });
+  //     }
+  //   }
+  // }, [isInView, isLast]);
   function getUniqueFolders(folders) {
     const seenIds = new Set();
     const uniqueFolders = [];
@@ -415,6 +569,10 @@ const ViewReports = ({
 
   useEffect(() => {
     if (textareaRef.current) {
+      // textareaRef.current.parentElement.style.setProperty(
+      //   "--cursor-pos-x",
+      //   "6px"
+      // );
       const textWidth = getTextWidth(
         briefingInput,
         window.getComputedStyle(textareaRef.current).fontSize
@@ -426,18 +584,74 @@ const ViewReports = ({
         window.getComputedStyle(textareaRef.current).paddingRight
       );
 
-      // Adjust for padding and ensure the cursor stays within bounds
-      const totalWidth = Math.min(
-        textWidth + paddingLeft,
-        textareaRef.current.offsetWidth - paddingRight - 1
+      const lineHeight = parseFloat(
+        window.getComputedStyle(textareaRef.current).lineHeight
       );
 
+      // Adjust for padding and ensure the cursor stays within bounds
+      // const totalWidth = Math.min(
+      //   textWidth + paddingLeft,
+      //   textareaRef.current.offsetWidth - paddingRight - 1
+      // );
+      const textareaContentWidth =
+        textareaRef.current.offsetWidth - paddingLeft - paddingRight;
+
+      const lines = Math.ceil(textWidth / textareaContentWidth);
+      const lastLineWidth = textWidth % textareaContentWidth || textWidth;
+
+      const cursorLeft = lastLineWidth + paddingLeft;
+      const cursorTop = (lines - 1) * lineHeight;
+
       textareaRef.current.parentElement.style.setProperty(
-        "--cursor-pos",
-        `${totalWidth}px`
+        "--cursor-pos-x",
+        `${cursorLeft}px`
       );
+      if (lines > 1) {
+        textareaRef.current.parentElement.style.setProperty(
+          "--cursor-pos-x",
+          `${cursorLeft + lines * 5}px`
+        );
+      }
+
+      if (briefingInput.length === 0) {
+        console.log("briefingInput.length === 0");
+        // textareaRef.current.parentElement.style.setProperty("top", "14px");
+        textareaRef.current.parentElement.style.setProperty(
+          "--cursor-pos-y",
+          `${cursorTop + 45}px`
+        );
+        textareaRef.current.parentElement.style.setProperty(
+          "caret-color",
+          "transparent"
+        );
+        textareaRef.current.parentElement.classList.remove("no-background");
+      } else {
+        // textareaRef.current.parentElement.style.removeProperty("top");
+        // console.log("lines");
+        // console.log(lines);
+        // textareaRef.current.parentElement.style.setProperty(
+        //   "--cursor-pos-y",
+        //   `${cursorTop + 15}px`
+        // );
+        // if (lines > 2) {
+        //   textareaRef.current.parentElement.style.removeProperty(
+        //     "--cursor-pos-y"
+        //   );
+        textareaRef.current.parentElement.style.setProperty(
+          "caret-color",
+          "limegreen"
+        );
+        textareaRef.current.parentElement.classList.add("no-background");
+      }
+      // } else {
+      // textareaRef.current.parentElement.style.setProperty(
+      //   "--cursor-pos-y",
+      //   `${cursorTop + 42}px`
+      // );
+      // }
+      // }
     }
-  }, [briefingInput]);
+  }, [briefingInput, textareaRef]);
 
   function getTextWidth(text, fontSize) {
     const canvas = document.createElement("canvas");
@@ -451,11 +665,28 @@ const ViewReports = ({
       textareaRef.current.focus();
     }
   }, []);
+
+  const [reportLength, setReportLength] = useState("short");
+  function handleSelectedLength(length) {
+    console.log("handleselected length");
+    console.log(length);
+    setReportLength(length);
+  }
+
   return (
     <>
+      <Head>
+        <title>Reports | {agencyName}</title>
+      </Head>
+
       <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white">
-          <Link style={{ color: "white" }} href="/account/tokens/get-tokens">
+          <i className="bi bi-briefcase" />
+          &nbsp;
+          <Link
+            style={{ color: "white", textDecoration: "none" }}
+            href="/account/tokens/get-tokens"
+          >
             {agencyName}
           </Link>
         </BreadcrumbItem>
@@ -494,24 +725,41 @@ const ViewReports = ({
                   onClick={handleQuickDraftClick}
                   style={{
                     textAlign: "left",
-                    borderColor: "#E7007C",
+                    borderColor: "#3fd000",
                     borderWidth: "2px",
                     alignContent: "right",
-
-                    marginRight: "10px",
+                    marginTop: "0px",
+                    marginRight: "8px",
                     cursor: "pointer",
                     width: "108",
                   }}
-                  disabled={briefingInput.length === 0}
+                  disabled={
+                    briefingInput.length === 0 ||
+                    didClickQuickDraft ||
+                    tokensRemaining < 1
+                  }
                   className="btn btn-primary "
                 >
                   <i className="bi bi-folder"></i>+ Quick Draft
                 </Button>
               </div>
-              <div style={{ marginBottom: "20px" }}>
+              <div style={{ marginBottom: "10px" }}>
                 <IntelliReportLengthDropdown
                   handleSelectedLength={handleSelectedLength}
                 />
+              </div>
+              <div
+                onClick={() => goToPage("/account/tokens/get-tokens")}
+                style={{
+                  marginBottom: "32px",
+                  marginTop: "22px",
+                  fontSize: "0.75em",
+                  color: "lightblue",
+                  cursor: "pointer",
+                  width: "148px",
+                }}
+              >
+                My Tokens: {tokensRemaining} <i className="bi bi-coin" />
               </div>
             </div>
             {/* <div style={{}}>
@@ -524,9 +772,7 @@ const ViewReports = ({
       </div>
       {loadedReports.length > 0 && (
         <>
-          <div style={{ marginBottom: "20px" }} className="section-title" />
-
-          <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
+          <div style={{ marginBottom: "20px", width: "100%", display: "flex" }}>
             <input
               type="text"
               style={{
@@ -555,6 +801,7 @@ const ViewReports = ({
                 handleCardClick={handleCardClick}
                 datums={loadedReports}
                 folderLikesByFolderId={folderLikesByFolderId}
+                reportCountsByFolderId={reportCountsByFolderId}
                 datumsType={"folders"}
               ></IntelliCardGroup>
             </Row>

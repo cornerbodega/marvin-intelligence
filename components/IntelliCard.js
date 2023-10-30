@@ -21,6 +21,7 @@ const IntelliCard = ({
   handleCardClick,
   index,
   folderLikesByFolderId,
+  reportCountsByFolderId,
 }) => {
   // console.log("intelli card group row");
   // console.log("Intellicard handleCardClick");
@@ -28,7 +29,11 @@ const IntelliCard = ({
   // const router = useRouter();
   // console.log("key");
   // console.log(index);
-  const imageStyle = {};
+  const imageStyle = {
+    borderTop: "2px solid #A9A9A9",
+    borderLeft: "1px solid #A9A9A9",
+    borderRight: "1px solid #A9A9A9",
+  };
   // if (index === 0) {
   imageStyle.borderTopLeftRadius = "16px";
   // }
@@ -42,6 +47,7 @@ const IntelliCard = ({
   let titleClassName = "";
   let icon;
   let likes;
+  let reportCount;
   const displayDatums = { ...datums };
   if (datumsType === "agents") {
     displayDatums.title = `Agent ${datums.agentName}`;
@@ -61,6 +67,9 @@ const IntelliCard = ({
     icon = "bi bi-folder";
     if (folderLikesByFolderId) {
       likes = folderLikesByFolderId[datums.folderId];
+    }
+    if (reportCountsByFolderId) {
+      reportCount = reportCountsByFolderId[datums.folderId];
     }
   }
   if (imageSize === "small") {
@@ -121,15 +130,18 @@ const IntelliCard = ({
             marginBottom: "30px",
             // marginTop: "-60px",
             // padding: "20px",
-            padding: "20px 20px 0 20px",
-
+            padding: "10px 20px 10px 20px",
+            borderBottom: "2px solid #A9A9A9",
+            borderLeft: "1px solid #A9A9A9",
+            borderRight: "1px solid #A9A9A9",
+            // border: "2px 2px 0px 0px solid #BFBFBF",
             boxShadow: `
             0 8px 0 -2px black, 
-            0 8px 0 0 grey,
+            0 8px 0 0 ${reportCount > 1 ? "#A9A9A9" : "black"},
             0 16px 0 -2px black, 
-            0 16px 0 0 grey,
+            0 16px 0 0 ${reportCount > 2 ? "#A9A9A9" : "black"},
             0 24px 0 -2px black, 
-            0 24px 0 0 black
+            0 24px 0 0 ${reportCount > 3 ? "#A9A9A9" : "black"}
         `,
           }}
         >
@@ -145,28 +157,43 @@ const IntelliCard = ({
               style={{
                 fontWeight: "800",
                 color: "white",
-                fontSize: "1.3rem",
-                height: "80px",
+                fontSize: "1em",
+                // height: "80px",
                 // marginTop: "4px",
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
                 WebkitLineClamp: 2,
                 overflow: "hidden",
+
+                textOverflow: "ellipsis",
+                whiteSpace: "normal",
               }}
               className={titleClassName}
             >
-              {icon && <i className={icon}></i>} {displayDatums.title}
+              {icon && <i className={icon}></i>} {displayDatums.title}{" "}
+              {reportCount && (
+                <span style={{ whiteSpace: "nowrap" }}>
+                  [{reportCount} <i className="bi bi-body-text" />]
+                </span>
+              )}
             </div>
           </div>
-
-          <CardSubtitle className="mb-2 text-muted" tag="h6">
-            {["expertise1", "expertise2", "expertise3"].map((expertise, i) => (
-              <Badge key={i} className="expertiseBadge">
-                {datums[expertise]}
-              </Badge>
-            ))}
-          </CardSubtitle>
-
+          {datums["expertise1"] && (
+            <CardSubtitle
+              style={{ marginTop: "8px" }}
+              className="mb-2 text-muted"
+              tag="h6"
+            >
+              {["expertise1", "expertise2", "expertise3"].map(
+                (expertise, i) => (
+                  <Badge key={i} className="expertiseBadge">
+                    {datums[expertise]}
+                  </Badge>
+                )
+              )}
+            </CardSubtitle>
+          )}
+          {/* {reportCount} */}
           <div
             style={{
               display: "flex",

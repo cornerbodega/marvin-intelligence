@@ -30,6 +30,7 @@ import IntelliProvider from "../../components/IntelliProvider/IntelliProvider";
 import IntelliContext from "../../components/intelliContext/IntelliContext";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { slugify } from "../../utils/slugify";
+import Head from "next/head";
 const PAGE_COUNT = 6;
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
@@ -239,15 +240,28 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
   }, [isInView, isLast]);
 
   // }
+
   return (
     <>
+      <Head>
+        <title>Agents | {agencyName}</title>
+      </Head>
       <Breadcrumb style={{ fontWeight: "200", fontFamily: "monospace" }}>
-        <BreadcrumbItem className="text-white">{agencyName}</BreadcrumbItem>
+        <BreadcrumbItem className="text-white">
+          <i className="bi bi-briefcase" />
+          &nbsp;
+          <Link
+            style={{ color: "white", textDecoration: "none" }}
+            href="/reports/folders/view-folders"
+          >
+            {agencyName}
+          </Link>
+        </BreadcrumbItem>
         <BreadcrumbItem className="text-white">
           <i className={`bi bi-person-badge`}></i>
           &nbsp;
-          <Link
-            href="/agents/view-agents"
+          <div
+            // href="/agents/view-agents"
             style={{
               fontWeight: "200",
               textDecoration: "none",
@@ -255,7 +269,7 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
             }}
           >
             Agents
-          </Link>
+          </div>
         </BreadcrumbItem>
         {parentReportTitle && (
           <BreadcrumbItem className="text-white">

@@ -994,7 +994,7 @@ const ViewReports = ({
           )} */}
         </div>
         {/* <div style={{ fontSize: "0.5em" }}>{folderPicDescription}</div> */}
-        <div style={{ marginTop: "-36px", marginBottom: "20px" }}>
+        <div style={{ marginTop: "-10px", marginBottom: "20px" }}>
           <Row>
             <Col>
               <span
@@ -1045,14 +1045,14 @@ const ViewReports = ({
         {/* {JSON.stringify(parentChildIdMap)} */}
         {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
         {parentChildIdMap.id && (
-          <ul>
+          <ul style={{ fontSize: "0.85em" }}>
             <li key={parentChildIdMap.id}>
               <a
                 style={{
                   color: "#E7007C",
                   textDecoration: "none",
                   cursor: "pointer",
-                  fontWeight: 400,
+                  // fontWeight: 400,
                 }}
                 href={`#${parentChildIdMap.id}`}
                 onClick={() => console.log("Navigating to parent report")}

@@ -335,8 +335,7 @@ const ViewReports = ({ folders, userId, folderLikesByFolderId }) => {
     <>
       <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white" active>
-          <i className={`bi bi-globe`}></i>
-          &nbsp; Intel-Net
+          <i className={`bi bi-globe`}></i>&nbsp;Intel-Net
         </BreadcrumbItem>
       </Breadcrumb>
 

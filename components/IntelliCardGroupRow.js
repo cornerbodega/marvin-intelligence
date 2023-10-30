@@ -17,6 +17,7 @@ const IntelliCardGroupRow = ({
   handleCardClick,
   datumsType,
   folderLikesByFolderId,
+  reportCountsByFolderId,
 }) => {
   //   const router = useRouter();
   //   console.log(router);
@@ -50,6 +51,7 @@ const IntelliCardGroupRow = ({
             key={i}
             index={i}
             folderLikesByFolderId={folderLikesByFolderId}
+            reportCountsByFolderId={reportCountsByFolderId}
             datumsType={datumsType}
           ></IntelliCard>
         ) : (
@@ -57,6 +59,7 @@ const IntelliCardGroupRow = ({
             handleCardClick={handleCardClick}
             imageSize="big"
             folderLikesByFolderId={folderLikesByFolderId}
+            reportCountsByFolderId={reportCountsByFolderId}
             datums={cols[i]}
             datumsType={datumsType}
             key={i}

@@ -52,11 +52,23 @@ const CreateMission = ({}) => {
   const [feedbackInput, setFeedbackInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [briefingInput, setBriefingInput] = useState(
-    router.query.briefingInput || ""
-  );
+  // const [briefingInput, setBriefingInput] = useState(
+  //   router.query.briefingInput
+  // );
+
+  console.log("router.query.briefingInput");
+  console.log(router.query.briefingInput);
+  if (!router.query.briefingInput || router.query.briefingInput.length == 0) {
+    console.log(
+      "no briefing input. going back to /reports/folders/view-folders"
+    );
+    console.log("router.query.briefingInput");
+    console.log(router.query.briefingInput);
+    // goToPage("/reports/folders/view-folders");
+  }
   const [expertiseOutput, setExpertiseOutput] = useState("");
-  const [folderId, setFolderId] = useState("");
+  // const [folderId, setFolderId] = useState("");
+
   const firebaseDraftData = useFirebaseListener(
     user
       ? `/${
@@ -96,9 +108,9 @@ const CreateMission = ({}) => {
       }
       // console.log("isStreaming");
       // console.log(isStreaming);
-      if (briefingInput.length != 0) {
-        setBriefingInput(firebaseDraftData.briefingInput);
-      }
+      // if (briefingInput.length != 0) {
+      //   setBriefingInput(firebaseDraftData.briefingInput);
+      // }
       setDraft(firebaseDraftData.draft);
       setExpertiseOutput(firebaseDraftData.expertiseOutput);
       // setSpecializedTraining(firebaseDraftData.);
@@ -126,7 +138,7 @@ const CreateMission = ({}) => {
   async function handleAcceptReport() {
     setHasSubmitted(true);
     const draftData = {
-      briefing: briefingInput,
+      briefingInput: router.query.briefingInput,
       draft,
     };
     if (expertiseOutput) {
@@ -152,21 +164,30 @@ const CreateMission = ({}) => {
     console.log(name);
     router.push(name);
   }
-  function handleSelectedLength(length) {}
+  const [reportLength, setReportLength] = useState("short");
+  function handleSelectedLength(length) {
+    console.log("handleselected length");
+    console.log(length);
+    setReportLength(length);
+  }
+  const [feedbacks, setFeedbacks] = useState([]);
   async function handleQuickDraftClick() {
-    const draftData = { briefingInput };
+    const draftData = { briefingInput: router.query.briefingInput };
     console.log("feedbackInput");
     console.log(feedbackInput);
     if (feedbackInput) {
       draftData.feedback = feedbackInput;
-      draftData.draft = draft;
+      // draftData.previousDraft = draft;
+      let newFeedbacks = feedbacks;
+      newFeedbacks.push({ feedback: feedbackInput, draft });
+      console.log("newFeedbacks");
+      console.log(newFeedbacks);
+      setFeedbacks(newFeedbacks);
+      draftData.feedbacks = newFeedbacks;
       // const newBriefingInput = `${briefingInput} ${draftData.feedback}`;
-      const newBriefingInput = briefingInput + "\n" + draftData.feedback;
-      setBriefingInput(newBriefingInput);
-      console.log("draftData.feedback");
-      console.log(draftData.feedback);
-      console.log("newBriefingInput");
-      console.log(newBriefingInput);
+
+      // setBriefingInput(newBriefingInput);
+
       setFeedbackInput("");
     }
 
@@ -176,6 +197,7 @@ const CreateMission = ({}) => {
       userId,
       context: {
         ...draftData,
+        reportLength,
         userId,
       },
       createdAt: new Date().toISOString(),
@@ -229,71 +251,75 @@ const CreateMission = ({}) => {
       wrote. It's in a text field like the google results page and editable and
       you can hit the button to create a new draft */}
       {draft && (
-        <Card>
+        <Card style={{ backgroundColor: "#131313", color: "white" }}>
           {/* <div className="text-white">Draft</div> */}
-          <CardBody>
+          <CardBody style={{ backgroundColor: "#131313", color: "white" }}>
             <i className="bi bi-body-text"> New Draft </i>
             <div
-              className="text-primary"
+              className="text-white"
               dangerouslySetInnerHTML={{ __html: draft }}
             />
           </CardBody>
         </Card>
       )}
-      {draft && (
-        <>
-          <Form onSubmit={(e) => handleQuickDraftClick(e)}>
-            <FormGroup>
-              <div style={{ marginTop: "40px" }}></div>
-              <Label htmlFor="exampleText" className="text-white">
-                Feedback
-              </Label>
-              <Input
-                id="exampleText"
-                placeholder="What do you think?"
-                name="text"
-                rows="5"
-                type="textarea"
-                autoFocus
-                value={feedbackInput}
-                onChange={(e) => setFeedbackInput(e.target.value)}
-              />
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "flex-start",
-                  paddingTop: "8px",
-                }}
-              >
-                <Button
-                  color="primary"
-                  style={{ border: "1px solid yellow", marginRight: "16px" }}
-                  disabled={!draft.endsWith(" ".repeat(3)) || !feedbackInput}
-                  onClick={(e) => handleQuickDraftClick(e)}
-                >
-                  <i className="bi bi-arrow-clockwise"></i>
-                  &nbsp;Refine
-                </Button>
-                <IntelliReportLengthDropdown
-                  handleSelectedLength={handleSelectedLength}
+      {(draft && isSubmitting) ||
+        hasSubmitted ||
+        (draft && draft.endsWith(" ".repeat(3)) && (
+          <>
+            <Form onSubmit={(e) => handleQuickDraftClick(e)}>
+              <FormGroup>
+                <div style={{ marginTop: "40px" }}></div>
+                <Label htmlFor="exampleText" className="text-white">
+                  Feedback
+                </Label>
+
+                <Input
+                  id="exampleText"
+                  placeholder="What do you think?"
+                  name="text"
+                  rows="5"
+                  type="textarea"
+                  style={{ backgroundColor: "#131313", color: "white" }}
+                  autoFocus
+                  value={feedbackInput}
+                  onChange={(e) => setFeedbackInput(e.target.value)}
                 />
-              </div>
-            </FormGroup>
-          </Form>
-          <div style={{ textAlign: "center" }}>
-            <Button
-              color="primary"
-              style={{ border: "3px solid green" }}
-              disabled={
-                isSubmitting || hasSubmitted || !draft.endsWith(" ".repeat(3))
-              }
-              onClick={(e) => handleAcceptReport(e)}
-            >
-              <i className="bi bi-floppy"></i> Save & Visualize
-            </Button>
-          </div>
-        </>
-      )}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "flex-start",
+                    paddingTop: "8px",
+                  }}
+                >
+                  <Button
+                    color="primary"
+                    style={{ border: "1px solid yellow", marginRight: "16px" }}
+                    disabled={!draft.endsWith(" ".repeat(3)) || !feedbackInput}
+                    onClick={(e) => handleQuickDraftClick(e)}
+                  >
+                    <i className="bi bi-arrow-clockwise"></i>
+                    &nbsp;Refine
+                  </Button>
+                  <IntelliReportLengthDropdown
+                    handleSelectedLength={handleSelectedLength}
+                  />
+                </div>
+              </FormGroup>
+            </Form>
+            <div style={{ textAlign: "center" }}>
+              <Button
+                color="primary"
+                style={{ border: "3px solid green" }}
+                disabled={
+                  isSubmitting || hasSubmitted || !draft.endsWith(" ".repeat(3))
+                }
+                onClick={(e) => handleAcceptReport(e)}
+              >
+                <i className="bi bi-floppy"></i> Save & Visualize
+              </Button>
+            </div>
+          </>
+        ))}
     </div>
   );
 };

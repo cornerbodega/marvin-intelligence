@@ -7,9 +7,9 @@ import {
 } from "reactstrap";
 
 const reportOptions = [
-  { label: "Short (200 words)", value: 1, tokens: "1 Token" },
-  { label: "Standard (400 words)", value: 2, tokens: "2 Tokens" },
-  { label: "Super (800 words)", value: 4, tokens: "4 Tokens" },
+  { label: "Short (100 words)", value: "short", tokens: "1 Token" },
+  { label: "Standard (200 words)", value: "standard", tokens: "2 Tokens" },
+  { label: "Super (500 words)", value: "super", tokens: "4 Tokens" },
 ];
 
 const IntelliReportLengthDropdown = ({ handleSelectedLength }) => {
@@ -19,28 +19,37 @@ const IntelliReportLengthDropdown = ({ handleSelectedLength }) => {
   const toggle = () => setDropdownOpen((prevState) => !prevState);
 
   const handleSelection = (option) => {
+    console.log("handleSelection intellireportlenghtdropdown");
     setSelectedOption(option);
+    console.log("handleSelectedLength");
+    console.log(handleSelectedLength);
     handleSelectedLength(option.value);
   };
 
   return (
-    <Dropdown style={{ width: "108px" }} isOpen={dropdownOpen} toggle={toggle}>
-      <DropdownToggle caret>
-        <span style={{ fontSize: "0.75em" }}>{selectedOption.label}</span>
-      </DropdownToggle>
-      <DropdownMenu>
-        {reportOptions.map((option) => (
-          <DropdownItem
-            key={option.value}
-            onClick={() => handleSelection(option)}
-          >
-            <span style={{ fontSize: "0.75em" }}>
-              <i className="bi bi-coin" /> {option.label} ({option.tokens})
-            </span>
-          </DropdownItem>
-        ))}
-      </DropdownMenu>
-    </Dropdown>
+    <>
+      <Dropdown
+        style={{ width: "108px" }}
+        isOpen={dropdownOpen}
+        toggle={toggle}
+      >
+        <DropdownToggle caret>
+          <span style={{ fontSize: "0.75em" }}>{selectedOption.label}</span>
+        </DropdownToggle>
+        <DropdownMenu>
+          {reportOptions.map((option) => (
+            <DropdownItem
+              key={option.value}
+              onClick={() => handleSelection(option)}
+            >
+              <span style={{ fontSize: "0.75em" }}>
+                <i className="bi bi-coin" /> {option.label} ({option.tokens})
+              </span>
+            </DropdownItem>
+          ))}
+        </DropdownMenu>
+      </Dropdown>
+    </>
   );
 };
 

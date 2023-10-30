@@ -24,6 +24,7 @@ import _ from "lodash";
 import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
 import { current } from "@reduxjs/toolkit";
 import IntelliReportLengthDropdown from "../../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
+import Head from "next/head";
 
 // import { child } from "@firebase/database";
 export const getServerSideProps = withPageAuthRequired({
@@ -31,6 +32,7 @@ export const getServerSideProps = withPageAuthRequired({
     const folderId = context.params.folderSlug.split("-")[0];
     const session = await getSession(context.req, context.res);
     const user = session?.user;
+    const userId = user.sub;
     if (!folderId) {
       console.log("Error! No folder Id");
       return {};
@@ -144,6 +146,7 @@ export const getServerSideProps = withPageAuthRequired({
           missionsResponse[0].reports.agent.specializedTraining;
       }
     }
+
     let { data: linksResponse, error: linksError } = await supabase
       .from("links")
       .select("parentReportId, childReportId");
@@ -181,6 +184,25 @@ export const getServerSideProps = withPageAuthRequired({
 
       _availability = mission.folders.availability;
     });
+
+    // My Tokens
+    let { data: tokensResponse, error: tokensError } = await supabase
+      .from("tokens")
+      .select("tokens")
+      .eq("userId", userId);
+    if (tokensError) {
+      console.log("tokensError");
+    }
+    console.log("tokensResponse");
+    console.log(tokensResponse);
+    let _tokensRemaining = 0;
+    if (tokensResponse) {
+      if (tokensResponse[0]) {
+        _tokensRemaining = tokensResponse[0].tokens;
+      }
+    }
+    console.log("tokensRemaining");
+    console.log(_tokensRemaining);
     // console.log("missions");
     // console.log(missions);
     // const _currentfolderPicUrlIndex = _folderPicUrls
@@ -201,6 +223,7 @@ export const getServerSideProps = withPageAuthRequired({
         // _currentfolderPicUrlIndex,
         _folderLikes,
         _availability,
+        _tokensRemaining,
       },
     };
   },
@@ -219,6 +242,7 @@ const ViewReports = ({
   _currentfolderPicUrlIndex,
   _folderLikes,
   _availability,
+  _tokensRemaining,
 }) => {
   // console.log("useUser");
   // console.log(useUser);
@@ -236,7 +260,8 @@ const ViewReports = ({
   const [offset, setOffset] = useState(1);
   const [isInView, setIsInView] = useState(false);
   const [loadedReports, setLoadedReports] = useState(_loadedReports);
-  // const [tableOfContents, setTableOfContents] = useState([]);
+  const [tokensRemaining, setTokensRemaining] = useState(_tokensRemaining);
+
   const [highlight, setHighlight] = useState({
     text: "",
     startIndex: undefined,
@@ -497,8 +522,17 @@ const ViewReports = ({
   //     }
   //   }
   // }, [firebaseSaveData]);
-  function handleSelectedLength() {}
+  const [reportLength, setReportLength] = useState("short");
+  function handleSelectedLength(length) {
+    console.log("handleselected length");
+    console.log(length);
+    setReportLength(length);
+  }
   async function handleContinuumClick(parentReport) {
+    if (tokensRemaining < 1) {
+      goToPage("/account/tokens/buy-tokens");
+    }
+    setTokensRemaining(tokensRemaining - 1);
     // "parentReportId",
     // "userId",
     // "parentReportContent",
@@ -532,6 +566,7 @@ const ViewReports = ({
         expertises,
         specializedTraining,
         existingHyperlinks,
+        reportLength,
       },
       createdAt: new Date().toISOString(),
     });
@@ -539,12 +574,11 @@ const ViewReports = ({
   }
 
   useEffect(() => {
-    console.log("Updated highlight.text", highlight);
+    console.log("Updated highlight.highlightedText", highlight);
   }, [highlight]);
   const handleTextHighlight = (event, report) => {
     console.log("handleTextHighlight");
     const selection = window.getSelection();
-    console.log("selection", selection);
 
     if (selection.toString().trim().length === 0) {
       setHighlight({ text: "", range: null });
@@ -567,9 +601,10 @@ const ViewReports = ({
     }
 
     const elementId = parentNode ? parentNode.id : null;
-
+    console.log("selection");
+    console.log("selection.toString()", selection.toString());
     setHighlight({
-      text: selection.toString(),
+      highlightedText: selection.toString(),
       // startIndex,
       // endIndex,
       elementId,
@@ -731,6 +766,8 @@ const ViewReports = ({
             highlightedText,
             newLink
           );
+          console.log("updatedHTML");
+          console.log(updatedHTML);
           element.innerHTML = updatedHTML;
         }
       });
@@ -784,22 +821,23 @@ const ViewReports = ({
         console.log("parentReportId");
         const childReports = parentChildIdMap[parentReportId];
         console.log(parentReportId);
-
-        if (!seenReportIds.includes(parentReportId)) {
-          seenReportIds.push(parentReportId);
-          if (!resultParentChildMap[parentReportId]) {
-            resultParentChildMap[parentReportId] = [];
-          }
-          childReports.forEach((childReport) => {
-            console.log("childReport");
-            console.log(childReport);
-            if (!seenReportIds.includes(childReport.childReportId)) {
-              resultParentChildMap[parentReportId].push(
-                childReport.childReportId
-              );
+        if (!childReports) {
+          if (!seenReportIds.includes(parentReportId)) {
+            seenReportIds.push(parentReportId);
+            if (!resultParentChildMap[parentReportId]) {
+              resultParentChildMap[parentReportId] = [];
             }
-            seenReportIds.push(childReport.childReportId);
-          });
+            childReports.forEach((childReport) => {
+              console.log("childReport");
+              console.log(childReport);
+              if (!seenReportIds.includes(childReport.childReportId)) {
+                resultParentChildMap[parentReportId].push(
+                  childReport.childReportId
+                );
+              }
+              seenReportIds.push(childReport.childReportId);
+            });
+          }
         }
       }
       // {"1300":[{"childReportId":1301}],"1301":[{"childReportId":1302}],"1302":[{"childReportId":1303}],"1303":[{"childReportId":1304}],"1304":[]}
@@ -1115,6 +1153,28 @@ const ViewReports = ({
         {/* ["http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png"] */}
         {/* {folderPicUrls} */}
         {folderPicUrl && (
+          <Head>
+            <title>{folderName}</title>
+
+            {/* General tags */}
+            <meta name="title" content={folderName} />
+            <meta name="description" content={folderDescription} />
+            <meta name="image" content={folderPicUrl} />
+
+            {/* Open Graph tags */}
+            <meta property="og:title" content={folderName} />
+            <meta property="og:description" content={folderDescription} />
+            <meta property="og:image" content={folderPicUrl} />
+            <meta property="og:url" content={folderPicUrl} />
+
+            {/* Twitter Card tags */}
+            <meta name="twitter:title" content={folderName} />
+            <meta name="twitter:description" content={folderDescription} />
+            <meta name="twitter:image" content={folderPicUrl} />
+            <meta name="twitter:card" content="summary_large_image" />
+          </Head>
+        )}
+        {folderPicUrl && (
           <div
             style={{
               maxHeight: "700px",
@@ -1157,45 +1217,47 @@ const ViewReports = ({
         )}
         {/* {JSON.stringify(folderPicUrls)} */}
       </div>
-      <div style={{ marginTop: "-33px", marginBottom: "20px" }}>
-        <Row>
-          <Col>
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                marginRight: "20px",
-                color: "gold",
-              }}
-            >
-              <i
+      {folderPicUrl && (
+        <div style={{ marginTop: "-10px", marginBottom: "20px" }}>
+          <Row>
+            <Col>
+              <span
                 style={{
-                  color: `${likes > 0 ? "gold" : "white"}`,
+                  whiteSpace: "nowrap",
+                  marginRight: "20px",
+                  color: "gold",
                 }}
-                onClick={handleLike}
-                className={`bi bi-star${
-                  likes === 0 ? "bi bi-star" : "bi bi-star-fill"
-                }`}
-              />
-              {likes < 2 ? "" : likes}
-            </span>
-            <span style={{ marginRight: "20px" }}>
-              <i
-                onClick={handleGlobeClick}
-                className="bi bi-globe"
-                style={{
-                  color: `${availability === "GLOBAL" ? "gold" : "white"}`,
-                }}
-              />
-              {/* {availability} */}
-            </span>
-            <span>
-              <IntelliPrint loadedReports={loadedReports} />
-            </span>
-          </Col>
+              >
+                <i
+                  style={{
+                    color: `${likes > 0 ? "gold" : "white"}`,
+                  }}
+                  onClick={handleLike}
+                  className={`bi bi-star${
+                    likes === 0 ? "bi bi-star" : "bi bi-star-fill"
+                  }`}
+                />
+                {likes < 2 ? "" : likes}
+              </span>
+              <span style={{ marginRight: "20px" }}>
+                <i
+                  onClick={handleGlobeClick}
+                  className="bi bi-globe"
+                  style={{
+                    color: `${availability === "GLOBAL" ? "gold" : "white"}`,
+                  }}
+                />
+                {/* {availability} */}
+              </span>
+              <span>
+                <IntelliPrint loadedReports={loadedReports} />
+              </span>
+            </Col>
 
-          <Col></Col>
-        </Row>
-      </div>
+            <Col></Col>
+          </Row>
+        </div>
+      )}
       <div> {folderDescription}</div>
       <div
         className="reportTitle reportFont section-title"
@@ -1220,7 +1282,8 @@ const ViewReports = ({
                 color: "#E7007C",
                 textDecoration: "none",
                 cursor: "pointer",
-                fontWeight: 400,
+                // fontWeight: 400,
+                fontSize: "0.85em",
               }}
               href={`#${parentChildIdMap.id}`}
               onClick={() => console.log("Navigating to parent report")}
@@ -1400,6 +1463,19 @@ const ViewReports = ({
       <IntelliReportLengthDropdown
         handleSelectedLength={handleSelectedLength}
       />
+      <div
+        onClick={() => goToPage("/account/tokens/get-tokens")}
+        style={{
+          marginBottom: "32px",
+          marginTop: "22px",
+          fontSize: "0.75em",
+          color: "lightblue",
+          cursor: "pointer",
+          width: "148px",
+        }}
+      >
+        My Tokens: {tokensRemaining} <i className="bi bi-coin" />
+      </div>
       {/* Draft */}
       {/* Is streaming{JSON.stringify(isStreaming)} */}
       {/* {JSON.stringify(loadedReports)} */}
@@ -1410,11 +1486,13 @@ const ViewReports = ({
             className="report text-primary reportFont"
             dangerouslySetInnerHTML={{ __html: draft }}
           ></div>
-          <div className="scroll-downs">
-            <div className="mousey">
-              <div className="scroller"></div>
+          {draft && !draft.endsWith(" ".repeat(3)) && (
+            <div className="scroll-downs">
+              <div className="mousey">
+                <div className="scroller"></div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
       {/* {JSON.stringify(agent)} */}
@@ -1454,7 +1532,7 @@ const ViewReports = ({
           </a>
         </div>
       )}
-      {highlight.text && loadedAgentId != 0 && (
+      {highlight.highlightedText && loadedAgentId != 0 && (
         <IntelliFab onClick={handleFabClick} icon="+" fabType="report" />
       )}
     </div>

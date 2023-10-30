@@ -30,7 +30,7 @@ import Link from "next/link";
 
 import { useRouter } from "next/router";
 
-import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 // import IntelliFab from "../components/IntelliFab";
 
 // import { getSupabase } from "../../utils/supabase";
@@ -46,15 +46,40 @@ import saveTask from "../../../utils/saveTask";
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
 import LoadingDots from "../../../components/LoadingDots";
 import IntelliReportLengthDropdown from "../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
+import Head from "next/head";
 // import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
+    const supabase = getSupabase();
     // const agentId = context.params.agentId;
+    const session = await getSession(context.req, context.res);
+    const user = session?.user;
+    const userId = user.sub;
+    const { data: agency, agencyError } = await supabase
+      .from("users")
+      .select("agencyName")
+      .eq("userId", user.sub);
+    const agencyName = agency[0].agencyName;
+    if (agencyError) {
+      console.log("agencyError");
+    }
+    console.log("agency");
+    console.log(agency);
+    if (!agency || agency.length === 0) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/agency/create-agency",
+        },
+        props: {},
+      };
+    }
+
     const { agentId, parentReportId, highlightStartIndex, highlightEndIndex } =
       context.query;
     console.log("parentReportId");
     console.log(parentReportId);
-    const supabase = getSupabase();
+
     console.log("agentId");
     console.log(agentId);
     let { data: agents, error } = await supabase
@@ -67,14 +92,42 @@ export const getServerSideProps = withPageAuthRequired({
       console.log(error);
     }
     const agent = agents[0];
-
+    const expertiseOutput = [
+      agent.expertise1,
+      agent.expertise2,
+      agent.expertise3,
+    ];
+    // My Tokens
+    let { data: tokensResponse, error: tokensError } = await supabase
+      .from("tokens")
+      .select("tokens")
+      .eq("userId", userId);
+    if (tokensError) {
+      console.log("tokensError");
+    }
+    console.log("tokensResponse");
+    console.log(tokensResponse);
+    let _tokensRemaining = 0;
+    if (tokensResponse) {
+      if (tokensResponse[0]) {
+        _tokensRemaining = tokensResponse[0].tokens;
+      }
+    }
+    console.log("_tokensRemaining");
+    console.log(_tokensRemaining);
     return {
-      props: { agent: agent || {} },
+      props: { userId, agent, expertiseOutput, agencyName, _tokensRemaining },
     };
   },
 });
 
-const CreateMission = ({ agent }) => {
+const CreateMission = ({
+  userId,
+  agent,
+  agencyName,
+  _tokensRemaining,
+  expertiseOutput,
+}) => {
   // console.log("agent");
   // console.log(agent);
   const { user, error, isLoading } = useUser();
@@ -88,7 +141,7 @@ const CreateMission = ({ agent }) => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [feedbackInput, setFeedbackInput] = useState("");
   const router = useRouter();
-
+  const [tokensRemaining, setTokensRemaining] = useState(_tokensRemaining);
   const draftRef = useRef();
   const [parentReportTitle, setParentReportTitle] = useState("");
   const [parentReportId, setParentReportId] = useState("");
@@ -107,9 +160,7 @@ const CreateMission = ({ agent }) => {
           process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
-        }/${process.env.NEXT_PUBLIC_serverUid}/${
-          user.sub
-        }/writeDraftReport/context/draft`
+        }/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/quickDraft/context`
       : null
   );
   const firebaseFolderIdData = useFirebaseListener(
@@ -120,17 +171,18 @@ const CreateMission = ({ agent }) => {
             : "localAsyncTasks"
         }/${process.env.NEXT_PUBLIC_serverUid}/${
           user.sub
-        }/saveReport/context/folderId`
+        }/saveLinkedReport/context/folderId`
       : null
   );
-  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [hasQuickDrafted, setHasQuickDrafted] = useState(false);
+  const [hasSavedReport, setHasSavedReport] = useState(false);
   // const firebaseDraftCompletedAt = useFirebaseListener(
-  //   user ? `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport/context/draft` : null
+  //   user ? `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/quickDraft/context/draft` : null
   // );
   // // const [draftResponseContent, setDraftResponseContent] = useState(null);
 
   useEffect(() => {
-    if (firebaseFolderIdData && hasSubmitted) {
+    if (firebaseFolderIdData && hasSavedReport) {
       console.log("firebaseFolderIdData");
       console.log(firebaseFolderIdData);
 
@@ -146,7 +198,8 @@ const CreateMission = ({ agent }) => {
     router.push(name);
   }
   useEffect(() => {
-    if (firebaseDraftData && hasSubmitted) {
+    if (!firebaseDraftData) return;
+    if (firebaseDraftData.draft) {
       console.log("firebaseDraftData");
       console.log(firebaseDraftData);
       function cleanIncompleteHTML(input) {
@@ -164,8 +217,17 @@ const CreateMission = ({ agent }) => {
       }
       // console.log("isStreaming");
       // console.log(isStreaming);
-
-      setDraft(firebaseDraftData);
+      console.log("firebaseDraftData.expertiseOutput");
+      console.log(firebaseDraftData.expertiseOutput);
+      if (firebaseDraftData.expertiseOutput) {
+        if (
+          JSON.stringify(firebaseDraftData.expertiseOutput) ===
+          JSON.stringify(expertiseOutput)
+        ) {
+          setDraft(firebaseDraftData.draft);
+        }
+        // setExpertiseOutput(firebaseDraftData.expertiseOutput);
+      }
       if (isSubmitting) {
         setIsSubmitting(false);
       }
@@ -183,7 +245,10 @@ const CreateMission = ({ agent }) => {
       setParentReportSlug(slugify(router.query.parentReportTitle));
     }
   });
-  async function handleWriteDraftReport(e) {
+
+  const [feedbacks, setFeedbacks] = useState([]);
+  async function handleQuickDraft(e) {
+    setTokensRemaining(tokensRemaining - 1);
     console.log("create mission handleSubmit");
     console.log("draft");
     console.log(draft);
@@ -197,7 +262,7 @@ const CreateMission = ({ agent }) => {
     setIsSubmitting(true);
     // setBriefing(`${briefing} ${feedbackInput}`);
     setFeedbackInput("");
-    setHasSubmitted(true);
+    setHasQuickDrafted(true);
 
     // const notificationMessagesResponse = await fetch(
     //   "/api/missions/write-draft-notification-endpoint",
@@ -213,45 +278,60 @@ const CreateMission = ({ agent }) => {
     // const notificationJson = await notificationMessagesResponse.json();
 
     // setNotificationMessages(notificationJson);
-    const expertises = [agent.expertise1, agent.expertise2, agent.expertise3];
+
     console.log(" dispatch briefing");
-    const draftData = { briefing, expertises };
-    const specializedTraining = agent.specializedTraining;
+    const draftData = {
+      briefingInput,
+      expertiseOutput,
+      feedbacks,
+      userId,
+      reportLength,
+    };
     if (feedbackInput) {
-      let feedback = [
-        { role: "assistant", content: draft },
-        {
-          role: "user",
-          content: `Please write the report again with the following feedback ${feedbackInput}.`,
-        },
-      ];
-      draftData.feedback = feedback;
+      // draftData.feedback = feedbackInput;
+      // draftData.previousDraft = draft;
+      let newFeedbacks = feedbacks;
+      newFeedbacks.push({ feedback: feedbackInput, draft });
+      console.log("newFeedbacks");
+      console.log(newFeedbacks);
+      setFeedbacks(newFeedbacks);
+      draftData.feedbacks = newFeedbacks;
+      // const newBriefingInput = `${briefingInput} ${draftData.feedback}`;
+
+      // setBriefingInput(newBriefingInput);
+
+      setFeedbackInput("");
     }
-    if (specializedTraining) {
-      draftData.specializedTraining = specializedTraining;
-    }
+    // feedbacks",
+    //     "userId",
+    //     "previousDraft", // the previous draft to feebdack on
+    //     "reportLength",
+
+    // if (feedbackInput) {
+    //   let feedback = [
+    //     { role: "assistant", content: draft },
+    //     {
+    //       role: "user",
+    //       content: `Please write the report again with the following feedback ${feedbackInput}.`,
+    //     },
+    //   ];
+    //   draftData.feedback = feedback;
+    // }
+    // if (specializedTraining) {
+    //   draftData.specializedTraining = specializedTraining;
+    // }
     console.log("draftData");
     console.log(draftData);
 
     try {
-      const newTask = {
-        type: "writeDraftReport",
-        status: "queued",
-        userId: user.sub,
-        context: {
-          ...draftData,
-          userId: user.sub,
-        },
-        createdAt: new Date().toISOString(),
-      };
-      const clearWriteDraftReportTask = {
-        type: "writeDraftReport",
+      const clearQuickDraftTask = {
+        type: "quickDraft",
         status: "cleared",
         userId: user.sub,
         context: {},
         createdAt: new Date().toISOString(),
       };
-      await saveTask(clearWriteDraftReportTask);
+      await saveTask(clearQuickDraftTask);
       const clearSaveReportTask = {
         type: "saveReport",
         status: "cleared",
@@ -261,20 +341,34 @@ const CreateMission = ({ agent }) => {
       };
       await saveTask(clearSaveReportTask);
       // const clearOldDraftRef = await saveToFirebase(
-      //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+      //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/quickDraft`,
       //   {}
       // );
       // const clearOldSaveRef = await saveToFirebase(
       //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
       //   {}
       // );
+      const newTask = {
+        type: "quickDraft",
+        status: "queued",
+        userId: user.sub,
+        context: {
+          ...draftData,
+          userId: user.sub,
+          reportLength,
+          existingExpertise: expertiseOutput,
+        },
+        createdAt: new Date().toISOString(),
+      };
       const newTaskRef = await saveTask(newTask);
       // const newTaskRef = await saveToFirebase(
-      //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+      //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/quickDraft`,
       //   newTask
       // );
 
       if (newTaskRef) {
+        console.log("newTaskRef");
+        console.log(newTaskRef);
         setWriteDraftTaskId(newTaskRef.key); // Store the task ID to set up the listener
         console.log("writeDraftTaskId");
         console.log(writeDraftTaskId);
@@ -289,7 +383,7 @@ const CreateMission = ({ agent }) => {
     }
   }
 
-  // async function handleWriteDraftReport(e) {
+  // async function handleQuickDraft(e) {
   //   console.log("create mission handleSubmit");
   //   console.log("draft");
   //   console.log(draft);
@@ -366,76 +460,72 @@ const CreateMission = ({ agent }) => {
     e.preventDefault();
     console.log("handleAcceptReport");
     setIsSaving(true);
+    setHasSavedReport(true);
     setIsSubmitting(true);
-    // fetch("/api/missions/save-report-notification-endpoint", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ briefing, agentName: agent.agentName }),
-    // }).then(async (notificationMessagesResponse) => {
-    //   // console.log(notificationMessagesResponse.js);
 
-    //   const notificationJson = await notificationMessagesResponse.json();
-    //   console.log("notificationJson");
-    //   console.log(notificationJson);
-    //   setNotificationMessages(notificationJson);
-    //   console.log("notificationMessages");
-    //   console.log(notificationMessages);
-    // });
-    let reportData = {};
-    if (router.query.parentReportId) {
-      reportData.parentReportId = router.query.parentReportId;
-    }
-    if (router.query.highlightedText) {
-      reportData.highlightedText = router.query.highlightedText;
-    }
-    if (router.query.elementId) {
-      reportData.elementId = router.query.elementId;
-    }
-    setWriteDraftTaskId(crypto.randomUUID());
-    const specializedTraining = agent.specializedTraining;
-    if (specializedTraining) {
-      reportData.specializedTraining = specializedTraining;
-    }
-    let generationsCount = 1;
-    if (continuumEnabled) {
-      generationsCount = 3;
-    }
+    // setWriteDraftTaskId(crypto.randomUUID());
 
     try {
+      const draftData = {
+        briefingInput: router.query.briefingInput,
+        existingAgentId: agent.agentId,
+        draft,
+      };
+      if (router.query.parentReportId) {
+        draftData.parentReportId = router.query.parentReportId;
+      }
+      if (router.query.highlightedText) {
+        draftData.highlightedText = router.query.highlightedText;
+      }
+      if (router.query.elementId) {
+        draftData.elementId = router.query.elementId;
+      }
+      // if (expertiseOutput) {
+      //   draftData.expertiseOutput = expertiseOutput;
+      //   // specializedTraining,
+      // }
+
+      // const newTask = {
+      //   type: "finalizeAndVisualizeReport",
+      //   status: "queued",
+      //   userId,
+      //   context: {
+      //     ...draftData,
+      //     userId,
+      //   },
+      //   createdAt: new Date().toISOString(),
+      // };
       const saveReportTask = {
-        // taskId: writeDraftTaskId,
-        type: "saveReport",
+        type: "saveLinkedReport",
         status: "queued",
         userId: user.sub,
         context: {
-          ...reportData,
+          ...draftData,
           draft,
           agentId: agent.agentId,
-          expertises: [agent.expertise1, agent.expertise2, agent.expertise3],
+          expertises: expertiseOutput,
           userId: user.sub,
-          currentGeneration: 1,
-          maxGenerations: 1,
-          maxGenerations: generationsCount,
-          // maxGenerations: 1,
         },
         createdAt: new Date().toISOString(),
       };
 
-      const saveReportTaskRef = await saveTask(saveReportTask);
+      const newTaskRef = await saveTask(saveReportTask);
       console.log("newTaskRef");
       console.log(newTaskRef);
+
+      // const saveReportTaskRef = await saveTask(saveReportTask);
+      // console.log("newTaskRef");
+      // console.log(newTaskRef);
 
       // const saveReportTaskRef = await saveToFirebase(
       //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/saveReport`,
       //   saveReportTask
       // );
 
-      if (saveReportTaskRef) {
+      if (newTaskRef) {
         // setWriteDraftTaskId(newTaskRef.key); // Store the task ID to set up the listener
-        console.log("writeDraftTaskId");
-        console.log(writeDraftTaskId);
+        console.log("newTaskRef");
+        console.log(newTaskRef);
       } else {
         console.error("Failed to queue the task.");
       }
@@ -443,8 +533,8 @@ const CreateMission = ({ agent }) => {
       console.error("Error queuing the task:", error.message);
     } finally {
       // setIsSubmitting(false);
-      clearInterval(notificationIntervalId); // Clear the interval properly
-      setNotificationMessages([]);
+      // clearInterval(notificationIntervalId); // Clear the interval properly
+      // setNotificationMessages([]);
     }
     // v1
     // const reportResponse = await fetch("/api/missions/save-report-endpoint", {
@@ -486,7 +576,7 @@ const CreateMission = ({ agent }) => {
     // if this is a continuum, go to the folder
 
     // clear the notification
-    clearInterval(notificationIntervalId); // Clear the interval properly
+    // clearInterval(notificationIntervalId); // Clear the interval properly
     // setNotificationMessages([]);
   }
   // async function handleAcceptReport(e) {
@@ -537,7 +627,7 @@ const CreateMission = ({ agent }) => {
 
   // useEffect(() => {
   //   if (briefing) {
-  //     handleWriteDraftReport();
+  //     handleQuickDraft();
   //   }
   // }, [briefing]);
 
@@ -546,7 +636,12 @@ const CreateMission = ({ agent }) => {
   //     setupFirebaseListener(user);
   //   }
   // }, [user]);
-  function handleSelectedLength(length) {}
+  const [reportLength, setReportLength] = useState("short");
+  function handleSelectedLength(length) {
+    console.log("handleselected length");
+    console.log(length);
+    setReportLength(length);
+  }
   useEffect(() => {
     async function fetchBriefingSuggestion() {
       // Logic to build expertiseString from agent prop
@@ -583,7 +678,7 @@ const CreateMission = ({ agent }) => {
         console.log(data);
         if (data.briefingSuggestion) {
           // setBriefingSuggestion(data.briefingSuggestion);
-          setBriefing(data.briefingSuggestion);
+          setBriefingInput(data.briefingSuggestion);
         }
 
         if (data.parentReportSummary) {
@@ -635,9 +730,115 @@ const CreateMission = ({ agent }) => {
   const [continuumEnabled, setContinuumEnabled] = useState(false);
   const [generationsSliderValue, setGenerationsSliderValue] = useState(1);
   // const [createNewAgentsEnabled, setCreateNewAgentsEnabled] = useState(false);
+  const textareaRef = useRef(null);
+  const [briefingInput, setBriefingInput] = useState("");
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      // textareaRef.current.parentElement.style.setProperty(
+      //   "--cursor-pos-x",
+      //   "6px"
+      // );
+      const textWidth = getTextWidth(
+        briefingInput,
+        window.getComputedStyle(textareaRef.current).fontSize
+      );
+      const paddingLeft = parseFloat(
+        window.getComputedStyle(textareaRef.current).paddingLeft
+      );
+      const paddingRight = parseFloat(
+        window.getComputedStyle(textareaRef.current).paddingRight
+      );
+
+      const lineHeight = parseFloat(
+        window.getComputedStyle(textareaRef.current).lineHeight
+      );
+
+      // Adjust for padding and ensure the cursor stays within bounds
+      // const totalWidth = Math.min(
+      //   textWidth + paddingLeft,
+      //   textareaRef.current.offsetWidth - paddingRight - 1
+      // );
+      const textareaContentWidth =
+        textareaRef.current.offsetWidth - paddingLeft - paddingRight;
+
+      const lines = Math.ceil(textWidth / textareaContentWidth);
+      const lastLineWidth = textWidth % textareaContentWidth || textWidth;
+
+      const cursorLeft = lastLineWidth + paddingLeft;
+      const cursorTop = (lines - 1) * lineHeight;
+
+      textareaRef.current.parentElement.style.setProperty(
+        "--cursor-pos-x",
+        `${cursorLeft}px`
+      );
+      if (lines > 1) {
+        textareaRef.current.parentElement.style.setProperty(
+          "--cursor-pos-x",
+          `${cursorLeft + lines * 5}px`
+        );
+      }
+
+      if (briefingInput.length === 0) {
+        console.log("briefingInput.length === 0");
+        // textareaRef.current.parentElement.style.setProperty("top", "14px");
+        textareaRef.current.parentElement.style.setProperty(
+          "--cursor-pos-y",
+          `${cursorTop + 45}px`
+        );
+        textareaRef.current.parentElement.style.setProperty(
+          "caret-color",
+          "transparent"
+        );
+        textareaRef.current.parentElement.classList.remove("no-background");
+      } else {
+        // textareaRef.current.parentElement.style.removeProperty("top");
+        // console.log("lines");
+        // console.log(lines);
+        // textareaRef.current.parentElement.style.setProperty(
+        //   "--cursor-pos-y",
+        //   `${cursorTop + 15}px`
+        // );
+        // if (lines > 2) {
+        //   textareaRef.current.parentElement.style.removeProperty(
+        //     "--cursor-pos-y"
+        //   );
+        textareaRef.current.parentElement.style.setProperty(
+          "caret-color",
+          "limegreen"
+        );
+        textareaRef.current.parentElement.classList.add("no-background");
+      }
+      // } else {
+      // textareaRef.current.parentElement.style.setProperty(
+      //   "--cursor-pos-y",
+      //   `${cursorTop + 42}px`
+      // );
+      // }
+      // }
+    }
+  }, [briefingInput, textareaRef]);
+
+  function getTextWidth(text, fontSize) {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    context.font = fontSize + " Arial";
+    return context.measureText(text).width;
+  }
+
+  useEffect(() => {
+    if (textareaRef && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, []);
 
   return (
     <div>
+      <Head>
+        <title>
+          Agent {agent.agentName} | {agencyName}
+        </title>
+      </Head>
       <Toaster position="bottom-center" />
 
       <Breadcrumb
@@ -645,43 +846,19 @@ const CreateMission = ({ agent }) => {
         className="text-white"
       >
         <BreadcrumbItem>
-          <i className="bi  bi-folder"></i>
+          <i className={`bi bi-person-badge`}></i>
           &nbsp;
           <Link
             style={{ fontWeight: "200", textDecoration: "none" }}
             className="text-white"
-            href="/reports/folders/view-folders"
+            href="/agents/view-agents"
           >
-            Reports
+            Agents
           </Link>
         </BreadcrumbItem>
-        {parentReportTitle && (
-          <BreadcrumbItem className="text-white">
-            <Link
-              className="text-white"
-              style={{ fontWeight: "200", textDecoration: "none" }}
-              href={`/missions/report/${parentReportId}-${parentReportSlug}`}
-            >
-              {parentReportTitle}
-            </Link>
-          </BreadcrumbItem>
-        )}
-        {/* <BreadcrumbItem>
-          <i className="bi bi-folder"></i>+&nbsp;
-          <Link
-            className="text-white"
-            style={{ fontWeight: "200", textDecoration: "none" }}
-            href={{
-              pathname: "/missions/create-mission/briefing",
-              query: currentQueryParams,
-            }}
-          >
-            Create Report
-          </Link>
-        </BreadcrumbItem> */}
+
         <BreadcrumbItem style={{ fontWeight: "800" }} className="">
-          <i className={`bi bi-person-badge`}></i>&nbsp;Dispatch Agent{" "}
-          {agent.agentName}
+          Agent {agent.agentName}
         </BreadcrumbItem>
         {/* <BreadcrumbItem className="">
           <div style={{ fontWeight: "800" }}>Dispatch</div>
@@ -690,14 +867,14 @@ const CreateMission = ({ agent }) => {
 
       <Row>
         <Col md={{ size: 7, offset: 2 }}>
-          <Form onSubmit={handleWriteDraftReport}>
+          <Form onSubmit={handleQuickDraft}>
             <FormGroup>
               <div>
                 <div style={{ marginTop: "20px" }}></div>
 
                 <FormGroup>
                   <Row>
-                    <Col>
+                    <Col className="col-8">
                       <Label htmlFor="exampleText" className="text-white">
                         What would you like to know?
                       </Label>
@@ -705,7 +882,7 @@ const CreateMission = ({ agent }) => {
                     <Col>
                       <div
                         onClick={(e) => {
-                          setBriefing("");
+                          setBriefingInput("");
                         }}
                         style={{
                           paddingTop: "4px",
@@ -719,7 +896,7 @@ const CreateMission = ({ agent }) => {
                       </div>
                     </Col>
                   </Row>
-                  <Input
+                  {/* <Input
                     id="exampleText"
                     placeholder="What would you like to know?"
                     name="text"
@@ -727,8 +904,27 @@ const CreateMission = ({ agent }) => {
                     type="textarea"
                     value={briefing}
                     onChange={(e) => setBriefing(e.target.value)}
-                  />
-
+                  /> */}
+                  <div className="textareaWrapper">
+                    <textarea
+                      ref={textareaRef}
+                      autoFocus
+                      value={briefingInput}
+                      onChange={(e) => setBriefingInput(e.target.value)}
+                      placeholder="What would you like to know?"
+                      style={{
+                        padding: "12px 12px 13px 13px",
+                        borderWidth: "0px",
+                        width: "100%",
+                        height: "180px",
+                        color: "white",
+                        borderRadius: "8px",
+                        border: "1px solid white",
+                        backgroundColor: "#000",
+                        "--cursor-pos": "0px", // Initial value
+                      }}
+                    />
+                  </div>
                   <div
                     style={{
                       display: "flex",
@@ -739,49 +935,78 @@ const CreateMission = ({ agent }) => {
                     <Button
                       color="primary"
                       style={{ border: "1px solid green", marginRight: "16px" }}
-                      disabled={isSubmitting || !briefing}
+                      disabled={isSubmitting || !briefingInput}
                     >
-                      <i className="bi bi-body-text"></i> Create Draft
+                      <i className="bi bi-folder"></i>+ Create Report
                     </Button>
+                  </div>
+                  <div style={{ marginTop: "10px" }}>
                     <IntelliReportLengthDropdown
                       handleSelectedLength={handleSelectedLength}
                     />
+                  </div>
+                  <div
+                    onClick={() => goToPage("/account/tokens/get-tokens")}
+                    style={{
+                      marginBottom: "32px",
+                      marginTop: "22px",
+                      fontSize: "0.75em",
+                      color: "lightblue",
+                      cursor: "pointer",
+                      width: "148px",
+                    }}
+                  >
+                    My Tokens: {tokensRemaining} <i className="bi bi-coin" />
                   </div>
                 </FormGroup>
               </div>
             </FormGroup>
             <div>
-              <Card className="text-primary">
-                <CardBody>
-                  <div
+              <Card
+                style={{
+                  backgroundColor: "black",
+                  color: "white",
+                  border: "1px solid white",
+                  borderRadius: "16px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    borderRadius: "16px",
+                    marginBottom: "16px",
+                    marginTop: "0px",
+                    height: "100%",
+                  }}
+                >
+                  <img
+                    src={`${agent.profilePicUrl}`}
                     style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      height: "237px",
-                      objectFit: "cover",
-                      marginBottom: "16px",
-                      marginTop: "16px",
+                      width: "100%",
+                      borderTopLeftRadius: "16px",
+                      borderTopRightRadius: "16px",
+                      // borderRadiusTopLeft: "16px",
+                      // borderRadiusTopRight: "16px",
+                      // objectFit: "cover",
+                      // objectPosition: "top",
+                      // borderRadius: "20%",
+                      // border: "12px solid green",
                     }}
-                  >
-                    <img
-                      src={`${agent.profilePicUrl}`}
-                      style={{
-                        borderRadius: "20%",
-                        // border: "12px solid green",
-                      }}
-                      alt="agent"
-                    />
-                  </div>
+                    alt="agent"
+                  />
+                </div>
+                <CardBody>
                   <CardTitle
                     style={{
                       display: "flex",
                       marginTop: "16px",
-                      marginBottom: "16px",
+                      // marginBottom: "16px",
                       justifyContent: "center",
                       fontWeight: 800,
+                      color: "white",
                       fontSize: "1.2rem",
                     }}
-                    className="text-primary"
                   >
                     Agent {agent.agentName}
                   </CardTitle>
@@ -826,7 +1051,7 @@ const CreateMission = ({ agent }) => {
                     <div>
                       <h4>Bio</h4>
                     </div>
-                    <div>{agent.bio}</div>
+                    <div style={{ fontSize: "0.8em" }}>{agent.bio}</div>
                     {/* {JSON.stringify(agentMissionHistory)} */}
                     {/* {!agentMissionHistory && <LoadingDots></LoadingDots>} */}
                     {/* {!agentMissionHistory ||
@@ -845,20 +1070,14 @@ const CreateMission = ({ agent }) => {
                               <li key={index}>
                                 {/* {JSON.stringify(mission)} */}
                                 <Link
-                                  // style={{ }}
                                   className="reportFont"
                                   style={{
                                     textDecoration: "none",
-                                    // fontStyle: "italic",
                                     fontWeight: 300,
-                                    color: "#0645ad",
-                                    // color: "#E7007C",
-
+                                    color: "#E7007C",
                                     cursor: "pointer",
                                   }}
-                                  // className="text-white"
                                   href={`/reports/folders/intel-report/${mission.reportFolders[0].folderId}`}
-                                  // href={`/missions/reports/folders/${mission.reportFolders[0].folderId}`}
                                 >
                                   {mission.reportTitle}
                                 </Link>
@@ -872,10 +1091,25 @@ const CreateMission = ({ agent }) => {
                     {parentReportSummary && (
                       <>
                         <div>
-                          <h4>Linked Report Context</h4>
+                          <h4>Parent Report Context</h4>
                         </div>
-
-                        <div>{parentReportSummary}</div>
+                        <div>
+                          <Link
+                            className="reportFont"
+                            style={{
+                              textDecoration: "none",
+                              fontWeight: 300,
+                              color: "#E7007C",
+                              cursor: "pointer",
+                            }}
+                            href={`/reports/folders/intel-report/${parentReportId}`}
+                          >
+                            {parentReportTitle}
+                          </Link>
+                        </div>
+                        <div style={{ fontSize: "0.85em" }}>
+                          {parentReportSummary}
+                        </div>
                       </>
                     )}
                     {/* {briefingSuggestion && (
@@ -904,15 +1138,23 @@ const CreateMission = ({ agent }) => {
               </CardBody>
             </Card>
           )}
+          {draft && !draft.endsWith(" ".repeat(3)) && (
+            <div className="scroll-downs">
+              <div className="mousey">
+                <div className="scroller"></div>
+              </div>
+            </div>
+          )}
           {draft && !isSubmitting && draft.endsWith(" ".repeat(3)) && (
             <>
-              <Form onSubmit={(e) => handleWriteDraftReport(e)}>
+              <Form onSubmit={(e) => handleQuickDraft(e)}>
                 <FormGroup>
                   <div style={{ marginTop: "40px" }}></div>
                   <Label htmlFor="exampleText" className="text-white">
                     Feedback
                   </Label>
                   <Input
+                    style={{ backgroundColor: "#131313" }}
                     id="exampleText"
                     placeholder="What do you think?"
                     name="text"
@@ -937,11 +1179,28 @@ const CreateMission = ({ agent }) => {
                       disabled={isSubmitting}
                     >
                       <i className="bi bi-arrow-clockwise"></i>
-                      &nbsp;Retry
+                      &nbsp;Refine
                     </Button>
+                  </div>
+                  <div style={{ marginTop: "10px" }}>
                     <IntelliReportLengthDropdown
                       handleSelectedLength={handleSelectedLength}
                     />
+                  </div>
+                  <div>
+                    <div
+                      onClick={() => goToPage("/account/tokens/get-tokens")}
+                      style={{
+                        marginBottom: "32px",
+                        marginTop: "22px",
+                        fontSize: "0.75em",
+                        color: "lightblue",
+                        cursor: "pointer",
+                        width: "148px",
+                      }}
+                    >
+                      My Tokens: {tokensRemaining} <i className="bi bi-coin" />
+                    </div>
                   </div>
                 </FormGroup>
               </Form>

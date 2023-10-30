@@ -7,6 +7,7 @@ const IntelliCardGroup = ({
   datumsType,
   offset,
   folderLikesByFolderId,
+  reportCountsByFolderId,
 }) => {
   // const [cardsModel, setCardsModel] = useState(datums);
   const cardsModel = datums;
@@ -54,6 +55,7 @@ const IntelliCardGroup = ({
                 cols={cols}
                 datumsType={datumsType}
                 folderLikesByFolderId={folderLikesByFolderId}
+                reportCountsByFolderId={reportCountsByFolderId}
               />
             </div>
           </motion.div>

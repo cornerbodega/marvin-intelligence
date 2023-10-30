@@ -3,20 +3,26 @@
   caret-color: transparent;
   overflow: hidden;
 }
+.textareaWrapper:not(:empty)::after {
+  top: var(--cursor-pos-y, 0);
+}
 
 .textareaWrapper:focus-within::after {
   content: "";
   position: absolute;
-  top: 16px; 
-  /* left: 10px; */
-  left: var(--cursor-pos);
+  left: var(--cursor-pos-x, 0);
+  
   width: 10px;
   height: 1em;
   background-color:#3fd000;
   animation: blink 3s infinite;
 }
-
-
+h4{
+  color:white !important;
+}
+.textareaWrapper.no-background:focus-within::after {
+  background-color: transparent;
+}
 /* textarea:focus::after {
   content: "";
   position: absolute;
@@ -353,7 +359,7 @@ body {
 
 /* If you want headers specifically to be white, target them like this */
 .report h1,
-.report h2,
+h2,
 .report h3,
 .report h4,
 .report h5,
@@ -367,7 +373,7 @@ body {
 .section-title {
   position: relative;
   padding-bottom: 10px;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .section-title:after {
@@ -377,7 +383,7 @@ body {
   right: 0;
   bottom: 0;
   height: 2px;
-  background: linear-gradient(to right, #ccc,#ccc, transparent);
+  /* background: linear-gradient(to right, #ccc,#ccc, transparent); */
 }
 a:hover {
   color: white !important;
