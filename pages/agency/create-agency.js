@@ -100,7 +100,10 @@ function CreateAgency() {
               <div style={{ marginBottom: "40px" }}>
                 {/* <Link href="#"> */}
                 <h3>Create Intelligence Agency</h3>
-                {/* </Link> */}
+                <p className="lead">
+                  This is where you will name your Intelligence Agency. Choose a
+                  name that reflects the ethos and mission of your agency.
+                </p>
               </div>
               <FormGroup>
                 <Row>
