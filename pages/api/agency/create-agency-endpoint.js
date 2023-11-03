@@ -37,17 +37,12 @@ export default async function handler(req, res) {
     // Add agency with agency name
     // Add agenciesUsers with agency id and user id
 
-    const newAgencyModel = { agencyName: req.body.agencyName };
-    const saveAgencyData = await saveToSupabase("agencies", newAgencyModel);
-    console.log("saveAgencyData");
-    console.log(saveAgencyData);
-
     // Assign the first 25 tokens
     const newTokensModel = { tokens: 25, userId: req.body.user.sub };
     const saveTokensData = await saveToSupabase("tokens", newTokensModel);
 
-    if (saveTokensData) {
-      res.send(saveAgencyData);
+    if (savedUsersData) {
+      res.send(savedUsersData);
     } else {
       res.send(500);
     }

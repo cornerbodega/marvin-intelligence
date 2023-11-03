@@ -7,6 +7,9 @@ import {
   FormGroup,
   Label,
   Input,
+  Jumbotron,
+  Card,
+  CardBody,
 } from "reactstrap";
 import { useEffect, useState } from "react";
 // This is where an agency is founded and named.
@@ -92,42 +95,41 @@ function CreateAgency() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   return (
     <>
-      {" "}
       <Container>
-        <Row>
-          <Col md={{ size: 6, offset: 3 }}>
-            <Form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: "40px" }}>
-                {/* <Link href="#"> */}
-                <h3>Create Intelligence Agency</h3>
-                {/* </Link> */}
-              </div>
-              <FormGroup>
-                <Row>
-                  <Label for="expertise1" md={4}>
-                    Agency Name
-                  </Label>
-                  <Col md={8}>
+        <Row className="justify-content-center">
+          <Col md={8}>
+            <Jumbotron>
+              <h1 className="display-4">Create Your Intelligence Agency</h1>
+              <p className="lead">
+                This is where you will name your Intelligence Agency. Choose a
+                name that reflects the ethos and mission of your agency.
+              </p>
+            </Jumbotron>
+          </Col>
+        </Row>
+        <Row className="justify-content-center">
+          <Col md={6}>
+            <Card>
+              <CardBody>
+                <Form onSubmit={handleSubmit}>
+                  <FormGroup>
+                    <Label for="agencyName">Agency Name</Label>
                     <Input
                       autoFocus
                       type="text"
-                      name="expertise1"
-                      id="expertise1"
+                      name="agencyName"
+                      id="agencyName"
                       value={agencyName}
                       onChange={(e) => setAgencyName(e.target.value)}
                       placeholder="Enter Agency Name"
                     />
-                  </Col>
-                </Row>
-              </FormGroup>
-
-              <div style={{ marginBottom: "40px" }}></div>
-              <div style={{ textAlign: "left" }}>
-                <Button color="primary" disabled={isSubmitting}>
-                  Create
-                </Button>{" "}
-              </div>
-            </Form>
+                  </FormGroup>
+                  <Button color="primary" disabled={isSubmitting} block>
+                    Create
+                  </Button>
+                </Form>
+              </CardBody>
+            </Card>
           </Col>
         </Row>
       </Container>
