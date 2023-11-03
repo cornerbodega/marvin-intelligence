@@ -1,5 +1,6 @@
 import { getSupabase } from "../../../utils/supabase";
 import { v2 as cloudinary } from "cloudinary";
+import { saveToSupabase } from "../../../utils/saveToSupabase";
 cloudinary.config({
   cloud_name: "dcf11wsow",
   api_key: "525679258926845",
@@ -29,181 +30,27 @@ export default async function handler(req, res) {
       email: req.body.user.email,
       agencyName: req.body.agencyName,
     };
-    const savedUserstData = await saveToSupabase("users", createUserModel);
-    console.log("savedUserstData");
-    console.log(savedUserstData);
+    const savedUsersData = await saveToSupabase("users", createUserModel);
+    console.log("savedUsersData");
+    console.log(savedUsersData);
     // Add user with user id as sub from auth0
     // Add agency with agency name
     // Add agenciesUsers with agency id and user id
-
-    // console.log("POST");
-    // let newAgentModel = {
-    //   //   agentName: req.body.animalName,
-    //   expertise1: req.body.expertises[0],
-    // };
-    // if (req.body.expertises.length > 1) {
-    //   newAgentModel.expertise2 = req.body.expertises[1];
-    // }
-    // if (req.body.expertises.length > 2) {
-    //   newAgentModel.expertise3 = req.body.expertises[2];
-    // }
-
-    // async function generateAnimalName() {
-    //   console.log("Start generate Animal Name");
-    //   let result = {
-    //     animalName: "API Erorr 1: Generate Animal Name",
-    //     bio: "API Error 2: Unable to Generate Animal Bio",
-    //   };
-    //   const cannotBeAnimalsString = "Cannot be: Otter, Fox";
-    //   let expertiseString = req.body.expertises[0];
-    //   if (req.body.expertises.length > 1) {
-    //     expertiseString += " and " + req.body.expertises[1];
-    //   }
-    //   if (req.body.expertises.length > 2) {
-    //     expertiseString += " and " + req.body.expertises[2];
-    //   }
-    //   const chat_completion = await openai.createChatCompletion({
-    //     model: "gpt-3.5-turbo",
-    //     messages: [
-    //       {
-    //         role: "system",
-    //         content:
-    //           "You are an expert at knowing lots of animal names and their characteristics. You are always as specific as possible with the sub-species.",
-    //       },
-    //       {
-    //         role: "user",
-    //         content: `Which animal embodies the characteristics of Business and Market Analysis? Do not explain your answer. Return only the results in the following JSON format.`,
-    //       },
-    //       {
-    //         role: "system", //try 'assistant' as well, but this works so far
-    //         content: `{
-    //             "animal": "Fennec Fox",
-    //             "bio": "The Fennec fox is often seen as a symbol of cunning and adaptability. In the realm of business strategy and market analysis, these are crucial traits. Foxes are known to observe and analyze their environment keenly, strategize their hunt, and change tactics as necessary, demonstrating a mix of intelligence, foresight, and flexibility. In business, the ability to assess the market, anticipate changes, and adjust strategies accordingly is vital for success, much like a fox navigating its terrain and seeking its prey."
-    //           }`,
-    //       },
-    //       {
-    //         role: "user",
-    //         content: `Which animal embodies the characteristics of ${expertiseString}? ${cannotBeAnimalsString}`,
-    //       },
-    //     ],
-    //   });
-    //   const animalNameResponseContent =
-    //     chat_completion.data.choices[0].message.content;
-    //   if (animalNameResponseContent) {
-    //     console.log("animalNameResponseContent");
-    //     console.log(animalNameResponseContent);
-    //     const animalNameResponseObject = JSON.parse(animalNameResponseContent);
-    //     if (animalNameResponseObject) {
-    //       if (animalNameResponseObject.animal) {
-    //         result.animalName = animalNameResponseObject.animal;
-    //       }
-    //       if (animalNameResponseObject.bio) {
-    //         result.bio = animalNameResponseObject.bio;
-    //       }
-    //     }
-    //   }
-    //   console.log(JSON.stringify(chat_completion.data.choices[0]));
-    //   console.log("End Generate Animal Name");
-    //   return result;
-    // }
-    // const agentNameResponse = await generateAnimalName();
-    // const agentName = agentNameResponse.animalName;
-    // const bio = agentNameResponse.bio;
-    // newAgentModel.agentName = agentName;
-    // newAgentModel.bio = bio;
-    // const aiImageResponse = await openai.createImage({
-    //   prompt: `a ${agentName}`,
-    //   n: 1,
-    //   size: "1024x1024",
-    // });
-    // const imageUrl = aiImageResponse.data.data[0].url;
-    // //   Upload Image to Cloudinary and receive Url
-    // const cloudinaryImageUploadResult = await cloudinary.uploader
-    //   .upload(imageUrl)
-    //   .catch((error) => console.log(error));
-    // //   .then((result) => console.log(result))
-    // console.log("cloudinaryImageUploadResult");
-    // const profilePicUrl = cloudinaryImageUploadResult.url;
-    // newAgentModel.profilePicUrl = profilePicUrl;
-    // console.log("newAgentModel");
-    // console.log(newAgentModel);
-    // //   Save Agent to Supabase
-    // const saveAgentData = await saveToSupabase("agents", newAgentModel);
-    // console.log("saveAgentData");
-    // console.log(saveAgentData);
-    // if (saveAgentData) {
-    //   res.send(saveAgentData);
-    // } else {
-    //   res.send(500);
-    // }
-    // const { saveAgentData, saveAgentError } = await supabase
-    //   .from("agents")
-    //   .insert(newAgentModel);
-    // console.log("saveAgentError");
-    // console.log(saveAgentError);
-    // // if (saveAgentError) {
-    // //   console.error(saveAgentError);
-    // //   return res.sendStatus(500);
-    // // }
-    // if (saveAgentError) {
-    //   console.error("Error inserting record:", error);
-    //   return res.sendStatus(500);
-    // } else {
-    //   console.log("saveAgentData");
-    //   console.log(saveAgentData);
-    //   // console.log("Inserted record with ID:", saveAgentData[0].id);
-    //   res.send(200);
-    // }
 
     const newAgencyModel = { agencyName: req.body.agencyName };
     const saveAgencyData = await saveToSupabase("agencies", newAgencyModel);
     console.log("saveAgencyData");
     console.log(saveAgencyData);
-    if (saveAgencyData) {
+
+    // Assign the first 25 tokens
+    const newTokensModel = { tokens: 25, userId: req.body.user.sub };
+    const saveTokensData = await saveToSupabase("tokens", newTokensModel);
+
+    if (saveTokensData) {
       res.send(saveAgencyData);
     } else {
       res.send(500);
     }
-
-    async function saveToSupabase(table, dataToSave) {
-      const response = await supabase.from(table).insert(dataToSave).select();
-      console.log("response");
-      console.log(response);
-      // if (error) {
-      //   console.log("error");
-      //   console.log(error);
-      //   return;
-      // }
-      // console.log("savedData");
-      // console.log(savedData);
-      return response;
-      // return new Promise((resolve, reject) => {
-      // supabase
-      //   .from(table)
-      //   .insert(data)
-      //   .then((response) => {
-      //     const { data, error } = response;
-      //     if (error) {
-      //       console.error("Error:", error.message);
-      //       reject(error);
-      //     } else {
-      //       console.log("Inserted record:", data);
-      //       resolve(data);
-      //     }
-      //   })
-      //   .catch((e) => {
-      //     console.error("Unexpected error:", e);
-      //     reject(e);
-      //   });
-      // });
-    }
-
-    // return res.sendStatus(200);
-    // const response = await fetch(
-    //   "https://jsonplaceholder.typicode.com/todos/1"
-    // );
-    // res.send(response);
-    // Process a POST request
   } else {
     return res.sendStatus(500);
     // Handle any other HTTP method

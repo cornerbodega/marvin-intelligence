@@ -107,8 +107,8 @@ export const getServerSideProps = withPageAuthRequired({
       .in("folderId", folderIds);
     console.log("reportCountsData");
     console.log(reportCountsData);
-    console.log("reportCountsData[0].reportFolders[0]");
-    console.log(reportCountsData[0].reportFolders[0]);
+    // console.log("reportCountsData[0].reportFolders[0]");
+    // console.log(reportCountsData[0].reportFolders[0]);
 
     if (reportCountsError) {
       console.error("Error fetching report counts:", reportCountsError);
@@ -385,10 +385,10 @@ const ViewReports = ({
       setIsInView((prev) => bottom <= innerHeight);
     }
   };
-  const handleFabClick = () => {
-    console.log("ViewReports HandleClick Clicked!");
-    goToPage("/missions/create-mission/briefing");
-  };
+  // const handleFabClick = () => {
+  //   console.log("ViewReports HandleClick Clicked!");
+  //   goToPage("/missions/create-mission/briefing");
+  // };
   const handleCardClick = (folder) => {
     console.log(folder);
     // console.log("handleCardClick");
@@ -493,65 +493,6 @@ const ViewReports = ({
     }
   }, [isInView, isLast]);
 
-  // useEffect(() => {
-  //   if (!isLast && !searchInput) {
-  //     const loadMoreReports = async () => {
-  //       const from = offset * PAGE_COUNT;
-  //       const to = from + PAGE_COUNT - 1;
-  //       setOffset((prev) => prev + 1);
-
-  //       let { data: folders } = await supabase
-  //         .from("folders")
-  //         .select("*")
-  //         .range(from, to)
-  //         .or(`availability.neq.DELETED,availability.is.null`)
-  //         .eq("userId", userId)
-  //         .order("createdAt", { ascending: false });
-
-  //       // Extract folderIds from the obtained folders data
-  //       const folderIds = folders.map((folder) => folder.folderId);
-
-  //       let folderLikes = [];
-
-  //       if (folderIds.length > 0) {
-  //         let { data } = await supabase
-  //           .from("folderLikes")
-  //           .select()
-  //           .in("folderId", folderIds);
-
-  //         folderLikes = data;
-  //       }
-
-  //       const newLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
-  //         if (!acc[folderLike.folderId]) {
-  //           acc[folderLike.folderId] = 0;
-  //         }
-
-  //         acc[folderLike.folderId] += folderLike.likeValue;
-  //         return acc;
-  //       }, {});
-
-  //       // Update the folderLikesByFolderId state with the new data
-  //       setFolderLikesByFolderId((prev) => ({
-  //         ...prev,
-  //         ...newLikesByFolderId,
-  //       }));
-
-  //       return folders;
-  //     };
-
-  //     if (isInView && !isLast && !searchInput) {
-  //       loadMoreReports().then((moreReports) => {
-  //         setLoadedReports((prev) =>
-  //           getUniqueFolders([...prev, ...moreReports])
-  //         );
-  //         if (moreReports.length < PAGE_COUNT) {
-  //           setIsLast(true);
-  //         }
-  //       });
-  //     }
-  //   }
-  // }, [isInView, isLast]);
   function getUniqueFolders(folders) {
     const seenIds = new Set();
     const uniqueFolders = [];

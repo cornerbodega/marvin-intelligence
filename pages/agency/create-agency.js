@@ -40,7 +40,7 @@ export const getServerSideProps = withPageAuthRequired({
       return {
         redirect: {
           permanent: false,
-          destination: "/missions/create-mission/agents/view-agents",
+          destination: "/reports/folders/view-folders",
         },
         props: {},
       };

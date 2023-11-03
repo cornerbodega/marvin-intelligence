@@ -102,6 +102,7 @@ const ViewReports = ({ user, _agencyName, tokensRemaining }) => {
     setIsSubmitting(false);
 
     if (res.status === 200) {
+      setAgencyName(agencyName);
     } else {
       console.log(JSON.stringify(res));
       alert("An error occurred while updating the agency. Please try again.");

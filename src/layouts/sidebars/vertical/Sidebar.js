@@ -75,7 +75,7 @@ const navigation = [
   // },
   {
     title: "Support",
-    href: "/about",
+    href: "/support",
     icon: "bi bi-patch-question-fill",
   },
 ];

@@ -110,7 +110,7 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
   }, []);
   useEffect(() => {
     if (!agents || agents.length === 0) {
-      goToPage("add-agent");
+      goToPage("/reports/folders/view-folders");
     }
   });
 

@@ -40,7 +40,7 @@ export const getServerSideProps = withPageAuthRequired({
     let { data: folders, error } = await supabase
       .from("folders")
       .select("*")
-      .eq("userId", userId)
+      // .eq("userId", userId)
       .filter("folderName", "neq", null)
       .filter("folderPicUrl", "neq", null)
       .filter("availability", "eq", "GLOBAL")
@@ -73,7 +73,7 @@ export const getServerSideProps = withPageAuthRequired({
       console.log("No folders found for the given criteria");
     }
 
-    const folderLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
+    const _folderLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
       if (!acc[folderLike.folderId]) {
         acc[folderLike.folderId] = 0;
       }
@@ -83,14 +83,42 @@ export const getServerSideProps = withPageAuthRequired({
     }, {});
 
     console.log("folderLikesByFolderId");
-    console.log(folderLikesByFolderId);
+    console.log(_folderLikesByFolderId);
 
+    // Query the reportFolders table to get the count of reports for each folderId
+    let { data: reportCountsData, error: reportCountsError } = await supabase
+      .from("folders")
+      .select(`folderId, reportFolders(count)`)
+      .in("folderId", folderIds);
+    console.log("reportCountsData");
+    console.log(reportCountsData);
+    // console.log("reportCountsData[0].reportFolders[0]");
+    // console.log(reportCountsData[0].reportFolders[0]);
+
+    if (reportCountsError) {
+      console.error("Error fetching report counts:", reportCountsError);
+    }
+
+    const _reportCountsByFolderId = reportCountsData.reduce((acc, item) => {
+      acc[item.folderId] = item.reportFolders[0].count || null;
+      return acc;
+    }, {});
     return {
-      props: { folders, userId, folderLikesByFolderId },
+      props: {
+        folders,
+        userId,
+        _folderLikesByFolderId,
+        _reportCountsByFolderId,
+      },
     };
   },
 });
-const ViewReports = ({ folders, userId, folderLikesByFolderId }) => {
+const ViewReports = ({
+  folders,
+  userId,
+  _folderLikesByFolderId,
+  _reportCountsByFolderId,
+}) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(2);
@@ -98,6 +126,9 @@ const ViewReports = ({ folders, userId, folderLikesByFolderId }) => {
   const [loadedReports, setLoadedReports] = useState(folders);
   const [briefingInput, setBriefingInput] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const [reportCountsByFolderId, setReportCountsByFolderId] = useState(
+    _reportCountsByFolderId
+  );
   console.log("loadedReports");
   console.log(loadedReports);
   async function loadPagedResults() {
@@ -191,58 +222,58 @@ const ViewReports = ({ folders, userId, folderLikesByFolderId }) => {
   //   // console.log(filteredReports);
   //   // setLoadedReports(filteredReports);
   // }
-  async function handleQuickDraftClick() {
-    // await queueQuickDraftTask();
-    // async function queueQuickDraftTask() {
-    const draftData = { briefingInput };
-    const newTask = {
-      type: "quickDraft",
-      status: "queued",
-      userId,
-      context: {
-        ...draftData,
-        userId,
-      },
-      createdAt: new Date().toISOString(),
-    };
+  // async function handleQuickDraftClick() {
+  //   // await queueQuickDraftTask();
+  //   // async function queueQuickDraftTask() {
+  //   const draftData = { briefingInput };
+  //   const newTask = {
+  //     type: "quickDraft",
+  //     status: "queued",
+  //     userId,
+  //     context: {
+  //       ...draftData,
+  //       userId,
+  //     },
+  //     createdAt: new Date().toISOString(),
+  //   };
 
-    // const newTaskRef = await saveToFirebase(
-    //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
-    //   newTask
-    // );
-    try {
-      const response = await fetch("/api/tasks/save-task", {
-        method: "POST", // Specify the request method
-        headers: {
-          "Content-Type": "application/json", // Content type header to tell the server the nature of the request body
-        },
-        body: JSON.stringify(newTask), // Convert the JavaScript object to a JSON string
-      });
+  //   // const newTaskRef = await saveToFirebase(
+  //   //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
+  //   //   newTask
+  //   // );
+  //   try {
+  //     const response = await fetch("/api/tasks/save-task", {
+  //       method: "POST", // Specify the request method
+  //       headers: {
+  //         "Content-Type": "application/json", // Content type header to tell the server the nature of the request body
+  //       },
+  //       body: JSON.stringify(newTask), // Convert the JavaScript object to a JSON string
+  //     });
 
-      if (response.ok) {
-        console.log("Task saved successfully");
-        // Process the response if needed
-        const data = await response.json();
-        console.log(data);
-        goToPage("/reports/create-report/quick-draft");
-      } else {
-        console.error("Failed to save the task");
-      }
-    } catch (error) {
-      console.error("An error occurred while saving the task:", error);
-    }
-    // }
-    // Go to quick draft page
-    // immediately start writing the report
-    // let the user provide feedback
-    // let the user save the report
-    // the user will go to the folder detail page
-    // the report will be there
-    // the agent, folder, reportFolder, and report will be saved to supabase with no art
-    // the agent will be created
-    // the images for the folder and report and agent will load dynamically
-    // at the bottom of the report is a continuum button
-  }
+  //     if (response.ok) {
+  //       console.log("Task saved successfully");
+  //       // Process the response if needed
+  //       const data = await response.json();
+  //       console.log(data);
+  //       goToPage("/reports/create-report/quick-draft");
+  //     } else {
+  //       console.error("Failed to save the task");
+  //     }
+  //   } catch (error) {
+  //     console.error("An error occurred while saving the task:", error);
+  //   }
+  //   // }
+  //   // Go to quick draft page
+  //   // immediately start writing the report
+  //   // let the user provide feedback
+  //   // let the user save the report
+  //   // the user will go to the folder detail page
+  //   // the report will be there
+  //   // the agent, folder, reportFolder, and report will be saved to supabase with no art
+  //   // the agent will be created
+  //   // the images for the folder and report and agent will load dynamically
+  //   // at the bottom of the report is a continuum button
+  // }
   // const reportNames = missions.map((report) => report.reportName);
   useEffect(() => {
     const handleDebouncedScroll = debounce(
@@ -291,7 +322,9 @@ const ViewReports = ({ folders, userId, folderLikesByFolderId }) => {
     console.log(name);
     router.push(name);
   }
-
+  const [folderLikesByFolderId, setFolderLikesByFolderId] = useState(
+    _folderLikesByFolderId
+  );
   useEffect(() => {
     if (!isLast && !searchInput) {
       const loadMoreReports = async () => {
@@ -299,36 +332,127 @@ const ViewReports = ({ folders, userId, folderLikesByFolderId }) => {
         const to = from + PAGE_COUNT - 1;
         setOffset((prev) => prev + 1);
 
-        const { data } = await supabase
+        let { data: folders } = await supabase
           .from("folders")
           .select("*")
           .range(from, to)
-          .order("createdAt", { ascending: false })
-          .eq("availability", "GLOBAL");
-        console.log("load more missions data");
+          .or(`availability.neq.DELETED,availability.is.null`)
+          .eq("userId", userId)
+          .order("createdAt", { ascending: false });
 
-        console.log(data);
-        return data;
+        // Extract folderIds from the obtained folders data
+        const folderIds = folders.map((folder) => folder.folderId);
+
+        let folderLikes = [];
+
+        if (folderIds.length > 0) {
+          let { data } = await supabase
+            .from("folderLikes")
+            .select()
+            .in("folderId", folderIds);
+
+          folderLikes = data;
+        }
+
+        const newLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
+          if (!acc[folderLike.folderId]) {
+            acc[folderLike.folderId] = 0;
+          }
+
+          acc[folderLike.folderId] += folderLike.likeValue;
+          return acc;
+        }, {});
+
+        // Update the folderLikesByFolderId state with the new data
+        setFolderLikesByFolderId((prev) => ({
+          ...prev,
+          ...newLikesByFolderId,
+        }));
+
+        // Fetch the report counts for the new folders
+        let { data: reportCountsData } = await supabase
+          .from("folders")
+          .select(`folderId, reportFolders(count)`)
+          .in("folderId", folderIds);
+
+        const newReportCountsByFolderId = reportCountsData.reduce(
+          (acc, item) => {
+            acc[item.folderId] = item.reportFolders[0].count || null;
+            return acc;
+          },
+          {}
+        );
+
+        // Update the reportCountsByFolderId state
+        setReportCountsByFolderId((prev) => ({
+          ...prev,
+          ...newReportCountsByFolderId,
+        }));
+        return folders;
       };
 
-      if (isInView) {
-        console.log(`LOAD MORE FOLDERS ${offset}`);
+      if (isInView && !isLast && !searchInput) {
         loadMoreReports().then((moreReports) => {
-          console.log("moreReports");
-          console.log(moreReports);
-          if (moreReports.length === 0) {
+          setLoadedReports((prev) =>
+            getUniqueFolders([...prev, ...moreReports])
+          );
+          if (moreReports.length < PAGE_COUNT) {
             setIsLast(true);
-          } else {
-            setLoadedReports([...loadedReports, ...moreReports]);
-            if (moreReports.length < PAGE_COUNT) {
-              setIsLast(true);
-            }
           }
-          // setLoadedReports((prev) => [...prev, ...moreReports]);
         });
       }
     }
   }, [isInView, isLast]);
+  function getUniqueFolders(folders) {
+    const seenIds = new Set();
+    const uniqueFolders = [];
+
+    for (const folder of folders) {
+      if (!seenIds.has(folder.folderId)) {
+        seenIds.add(folder.folderId);
+        uniqueFolders.push(folder);
+      }
+    }
+
+    return uniqueFolders;
+  }
+  // useEffect(() => {
+  //   if (!isLast && !searchInput) {
+  //     const loadMoreReports = async () => {
+  //       const from = offset * PAGE_COUNT;
+  //       const to = from + PAGE_COUNT - 1;
+  //       setOffset((prev) => prev + 1);
+
+  //       const { data } = await supabase
+  //         .from("folders")
+  //         .select("*")
+  //         .range(from, to)
+  //         .order("createdAt", { ascending: false })
+  //         .eq("availability", "GLOBAL");
+  //       console.log("load more missions data");
+
+  //       console.log(data);
+  //       return data;
+  //     };
+
+  //     if (isInView) {
+  //       console.log(`LOAD MORE FOLDERS ${offset}`);
+  //       loadMoreReports().then((moreReports) => {
+  //         console.log("moreReports");
+  //         console.log(moreReports);
+  //         if (moreReports.length === 0) {
+  //           setIsLast(true);
+  //         } else {
+  //           setLoadedReports([...loadedReports, ...moreReports]);
+  //           if (moreReports.length < PAGE_COUNT) {
+  //             setIsLast(true);
+  //           }
+  //         }
+  //         // setLoadedReports((prev) => [...prev, ...moreReports]);
+  //       });
+  //     }
+  //   }
+  // }, [isInView, isLast]);
 
   // }
   return (
@@ -367,6 +491,7 @@ const ViewReports = ({ folders, userId, folderLikesByFolderId }) => {
             handleCardClick={handleCardClick}
             datums={loadedReports}
             folderLikesByFolderId={folderLikesByFolderId}
+            reportCountsByFolderId={reportCountsByFolderId}
             datumsType={"folders"}
           ></IntelliCardGroup>
         </Row>
