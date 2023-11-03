@@ -9,7 +9,7 @@ import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { getSupabase } from "../../../../utils/supabase";
 // import Link from "next/link";
 import IntelliFab from "../../../../components/IntelliFab";
-// import getCloudinaryImageUrlForHeight from "../../../../utils/getCloudinaryImageUrlForHeight";
+import getCloudinaryImageUrlForHeight from "../../../../utils/getCloudinaryImageUrlForHeight";
 // rest of component
 // import { slugify } from "../../../../utils/slugify";
 // const PAGE_COUNT = 6;
@@ -1192,7 +1192,7 @@ const ViewReports = ({
             >
               <img
                 // className="report-image"
-                src={`${folderPicUrl}`}
+                src={`${getCloudinaryImageUrlForHeight(folderPicUrl, 700)}`}
                 style={{
                   // objectFit: "contain",
                   // width: "auto",
@@ -1387,7 +1387,10 @@ const ViewReports = ({
                     title={report.reportPicDescription}
                   >
                     <img
-                      src={report.reportPicUrl}
+                      src={getCloudinaryImageUrlForHeight(
+                        report.reportPicUrl,
+                        700
+                      )}
                       alt="Report Image"
                       className="report-image"
                       style={{ borderRadius: "10px" }}
@@ -1513,7 +1516,10 @@ const ViewReports = ({
             }}
           >
             <img
-              src={`${agent.profilePicUrl}`}
+              src={`${getCloudinaryImageUrlForHeight(
+                agent.profilePicUrl,
+                237
+              )}`}
               style={{ borderRadius: "20%", cursor: "pointer" }}
               alt="agent"
             />

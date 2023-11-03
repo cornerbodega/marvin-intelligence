@@ -9,7 +9,7 @@ import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { getSupabase } from "../../../../utils/supabase";
 // import Link from "next/link";
 import IntelliFab from "../../../../components/IntelliFab";
-// import getCloudinaryImageUrlForHeight from "../../../../utils/getCloudinaryImageUrlForHeight";
+import getCloudinaryImageUrlForHeight from "../../../../utils/getCloudinaryImageUrlForHeight";
 // rest of component
 // import { slugify } from "../../../../utils/slugify";
 // const PAGE_COUNT = 6;
@@ -909,7 +909,7 @@ const ViewReports = ({
           {folderPicUrl && (
             <div
               style={{
-                // height: "700px",
+                height: "700px",
                 position: "relative",
               }}
               className="image-container"
@@ -923,7 +923,7 @@ const ViewReports = ({
               >
                 <img
                   // className="report-image"
-                  src={`${folderPicUrl}`}
+                  src={`${getCloudinaryImageUrlForHeight(folderPicUrl, 700)}`}
                   style={
                     {
                       // objectFit: "contain",
@@ -1123,7 +1123,10 @@ const ViewReports = ({
                       rel="noopener noreferrer"
                     >
                       <img
-                        src={report.reportPicUrl}
+                        src={getCloudinaryImageUrlForHeight(
+                          report.reportPicUrl,
+                          700
+                        )}
                         alt={report.reportPicDescription}
                         title={report.reportPicDescription}
                         className="report-image"
