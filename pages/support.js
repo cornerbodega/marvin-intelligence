@@ -13,8 +13,8 @@ export default function SupportPage() {
         Please add your issue to the <code>#support</code> channel in our
         Discord server.
       </p>
-      <Link href="https://discord.gg/RwKkeZzq" passHref>
-        <Button color="primary" target="_blank">
+      <Link target="_blank" href="https://discord.gg/RwKkeZzq" passHref>
+        <Button color="primary" rel="noopener noreferrer">
           Go to Discord
         </Button>
       </Link>
