@@ -867,6 +867,7 @@ const ViewReports = ({
       return;
     }
   }
+  // Speech
   // Use state to track whether audio is playing
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false); // New state for loading
@@ -1194,6 +1195,7 @@ const ViewReports = ({
                     </a>
                   )}
                 </div>
+                {/* Speech */}
                 <div>
                   <div
                     onClick={() => handleReadReportClick(index)}
