@@ -41,7 +41,6 @@ const HourglassAnimation = () => {
 
   const iconStyle = {
     fontSize: "5rem",
-    transition: "transform 1s ease-in-out",
     color: `hsl(${color}, 100%, 50%)`, // Apply dynamic color
     filter: `drop-shadow(0 0 0.75rem hsl(${color}, 100%, 50%))`, // Add a glow effect
   };
@@ -63,7 +62,7 @@ const HourglassAnimation = () => {
 
         .bi {
           font-size: 5rem;
-          transition: transform 1s ease-in-out, color 2s ease;
+          transition: color 2s ease;
           position: relative;
         }
 
@@ -77,35 +76,6 @@ const HourglassAnimation = () => {
           }
           100% {
             transform: rotateX(360deg);
-          }
-        }
-
-        /* Adjusted Sand fading effect without the radial gradient */
-        .bi-hourglass-top::after,
-        .bi-hourglass-split::after,
-        .bi-hourglass-bottom::after {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 50%;
-          background: linear-gradient(
-            to bottom,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.8) 50%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          animation: fadeSand 2s infinite;
-        }
-
-        @keyframes fadeSand {
-          0%,
-          100% {
-            opacity: 0;
-          }
-          50% {
-            opacity: 1;
           }
         }
       `}</style>
