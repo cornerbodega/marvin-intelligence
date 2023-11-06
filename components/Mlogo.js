@@ -39,13 +39,13 @@ const Mlogo = ({ onClick }) => {
         // display: "flex",
 
         borderRadius: "50%",
-        // background: "black",
-        height: "400px",
+        // background: "red",
+        height: "300px",
         width: "400px",
       }}
     >
       <Canvas>
-        <OrbitControls minDistance={3.5} maxDistance={3.5} />
+        <OrbitControls minDistance={3} maxDistance={3} />
         <ambientLight intensity={2} />
         <pointLight position={[-30, -30, -30]} intensity={0.5} />
         <pointLight position={[20, 20, 20]} intensity={0.5} />

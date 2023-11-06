@@ -1,6 +1,7 @@
 import { Button, Nav, NavItem } from "reactstrap";
 import Logo from "../../logo/Logo";
 import Link from "next/link";
+import Mlogo from "../../../../components/Mlogo";
 import { useRouter } from "next/router";
 
 const navigation = [
@@ -85,18 +86,44 @@ const Sidebar = ({ showMobilemenu }) => {
   const location = curl.pathname;
 
   return (
-    <div className="p-3 ">
-      <div className="d-flex align-items-center">
-        <Logo />
+    <div className="p-3">
+      <div
+        style={{
+          textAlign: "right",
+          marginBottom: "-10px",
+          // background: "blue",
+        }}
+      >
         <a
           close="true"
           size="sm"
           className="ms-auto d-lg-none"
-          style={{ color: "white", textDecoration: "none" }}
-          onClick={showMobilemenu}
+          style={{
+            zIndex: 9999,
+            color: "white",
+            textDecoration: "none",
+            cursor: "pointer",
+          }}
+          // onClick={showMobilemenu}
+          onClick={(e) => {
+            e.stopPropagation(); // Stop the click from reaching the canvas
+            showMobilemenu();
+          }}
         >
           ✖
         </a>
+      </div>
+      <div className="d-flex align-items-center">
+        <div
+          style={{
+            position: "relative",
+            marginLeft: "-100px",
+            marginBottom: "-80px",
+            zIndex: 2, // Ensure this is above the canvas's z-index
+          }}
+        >
+          <Mlogo />
+        </div>
       </div>
 
       <div className="pt-4 mt-2">

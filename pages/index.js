@@ -4,6 +4,7 @@ import Mlogo from "../components/Mlogo";
 import { Button } from "reactstrap";
 
 import React from "react";
+import Logo from "../src/layouts/logo/Logo";
 
 export default function Home() {
   return (
@@ -270,7 +271,8 @@ export default function Home() {
               // display: "flex",
             }}
           >
-            <Mlogo />
+            {/* <Mlogo /> */}
+            <Logo />
           </div>
           <div style={{ height: "60px" }}></div>
           <div
