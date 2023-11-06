@@ -97,7 +97,7 @@ export default function Home() {
                           <div
                             style={{ marginTop: "20px", fontSize: "0.75em" }}
                           >
-                            <i className="bi bi-coin" /> 1 Token = 200 words
+                            <i className="bi bi-coin" /> 1 Token = 100 words
                           </div>
                         </div>
                       </div>
