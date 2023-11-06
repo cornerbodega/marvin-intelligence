@@ -1,7 +1,7 @@
 import Head from "next/head";
 
 import Mlogo from "../components/Mlogo";
-import { Button } from "reactstrap";
+import { Button, Container, Row, Col } from "reactstrap";
 
 import React from "react";
 import Logo from "../src/layouts/logo/Logo";
@@ -32,60 +32,60 @@ export default function Home() {
           <header className="">
             <div className=""></div>
           </header>
-          <main>
-            <div className="">
-              <div className="">
-                <div
-                  // className="hero-inner"
-                  style={{
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                    display: "flex",
-                    // alignItems: "center",
-                    flexDirection: "column",
-                    background: "black",
-                    borderRadius: "20px",
-                  }}
-                >
-                  <div>
-                    <img
-                      src="/brain.jpg"
-                      style={{
-                        maxHeight: "400px",
-                        width: "auto",
-                        borderRadius: "20%",
-                        marginBottom: "20px",
-                      }}
-                    />
-                  </div>
+          <Container>
+            <Row>
+              <Col md={{ size: 6, offset: 1 }}>
+                <main>
+                  <div className="">
+                    <div className="">
+                      <div
+                        // className="hero-inner"
+                        style={{
+                          marginLeft: "auto",
+                          marginRight: "auto",
+                          display: "flex",
+                          // alignItems: "center",
+                          flexDirection: "column",
+                          background: "black",
+                          borderRadius: "20px",
+                        }}
+                      >
+                        <div style={{ width: "600px", marginBottom: "20px" }}>
+                          <img
+                            style={{ borderRadius: "20px" }}
+                            src="library.png"
+                          />
+                        </div>
+                        <div
+                          style={{
+                            minWidth: "300px",
+                            marginBottom: "20px",
+                            maxWidth: "500px",
+                          }}
+                        >
+                          <h1 className="hero-title mt-0 text-white">
+                            Unlock the Power of Automated Learning
+                          </h1>
+                          <p className="text-white hero-paragraph">
+                            Empower your intellectual journey with your personal
+                            team of AI researchers. Discover, Catalog, and Link
+                            any subject matter effortlessly.
+                          </p>
+                        </div>
+                        <div>Try the Beta</div>
+                        <div className="" style={{ marginTop: "20px" }}>
+                          <Button
+                            // className="button btn-primary text-white"
+                            href="/account/log-in"
+                            style={{
+                              color: "white",
+                              border: "3px solid green",
+                            }}
+                          >
+                            Get 25 Free Tokens
+                          </Button>
 
-                  <div
-                    style={{
-                      minWidth: "300px",
-                      marginBottom: "20px",
-                      maxWidth: "500px",
-                    }}
-                  >
-                    <h1 className="hero-title mt-0 text-white">
-                      Unlock the Power of Automated Learning
-                    </h1>
-                    <p className="text-white hero-paragraph">
-                      Empower your intellectual journey with your personal team
-                      of AI researchers. Discover, Catalog, and Link any subject
-                      matter effortlessly.
-                    </p>
-                  </div>
-                  <div>Try the Beta</div>
-                  <div className="" style={{ marginTop: "20px" }}>
-                    <Button
-                      // className="button btn-primary text-white"
-                      href="/account/log-in"
-                      style={{ color: "white", border: "3px solid green" }}
-                    >
-                      Get 25 Free Tokens
-                    </Button>
-
-                    {/* <span className="text-white" style={{ margin: "10px" }}>
+                          {/* <span className="text-white" style={{ margin: "10px" }}>
                         or
                       </span>
                       <Button
@@ -94,14 +94,16 @@ export default function Home() {
                       >
                         Meet your AI Team
                       </Button> */}
-                    <div style={{ marginTop: "20px", fontSize: "0.75em" }}>
-                      <i className="bi bi-coin" /> 1 Token = 200 words
+                          <div
+                            style={{ marginTop: "20px", fontSize: "0.75em" }}
+                          >
+                            <i className="bi bi-coin" /> 1 Token = 200 words
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-            {/* <section className="features section">
+                  {/* <section className="features section">
               <div className="container">
                 <div className="features-inner section-inner has-bottom-divider">
                   <div className="features-wrap">
@@ -255,79 +257,54 @@ export default function Home() {
                 </div>
               </div>
             </section> */}
-          </main>
+                </main>
 
-          <div style={{ height: "60px" }}></div>
-          <div
-            style={{
-              width: "80%",
-              // marginRight: "auto",
-              // marginLeft: "auto",
-              // alignContent: "center",
-              // justifyContent: "center",
-              // alignItems: "center",
-              // position: "relative",
-              // background: "red",
-              // display: "flex",
-            }}
-          >
-            {/* <Mlogo /> */}
-            <img style={{ borderRadius: "20px" }} src="library.png" />
-            {/* <Logo /> */}
-          </div>
-          <div style={{ height: "60px" }}></div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
-            {" "}
-            <div> © 2024 Marvin.Technology</div>
-            <div className="reportFont">
-              H-T-T-P-S colon slash slash Marvin dot technology
-            </div>
-          </div>
-
-          <footer className="site-footer">
-            <div className="container">
-              <div className="site-footer-inner">
-                <div className="brand footer-brand">
-                  <a href="#">
-                    {/* <img
-                      className="header-logo-image"
-                      src="logo.png"
-                      alt="Logo"
-                      width={200}
-                    /> */}
-                  </a>
+                <div style={{ height: "60px" }}></div>
+                <div
+                  style={{
+                    width: "80%",
+                    // marginRight: "auto",
+                    // marginLeft: "auto",
+                    // alignContent: "center",
+                    // justifyContent: "center",
+                    // alignItems: "center",
+                    // position: "relative",
+                    // background: "red",
+                    // display: "flex",
+                  }}
+                >
+                  {/* <Mlogo /> */}
+                  <div>
+                    <img
+                      src="/brain.jpg"
+                      style={{
+                        maxHeight: "400px",
+                        width: "auto",
+                        borderRadius: "20%",
+                        marginBottom: "20px",
+                      }}
+                    />
+                  </div>
+                  {/* <Logo /> */}
                 </div>
-                {/* <ul className="footer-links list-reset">
-                  <li>
-                    <Link href="#" className="text-white">
-                      Contact
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#" className="text-white">
-                      About Us
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#" className="text-white">
-                      FAQ
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#" className="text-white">
-                      Support
-                    </Link>
-                  </li>
-                </ul> */}
-              </div>
-            </div>
-          </footer>
+                <div style={{ height: "60px" }}></div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                  }}
+                >
+                  {" "}
+                  <div> © 2024 Marvin.Technology</div>
+                  <div className="reportFont">
+                    H-T-T-P-S colon slash slash Marvin dot technology
+                  </div>
+                </div>
+              </Col>
+            </Row>
+          </Container>
+
           {/* <div
             style={{
               fontSize: "0.75em",
