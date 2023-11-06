@@ -12,6 +12,7 @@
     "@auth0/nextjs-auth0": "^2.7.0",
     "@firebase/app": "^0.9.18",
     "@firebase/database": "^1.0.1",
+    "@google-cloud/text-to-speech": "^5.0.1",
     "@react-three/drei": "^9.80.1",
     "@react-three/fiber": "^8.13.6",
     "@reduxjs/toolkit": "^1.7.1",

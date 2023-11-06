@@ -121,7 +121,7 @@ const ViewReports = ({
 }) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
-  const [offset, setOffset] = useState(2);
+  const [offset, setOffset] = useState(1);
   const [isInView, setIsInView] = useState(false);
   const [loadedReports, setLoadedReports] = useState(folders);
   const [briefingInput, setBriefingInput] = useState("");
@@ -129,8 +129,8 @@ const ViewReports = ({
   const [reportCountsByFolderId, setReportCountsByFolderId] = useState(
     _reportCountsByFolderId
   );
-  console.log("loadedReports");
-  console.log(loadedReports);
+  // console.log("loadedReports");
+  // console.log(loadedReports);
   async function loadPagedResults() {
     console.log("Loading paged results");
 
@@ -166,7 +166,10 @@ const ViewReports = ({
         .from("folders")
         .select("*")
         .ilike("folderName", `%${searchInput}%`)
-        .eq("userId", userId);
+        .filter("folderName", "neq", null)
+        .filter("folderPicUrl", "neq", null)
+        .filter("availability", "eq", "GLOBAL");
+      // .eq("userId", userId);
 
       if (error) {
         console.error("Error fetching data:", error);
@@ -331,14 +334,30 @@ const ViewReports = ({
         const from = offset * PAGE_COUNT;
         const to = from + PAGE_COUNT - 1;
         setOffset((prev) => prev + 1);
-
-        let { data: folders } = await supabase
+        console.log("from");
+        console.log(from);
+        console.log("to");
+        console.log(to);
+        let { data: folders, error } = await supabase
           .from("folders")
           .select("*")
+          // .eq("userId", userId)
+          .filter("folderName", "neq", null)
+          .filter("folderPicUrl", "neq", null)
+          .filter("availability", "eq", "GLOBAL")
+          .limit(PAGE_COUNT)
           .range(from, to)
-          .or(`availability.neq.DELETED,availability.is.null`)
-          .eq("userId", userId)
-          .order("createdAt", { ascending: false });
+          .order("folderId", { ascending: false });
+        console.log("load more missions data");
+        console.log(folders);
+        // let { data: folders } = await supabase
+        //   .from("folders")
+        //   .select("*")
+        //   .eq("availability", "GLOBAL")
+        //   .range(from, to)
+        //   // .or(`availability.neq.DELETED,availability.is.null`)
+        //   // .eq("userId", userId)
+        //   .order("createdAt", { ascending: false });
 
         // Extract folderIds from the obtained folders data
         const folderIds = folders.map((folder) => folder.folderId);

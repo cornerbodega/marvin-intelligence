@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "missions-server",
+  "private_key_id": "d87f87bd62b4f19fb00cc3c57ab57057507e6456",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCy/vP8aG2qN0+X\nssT2dIrF+R46HCW8tpcp7NMwQepshODJ+MFlaVoQ/95uNn4c+Rb8ImJ+oj7h/u/s\n79SvHNk7DbgeMj7TauschylYvWLrJql0npYqzrVftKFbzYQ0PbW/XmTXc1KieifW\nVAsK0qcE8fT4dfNce3wH3+dWn7cRLARnUPeSPgSbP1X3y60X9csrtol9PXcTtkG7\niT/kSHBRtBGt8ksM6tZ7vh9eiQogw2GRnvQCWG7FvQi7eSMwUNg8EX6IaaxC/464\n64Esz0RVP2vHZIjP6kjR95cFrJlDHqcxRQdVe4wmiAOuvspknmuP4m/0VEEd36yX\nAF+zVkudAgMBAAECgf8kW6UzoAKmkJWaOrXHWeTWUcPSCeWgb3ZFDdXX94umf1cp\nr12ZO80PpumHeYokWHRSwqk/D7W2MhKKDi0lZLa7SA4eFBau2wjmwo2jeNSe7zt8\ndLoL9/Dff9FG1HgGJILGXGYfXU1rs2RkJK4ZhLBoUL1xuoO0RWDsOI7FCawl0HPy\nNkrmXUVFFBveYZRqvH0FJGgCRpA+1/Fa2JVfC1I/LScV1nU8v/pOA3VRtSj9hgEc\nejjBGA1fcuATulxJx5MAYhEkr8rsBpokuKelvpYEuKQvT6c+BWVftonRbya8lcBe\n7M6h7gL0/pk8fuFhgi6y1NeoJwXSgIa4+GabnLECgYEA4+oDbf1cfsS/nt4DPVhj\nCND6sgjqhKHq9ml8QRoDZZEWix/hv11ItCLh54O0MbeRgjxuW4K/hPtHizDIXr2O\nU0oJZR5VPW48o9TevLscKrNNiiQMBNn56JbeVodz01CLg/WgmZqWuyq9AlPgDtnA\nE4aGMBo4SwnDnGL57ZA3+qcCgYEAyQ24q330YEEWd1xLJuVm6vA+qmce5ghn5+Hc\nEWmkGBbH3eHN3wJNYhP67F7wBjSZSIQMfr4LGLk5MRtpsK0lqHwWiA3BDkvPG0nX\nmz6AuFaWBI/jKJ7tO9MtYFb47H24HocUyIYJB7Hqu0ujFMQH4Nz8DDesTtGGp7aA\n6l4hxBsCgYEA4Ees0FP+7ZDXsJJxRbDw5AAic4hqn9Jm0c3ERJxAs3YvZQEeuZ4m\nqX2aKKVmcXZfbnXhc5Qau9Y69TIwO2r13+h/jk5nO2h7rA0Sk07dzPddWo9WdH+8\nebHdYfExfcVJRbY1MHL72XuZO+0mE/ccGRrMehGTS+Rz5jVQFQNS0wkCgYEAt4u1\nSapFTRJepj01xp6rJFSLgRl/VdXathC1zZe53Nv/PwsD3VHGv4EqFFxfl+qw/Ui/\n930buEhwc+poxIht1rDiCPc1hg2jV3BES0/2R1OUxTlu0gi032bdCBSeT5g+XHBJ\ngv8Kg2Hjv3U/vpdv8dMMr0KsJZCW88ljS5MAFH0CgYAPHJmAf6ILFryKqq3KdV1i\nIww5PRkEpv3RKbClsf1H1mSH3WETYT5rr3vKIzDArXsJ37/F1pIp85Czgsu7qkPh\ndmfz8R3zKf5U4uwKR6+Nyp2BOvmUm8pEb3VTwC1O8fQFy8ML5xRQRHZ4GUVNDFvR\nU/w+nOnmgr916e1XuplAWg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "intellispeech@missions-server.iam.gserviceaccount.com",
+  "client_id": "111679818574946412472",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/intellispeech%40missions-server.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

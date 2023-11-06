@@ -225,7 +225,7 @@ const ViewReports = ({
   // expertises,
   // specializedTraining,
 
-  const { user, error, isLoading } = useUser();
+  const { user, error } = useUser();
   const userId = user ? user.sub : null;
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
@@ -867,6 +867,63 @@ const ViewReports = ({
       return;
     }
   }
+  // Use state to track whether audio is playing
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false); // New state for loading
+
+  // Use ref to persist the audio object without re-rendering the component
+  const audioRef = useRef(null);
+
+  const handleReadReportClick = async (index) => {
+    // If audio is playing, pause it
+    if (audioRef.current && !audioRef.current.paused) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      // If there's no audio or it's paused, start loading and playing
+      setIsLoadingAudio(true); // Start loading
+
+      if (!audioRef.current) {
+        const textToRead = document.getElementById(
+          `reportRoot${index}`
+        ).textContent;
+
+        try {
+          const response = await fetch("/api/reports/speech/speak", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text: textToRead }),
+          });
+
+          if (response.ok) {
+            const audioBlob = await response.blob();
+            if (!audioRef.current) {
+              audioRef.current = new Audio(URL.createObjectURL(audioBlob));
+            }
+            audioRef.current.play();
+            setIsPlaying(true);
+            setIsLoadingAudio(false); // End loading
+
+            audioRef.current.onended = () => {
+              setIsPlaying(false);
+            };
+          } else {
+            throw new Error("Network response was not ok.");
+          }
+        } catch (error) {
+          console.error("There was a problem with the fetch operation:", error);
+          setIsLoadingAudio(false); // End loading in case of an error
+        }
+      } else {
+        // If audio object exists but is paused, just play it
+        audioRef.current.play();
+        setIsPlaying(true);
+        setIsLoadingAudio(false); // We are not loading because the audio is already there
+      }
+    }
+  };
   return (
     <>
       {folderPicUrl && (
@@ -1008,6 +1065,7 @@ const ViewReports = ({
                   onClick={handleLike}
                   style={{
                     color: `${likes > 0 ? "gold" : "white"}`,
+                    cursor: "pointer",
                   }}
                   className={`bi bi-star${
                     likes === 0 ? "bi bi-star" : "bi bi-star-fill"
@@ -1135,6 +1193,28 @@ const ViewReports = ({
                       {/* <div className="overlay" /> */}
                     </a>
                   )}
+                </div>
+                <div>
+                  <div
+                    onClick={() => handleReadReportClick(index)}
+                    disabled={isLoadingAudio}
+                    style={{
+                      fontSize: "1.25em",
+
+                      marginTop: "10px",
+                    }}
+                  >
+                    {isLoadingAudio ? (
+                      <i className="bi bi-hourglass-split" />
+                    ) : isPlaying ? (
+                      <i className="bi bi-pause-btn" />
+                    ) : (
+                      <i
+                        style={{ cursor: "pointer" }}
+                        className="bi bi-speaker"
+                      />
+                    )}
+                  </div>
                 </div>
                 <div
                   id={`reportRoot${index}`}

@@ -21,7 +21,7 @@ const IntelliCopyUrl = () => {
   }, [copied]);
 
   return (
-    <span className="copy-to-clipboard">
+    <span className="copy-to-clipboard" style={{ cursor: "pointer" }}>
       <span onClick={copyToClipboard} className={copied ? "copied" : ""}>
         <i className="bi bi-send" />
       </span>

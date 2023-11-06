@@ -50,6 +50,7 @@ const IntelliPrint = ({ loadedReports }) => {
         className="bi bi-printer"
         style={{
           color: "white",
+          cursor: "pointer",
         }}
       />
       {/* </button> */}
