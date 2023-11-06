@@ -1145,47 +1145,55 @@ const ViewReports = ({
   const audioRef = useRef(null);
 
   const handleReadReportClick = async (index) => {
-    // Pause and reset the current audio if it's playing
-    if (audioRef.current && !audioRef.current.paused) {
+    // If audio is currently playing, pause it
+    if (isPlaying) {
       audioRef.current.pause();
-      audioRef.current = null; // Clear the current reference
       setIsPlaying(false);
-    }
-
-    // Start loading the new audio
-    setIsLoadingAudio(true);
-
-    // Fetch the new text to read
-    const textToRead = document.getElementById(
-      `reportRoot${index}`
-    ).textContent;
-
-    try {
-      const response = await fetch("/api/reports/speech/speak", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: textToRead }),
-      });
-
-      if (response.ok) {
-        const audioBlob = await response.blob();
-        // Assign the new audio blob to the audioRef
-        audioRef.current = new Audio(URL.createObjectURL(audioBlob));
+    } else {
+      // If audio is already loaded and is paused, resume playing
+      if (audioRef.current && isLoadingAudio === false) {
         audioRef.current.play();
         setIsPlaying(true);
-        audioRef.current.onended = () => {
-          setIsPlaying(false);
-          audioRef.current = null; // Clear the reference once audio ends
-        };
       } else {
-        throw new Error("Network response was not ok.");
+        // Start loading new audio
+        setIsLoadingAudio(true);
+
+        // Fetch the new text to read
+        const textToRead = document.getElementById(
+          `reportRoot${index}`
+        ).textContent;
+
+        try {
+          const response = await fetch("/api/reports/speech/speak", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text: textToRead }),
+          });
+
+          if (response.ok) {
+            const audioBlob = await response.blob();
+            // If there was a previous audio object, revoke the old object URL
+            if (audioRef.current) {
+              URL.revokeObjectURL(audioRef.current.src);
+            }
+            // Assign the new audio blob to the audioRef
+            audioRef.current = new Audio(URL.createObjectURL(audioBlob));
+            audioRef.current.play();
+            setIsPlaying(true);
+            audioRef.current.onended = () => {
+              setIsPlaying(false);
+            };
+          } else {
+            throw new Error("Network response was not ok.");
+          }
+        } catch (error) {
+          console.error("There was a problem with the fetch operation:", error);
+        }
+        setIsLoadingAudio(false);
       }
-    } catch (error) {
-      console.error("There was a problem with the fetch operation:", error);
     }
-    setIsLoadingAudio(false);
   };
 
   return (
