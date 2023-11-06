@@ -1,9 +1,21 @@
 import { TextToSpeechClient } from "@google-cloud/text-to-speech";
 
-// Initialize the client with your credentials
+// Decode the base64 environment variable to a JSON object
+const credentialsJSON = JSON.parse(
+  Buffer.from(
+    process.env.GOOGLE_APPLICATION_CREDENTIALS_BASE64,
+    "base64"
+  ).toString("utf-8")
+);
+
+// Instantiate the TextToSpeech client with decoded credentials
 const client = new TextToSpeechClient({
-  keyFilename: "./pages/api/reports/speech/missions-server-d87f87bd62b4.json",
+  credentials: credentialsJSON,
 });
+// Initialize the client with your credentials
+// const client = new TextToSpeechClient({
+//   keyFilename: "./pages/api/reports/speech/missions-server-d87f87bd62b4.json",
+// });
 
 export default async (req, res) => {
   // Parse the text from the request body
