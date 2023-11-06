@@ -298,7 +298,7 @@ export default function Home() {
                   {" "}
                   <div> © 2024 Marvin.Technology</div>
                   <div className="reportFont">
-                    H-T-T-P-S colon slash slash Marvin dot technology
+                    H-T-T-P-S colon slash slash Marvin dot Technology
                   </div>
                 </div>
               </Col>
