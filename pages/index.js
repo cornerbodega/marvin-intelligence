@@ -272,7 +272,8 @@ export default function Home() {
             }}
           >
             {/* <Mlogo /> */}
-            <Logo />
+            <img style={{ borderRadius: "20px" }} src="library.png" />
+            {/* <Logo /> */}
           </div>
           <div style={{ height: "60px" }}></div>
           <div
