@@ -118,7 +118,7 @@ const Sidebar = ({ showMobilemenu }) => {
           style={{
             position: "relative",
             marginLeft: "-100px",
-            marginBottom: "-80px",
+            marginBottom: "-70px",
             zIndex: 2, // Ensure this is above the canvas's z-index
           }}
         >
