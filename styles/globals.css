@@ -115,7 +115,7 @@ h4{
 .report {
   color: white;
   background-color: #000000; /* Adjust as necessary to ensure contrast */
-  padding: 20px;
+  /* padding: 20px; */
   font-size: 20px; /* Increased font size */
   line-height: 1.6; 
   max-width: 800px; 
@@ -130,11 +130,11 @@ h4{
 }
 
 /* Adjust padding for smaller screens */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .report {
     padding: 15px;
   }
-}
+} */
 
 .reportFont {
    font-family: 'ComputerModern', serif;
@@ -237,7 +237,7 @@ body {
 
 .report {
   color: white;
-  padding: 20px;
+  /* padding: 20px; */
   /* Removed transition effects from here */
 }
 
