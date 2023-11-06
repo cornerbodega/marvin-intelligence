@@ -1055,10 +1055,9 @@ const ViewReports = ({
         {/* <div style={{ fontSize: "0.5em" }}>{folderPicDescription}</div> */}
         <div style={{ marginTop: "-10px", marginBottom: "20px" }}>
           <Row>
-            <Col>
+            <Col style={{ whiteSpace: "nowrap" }}>
               <span
                 style={{
-                  whiteSpace: "nowrap",
                   marginRight: "20px",
                   color: "gold",
                 }}

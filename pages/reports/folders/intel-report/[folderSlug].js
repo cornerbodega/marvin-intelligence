@@ -1279,7 +1279,7 @@ const ViewReports = ({
       {folderPicUrl && (
         <div style={{ marginTop: "-10px", marginBottom: "20px" }}>
           <Row>
-            <Col>
+            <Col style={{ whiteSpace: "nowrap" }}>
               <span
                 style={{
                   whiteSpace: "nowrap",
