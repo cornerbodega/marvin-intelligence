@@ -277,6 +277,9 @@ const ViewReports = ({
       return;
     }
     setDidClickQuickDraft(true);
+    if (!userId) {
+      // go to create agency page
+    }
     // check if the user has enough tokens
     // query supabase for the user's tokens
     // check the cost of the proposed report
