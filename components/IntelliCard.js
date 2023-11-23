@@ -30,9 +30,9 @@ const IntelliCard = ({
   // console.log("key");
   // console.log(index);
   const imageStyle = {
-    borderTop: "2px solid #395639",
-    borderLeft: "1px solid #395639",
-    borderRight: "1px solid #395639",
+    borderTop: "2px solid #0092AE",
+    borderLeft: "1px solid #0092AE",
+    borderRight: "1px solid #0092AE",
   };
   // if (index === 0) {
   imageStyle.borderTopLeftRadius = "16px";
@@ -131,17 +131,17 @@ const IntelliCard = ({
             // marginTop: "-60px",
             // padding: "20px",
             padding: "10px 20px 10px 20px",
-            borderBottom: "2px solid #395639",
-            borderLeft: "1px solid #395639",
-            borderRight: "1px solid #395639",
+            borderBottom: "2px solid #0092AE",
+            borderLeft: "1px solid #0092AE",
+            borderRight: "1px solid #0092AE",
             // border: "2px 2px 0px 0px solid #BFBFBF",
             boxShadow: `
             0 8px 0 -2px black, 
-            0 8px 0 0 ${reportCount > 1 ? "#395639" : "black"},
+            0 8px 0 0 ${reportCount > 1 ? "#0092AE" : "black"},
             0 16px 0 -2px black, 
-            0 16px 0 0 ${reportCount > 2 ? "#395639" : "black"},
+            0 16px 0 0 ${reportCount > 2 ? "#0092AE" : "black"},
             0 24px 0 -2px black, 
-            0 24px 0 0 ${reportCount > 3 ? "#395639" : "black"}
+            0 24px 0 0 ${reportCount > 3 ? "#0092AE" : "black"}
         `,
           }}
         >

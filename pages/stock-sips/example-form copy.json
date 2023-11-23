@@ -1,0 +1,72 @@
+ {
+  stockTickerPriceAndShares: "PG	PROCTER & GAMBLE	152.12	2356886000",
+  yahooFinanceRatios: `Previous Close	152.46
+  Open	152.55
+  Bid	151.75 x 1000
+  Ask	152.95 x 1100
+  Day's Range	151.68 - 153.50
+  52 Week Range	135.83 - 158.38
+  Volume	7,981,026
+  Avg. Volume	5,648,893
+  Market Cap	358.53B
+  Beta (5Y Monthly)	0.46
+  PE Ratio (TTM)	24.73
+  EPS (TTM)	6.15
+  Earnings Date	Jan 23, 2024
+  Forward Dividend & Yield	3.76 (2.47%)
+  Ex-Dividend Date	Oct 19, 2023
+  1y Target Est	165.35
+  
+  `,
+  tea: "Taylors Green Tea with Jasmine",
+  snack: "Jet Puff Marshmallows",
+  nextStock: "Costco",
+  nextTea: "Stash - Peppermint Tea",
+  nextSnack: "Cuties Seedless Mandarins"
+  
+}
+  
+//
+{ stockPriceHistory: `Currency in USDDownload
+Date	Open	High	Low	Close*	Adj Close**	Volume
+Nov 14, 2023	244.81	246.90	244.69	246.24	246.24	922,452
+Oct 31, 2023	229.77	246.90	229.41	246.24	246.24	8,802,900
+Sep 30, 2023	234.92	240.75	224.41	229.31	229.31	22,068,000
+Sep 26, 2023	1.006 Dividend
+Aug 31, 2023	249.41	249.65	232.17	234.91	233.92	20,161,400
+Jul 31, 2023	251.41	251.78	237.78	247.79	246.74	14,694,600
+Jun 30, 2023	243.71	252.94	240.02	252.17	251.11	14,803,400
+Jun 07, 2023	0.633 Dividend
+May 31, 2023	229.14	244.26	228.49	243.74	242.06	15,796,500
+Apr 30, 2023	227.83	231.75	221.31	229.06	227.48	12,883,400
+Mar 31, 2023	224.99	228.33	221.47	227.99	226.42	9,053,300
+Mar 23, 2023	0.826 Dividend
+Mar 01, 2023	218.84	225.32	209.39	225.23	222.82	19,512,800
+Feb 01, 2023	223.93	231.48	217.53	219.15	216.81	13,450,200
+Jan 01, 2023	211.62	225.36	208.04	224.50	222.10	18,255,500
+Dec 13, 2022	0.927 Dividend
+Dec 01, 2022	224.88	225.81	206.23	210.52	207.39	26,516,200
+`, russel1000PriceHistory: `Date	Open	High	Low	Close*	Adj Close**	Volume
+Nov 14, 2023	244.81	246.90	244.69	246.24	246.24	922,452
+Oct 31, 2023	229.77	246.90	229.41	246.24	246.24	8,802,900
+Sep 30, 2023	234.92	240.75	224.41	229.31	229.31	22,068,000
+Sep 26, 2023	1.006 Dividend
+Aug 31, 2023	249.41	249.65	232.17	234.91	233.92	20,161,400
+Jul 31, 2023	251.41	251.78	237.78	247.79	246.74	14,694,600
+Jun 30, 2023	243.71	252.94	240.02	252.17	251.11	14,803,400
+Jun 07, 2023	0.633 Dividend
+May 31, 2023	229.14	244.26	228.49	243.74	242.06	15,796,500
+Apr 30, 2023	227.83	231.75	221.31	229.06	227.48	12,883,400
+Mar 31, 2023	224.99	228.33	221.47	227.99	226.42	9,053,300
+Mar 23, 2023	0.826 Dividend
+Mar 01, 2023	218.84	225.32	209.39	225.23	222.82	19,512,800
+Feb 01, 2023	223.93	231.48	217.53	219.15	216.81	13,450,200
+Jan 01, 2023	211.62	225.36	208.04	224.50	222.10	18,255,500
+Dec 13, 2022	0.927 Dividend
+Dec 01, 2022	224.88	225.81	206.23	210.52	207.39	26,516,200
+*Close price adjusted for splits.**Adjusted close price adjusted for splits and dividend and/or capital gain distributions.
+` }
+
+
+
+

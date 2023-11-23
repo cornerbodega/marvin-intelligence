@@ -27,11 +27,12 @@ import IntelliReportLengthDropdown from "../../../components/IntelliReportLength
 import Head from "next/head";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
-export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps(context) {
-    const session = await getSession(context.req, context.res);
-    // const user = ;
-    const userId = session?.user.sub;
+
+export async function getServerSideProps(context) {
+  const session = await getSession(context.req, context.res);
+  // const user = ;
+  const userId = session?.user.sub;
+  if (userId) {
     let { data: agency, agencyError } = await supabase
       .from("users")
       .select("agencyName")
@@ -148,8 +149,19 @@ export const getServerSideProps = withPageAuthRequired({
         tokensRemaining,
       },
     };
-  },
-});
+  } else {
+    return {
+      props: {
+        folders: [],
+        userId: null,
+        agencyName: "Guest Agency",
+        _folderLikesByFolderId: null,
+        _reportCountsByFolderId: null,
+        tokensRemaining: 25,
+      },
+    };
+  }
+}
 const ViewReports = ({
   folders,
   userId,
@@ -684,12 +696,12 @@ const ViewReports = ({
                   <i className="bi bi-folder"></i>+ Quick Draft
                 </Button>
               </div>
-              <div style={{ marginBottom: "10px" }}>
-                <IntelliReportLengthDropdown
+              <div style={{ marginBottom: "200px" }}>
+                {/* <IntelliReportLengthDropdown
                   handleSelectedLength={handleSelectedLength}
-                />
+                /> */}
               </div>
-              <div
+              {/* <div
                 onClick={() => goToPage("/account/tokens/get-tokens")}
                 style={{
                   marginBottom: "32px",
@@ -697,11 +709,11 @@ const ViewReports = ({
                   fontSize: "0.75em",
                   color: "lightblue",
                   cursor: "pointer",
-                  width: "148px",
+                  width: "200px",
                 }}
               >
                 My Tokens: {tokensRemaining} <i className="bi bi-coin" />
-              </div>
+              </div> */}
             </div>
             {/* <div style={{}}>
             

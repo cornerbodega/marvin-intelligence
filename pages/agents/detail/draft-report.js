@@ -1127,12 +1127,13 @@ const CreateMission = ({
           </Form>
           <div style={{ marginTop: "50px" }} ref={draftRef}></div>
           {draft && (
-            <Card>
+            <Card style={{ background: "black", color: "white" }}>
               {/* <div className="text-white">Draft</div> */}
-              <CardBody>
+              <CardBody className="report">
                 <i className="bi bi-body-text"> New Draft </i>
                 <div
-                  className="text-primary"
+                  // className="text-primary"
+                  style={{ color: "white" }}
                   dangerouslySetInnerHTML={{ __html: draft }}
                 />
               </CardBody>

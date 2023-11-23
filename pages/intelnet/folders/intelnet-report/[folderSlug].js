@@ -839,34 +839,54 @@ const ViewReports = ({
   // };
   // console.log("process.env.NEXT_PUBLIC_serverUid");
   // console.log(process.env.NEXT_PUBLIC_serverUid);
+  // const [likes, setLikes] = useState(0); // initial likes state, assuming it starts from 0
+  const [hasLiked, setHasLiked] = useState(false);
   async function handleLike() {
-    // console.log("handleLike");
-    // console.log("_folderLikes");
-    // console.log(_folderLikes);
-    // console.log("likes");
-    // console.log(likes);
-    let _likes = likes;
-    let likeValue = 0;
-    if (likes === 0) {
-      likeValue = 1;
-    } else {
-      likeValue = -1;
-    }
-    _likes += likeValue;
-    if (likes < 0) {
-      _likes = 0;
-    }
-    setLikes(_likes);
-    // update supabase likes table
-
-    const { error } = await supabase
+    // Query the folderLikes table to check if the user has already liked or disliked the folder
+    const { data: existingLikes, error: likesError } = await supabase
       .from("folderLikes")
-      .insert({ folderId, userId, likeValue });
+      .select("likeValue")
+      .eq("folderId", folderId)
+      .eq("userId", userId);
+
+    if (likesError) {
+      console.error("Error checking existing likes", likesError);
+      return; // Exit early if there is an error fetching the likes
+    }
+
+    // Calculate the current balance of likes and dislikes for this user and folder
+    const likeBalance = existingLikes.reduce(
+      (total, record) => total + record.likeValue,
+      0
+    );
+    console.log("likeBalance");
+    console.log(likeBalance);
+    // Determine the likeValue based on the like balance
+    const likeValue = likeBalance >= 0 ? -1 : 1;
+
+    // Prepare the record for the database operation
+    const likeRecord = { folderId, userId, likeValue };
+
+    // Insert a new like or dislike record
+    const { data, error } = await supabase
+      .from("folderLikes")
+      .insert([likeRecord]);
+
     if (error) {
       console.error("Error updating likes", error);
-      return;
+    } else {
+      // Update the local state to reflect the new like or dislike
+      setLikes((prevLikes) => prevLikes + likeValue);
+      // If the balance was zero, the user has now liked/disliked for the first time
+      if (likeBalance === 0) {
+        setHasLiked(likeValue === 1);
+      } else {
+        // If the balance was not zero, we simply invert the current hasLiked state
+        setHasLiked((prevHasLiked) => !prevHasLiked);
+      }
     }
   }
+
   // Speech
   // Use state to track whether audio is playing
   const [isPlaying, setIsPlaying] = useState(false);

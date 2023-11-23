@@ -4,15 +4,10 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 export async function getFromOpenAi(messages) {
-  const results = await openai
-    .createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: messages,
-    })
-    .catch((error) => {
-      console.log("error");
-      console.log(error);
-    });
+  const results = await openai.createChatCompletion(messages).catch((error) => {
+    console.log("error");
+    console.log(error);
+  });
 
-  return results.data.choices[0].message.content;
+  return results.choices[0].message.content;
 }
