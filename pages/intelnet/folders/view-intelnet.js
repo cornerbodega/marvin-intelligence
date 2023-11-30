@@ -125,7 +125,7 @@ const ViewReports = ({
 }) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
-  const [offset, setOffset] = useState(1);
+  const [offset, setOffset] = useState(0);
   const [isInView, setIsInView] = useState(false);
   const [loadedReports, setLoadedReports] = useState(folders);
   const [briefingInput, setBriefingInput] = useState("");
@@ -135,6 +135,7 @@ const ViewReports = ({
   );
   // console.log("loadedReports");
   // console.log(loadedReports);
+  loadPagedResults();
   async function loadPagedResults() {
     console.log("Loading paged results");
 
