@@ -507,7 +507,7 @@ const ViewReports = ({
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
-      {/* <div>{JSON.stringify(loadedReports)}</div> */}
+      <div>{JSON.stringify(loadedReports)}</div>
       <div ref={containerRef}>
         <Row className="text-primary">
           <IntelliCardGroup
