@@ -96,22 +96,33 @@ const IntelliCard = ({
         style={{ background: "black", cursor: "pointer" }}
         className="cardShadow text-white"
       >
-        <div style={{ position: "relative", width: "auto", height: "337px" }}>
+        <div style={{ position: "relative", width: "100%" }}>
           <Image
+            src={displayDatums.picUrl}
+            style={{ maxWidth: "100%", height: "auto", ...imageStyle }}
+            layout="responsive"
+            width={337} // You may need to provide a sensible default or calculate this based on the aspect ratio
+            height={337}
+            objectFit="contain"
+            alt={displayDatums.title}
+          />
+        </div>
+        {/* <div style={{ position: "relative", width: "100%", height: "337px" }}> */}
+        {/* <Image
             // onClick={handleClick}
 
             src={displayDatums.picUrl} // insert image transformations based on imageSize here
             style={imageStyle}
-            // layout="fill"
+            layout="fill"
             objectFit="contain"
-            fill={true}
+            // fill={true}
             // sizes="100vw"
             // style={{ width: "100%", height: "auto" }}
             alt={displayDatums.title}
-          />
-          {/* <div onClick={handleClick} className="
+          /> */}
+        {/* <div onClick={handleClick} className="
           "></div> */}
-        </div>
+        {/* </div> */}
         <CardBody
           style={{
             display: "flex",
