@@ -149,6 +149,7 @@ const IntelliCard = ({
         `,
           }}
         >
+          <div style={{ color: "white" }}>{displayDatums.title}</div>
           <div
             style={{
               display: "flex",
