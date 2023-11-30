@@ -980,21 +980,30 @@ const CreateMission = ({
                     height: "100%",
                   }}
                 >
-                  <Image
-                    src={`${agent.profilePicUrl}`}
+                  <div
                     style={{
-                      width: "100%",
-                      borderTopLeftRadius: "16px",
-                      borderTopRightRadius: "16px",
-                      // borderRadiusTopLeft: "16px",
-                      // borderRadiusTopRight: "16px",
-                      // objectFit: "cover",
-                      // objectPosition: "top",
-                      // borderRadius: "20%",
-                      // border: "12px solid green",
+                      height: "337px",
+                      width: "auto",
+                      position: "relative",
                     }}
-                    alt="agent"
-                  />
+                  >
+                    <Image
+                      src={`${agent.profilePicUrl}`}
+                      fill={true}
+                      style={{
+                        // width: "100%",
+                        borderTopLeftRadius: "16px",
+                        borderTopRightRadius: "16px",
+                        // borderRadiusTopLeft: "16px",
+                        // borderRadiusTopRight: "16px",
+                        // objectFit: "cover",
+                        // objectPosition: "top",
+                        // borderRadius: "20%",
+                        // border: "12px solid green",
+                      }}
+                      alt="agent"
+                    />
+                  </div>
                 </div>
                 <CardBody>
                   <CardTitle

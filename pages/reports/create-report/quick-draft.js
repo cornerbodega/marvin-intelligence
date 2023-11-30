@@ -5,43 +5,30 @@
 import saveTask from "../../../utils/saveTask";
 import {
   Card,
-  CardImg,
-  CardText,
   CardBody,
-  CardTitle,
-  CardSubtitle,
-  CardGroup,
   Form,
   FormGroup,
   Label,
   Input,
   Button,
-  Row,
-  Col,
-  Badge,
   Breadcrumb,
   BreadcrumbItem,
 } from "reactstrap";
 import toast, { Toaster } from "react-hot-toast";
 
 import { useUser } from "@auth0/nextjs-auth0/client";
-import Link from "next/link";
+
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { useState, useEffect } from "react";
 
-import { getSupabase } from "../../../utils/supabase";
-import { useState, useRef, useEffect } from "react";
-
-import { slugify } from "../../../utils/slugify";
 // import { setupFirebaseListener } from "../../../utils/firebaseListener";
 
 // bring in original report's summary
 // bring in agent's memory of previous reports
 // bring in content of link from original report
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
-import IntelliReportLengthDropdown from "../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
 
 const CreateMission = ({}) => {
   const { user, error, isLoading } = useUser();
@@ -299,11 +286,8 @@ const CreateMission = ({}) => {
         </div>
       )}
       {showLoadingImage && (
-        <div style={{ textAlign: "center" }}>
-          <Image
-            src="/library.png"
-            style={{ width: "500px", height: "500px" }}
-          />
+        <div style={{ textAlign: "center", width: "auto", height: "500px" }}>
+          <Image fill={true} src="/library.png" />
         </div>
       )}
     </div>

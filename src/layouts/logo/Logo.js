@@ -8,7 +8,7 @@ const Logo = () => {
     <Link href="/reports/folders/view-folders">
       {/* <a> */}
       {/* Marvin Intelligence Agency */}
-      <Image src={LogoDark} alt="logo" />
+      <Image height="200" width="200" src={LogoDark} alt="logo" />
       {/* </a> */}
     </Link>
   );

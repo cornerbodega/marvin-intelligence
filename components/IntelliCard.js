@@ -60,7 +60,7 @@ const IntelliCard = ({
     }
   }
   if (imageSize === "small") {
-    imageStyle.height = "337px";
+    // imageStyle.width = "auto";
     imageStyle.objectFit = "cover";
     displayDatums.picUrl = getCloudinaryImageUrlForHeight(
       displayDatums.picUrl,
@@ -96,12 +96,18 @@ const IntelliCard = ({
         style={{ background: "black", cursor: "pointer" }}
         className="cardShadow text-white"
       >
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative", width: "auto", height: "337px" }}>
           <Image
             // onClick={handleClick}
+
             src={displayDatums.picUrl} // insert image transformations based on imageSize here
             style={imageStyle}
-            alt="Card image cap"
+            // layout="fill"
+            objectFit="contain"
+            fill={true}
+            // sizes="100vw"
+            // style={{ width: "100%", height: "auto" }}
+            alt={displayDatums.title}
           />
           {/* <div onClick={handleClick} className="
           "></div> */}

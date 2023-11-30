@@ -16,10 +16,18 @@ export default function LoadingDots() {
           justifyContent: "center",
         }}
       >
-        <div style={{ textAlign: "center" }}>
+        <div
+          style={{
+            position: "relative",
+            width: "auto",
+            height: "337px",
+            textAlign: "center",
+          }}
+        >
           <Image
             src="/library.png"
-            style={{ width: "500px", height: "500px" }}
+            fill={true}
+            // style={{ width: "500px", height: "500px" }}
           />
         </div>
         {/* <HourglassAnimation /> */}

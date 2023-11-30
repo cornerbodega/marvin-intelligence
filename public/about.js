@@ -102,7 +102,7 @@ const About = () => {
               5 premium and highly customizable demo variations included in the
               package, with React Router 6, Redux Toolkit, Axios nd much more...
             </p>
-            <Image src={simg} alt="icons" className="img-fluid" />
+            {/* <Image fill={true} src={simg} alt="icons" className="img-fluid" /> */}
             <Row>
               <Col lg="8">
                 <div className="mt-3">

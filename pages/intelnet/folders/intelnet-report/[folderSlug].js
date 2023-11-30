@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 
 // import _, { debounce, get, has, set } from "lodash";
 // other imports
-import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
+// import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 // import IntelliCardGroup from "../../../../components/IntelliCardGroup";
 import { getSupabase } from "../../../../utils/supabase";
 // import Link from "next/link";
-import IntelliFab from "../../../../components/IntelliFab";
+
 import getCloudinaryImageUrlForHeight from "../../../../utils/getCloudinaryImageUrlForHeight";
 // rest of component
 // import { slugify } from "../../../../utils/slugify";
@@ -17,10 +17,10 @@ const supabase = getSupabase();
 import { useUser } from "@auth0/nextjs-auth0/client";
 import LoadingDots from "../../../../components/LoadingDots";
 import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
-import saveTask from "../../../../utils/saveTask";
+// import saveTask from "../../../../utils/saveTask";
 import Head from "next/head";
 import Router from "next/router";
-import _ from "lodash";
+// import _ from "lodash";
 import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
 import IntelliCopyUrl from "../../../../components/IntelliCopyUrl/IntelliCopyUrl";
 import Image from "next/image";
@@ -990,6 +990,7 @@ const ViewReports = ({
               style={{
                 height: "700px",
                 position: "relative",
+                width: "auto",
               }}
               className="image-container"
             >
@@ -1003,6 +1004,7 @@ const ViewReports = ({
                 <Image
                   // className="report-image"
                   src={`${getCloudinaryImageUrlForHeight(folderPicUrl, 700)}`}
+                  fill={true}
                   style={
                     {
                       // objectFit: "contain",

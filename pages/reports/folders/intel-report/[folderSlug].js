@@ -20,10 +20,10 @@ import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
 
 import Router from "next/router";
-import _ from "lodash";
+// import _ from "lodash";
 import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
-import { current } from "@reduxjs/toolkit";
-import IntelliReportLengthDropdown from "../../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
+// import { current } from "@reduxjs/toolkit";
+// import IntelliReportLengthDropdown from "../../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
 import Head from "next/head";
 import Image from "next/image";
 // import { child } from "@firebase/database";
@@ -1236,8 +1236,8 @@ const ViewReports = ({
         {folderPicUrl && (
           <div
             style={{
-              maxHeight: "700px",
-
+              height: "700px",
+              width: "auto",
               position: "relative",
             }}
             className="image-container"
@@ -1252,6 +1252,7 @@ const ViewReports = ({
               <Image
                 // className="report-image"
                 src={`${getCloudinaryImageUrlForHeight(folderPicUrl, 700)}`}
+                fill={true}
                 style={{
                   // objectFit: "contain",
                   // width: "auto",
