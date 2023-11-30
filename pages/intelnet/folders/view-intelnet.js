@@ -11,6 +11,7 @@ import { getSupabase } from "../../../utils/supabase";
 // rest of component
 import { slugify } from "../../../utils/slugify";
 import IntelliCardGroup from "../../../components/IntelliCardGroup";
+import IntelliFab from "../../../components/IntelliFab";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 //  const getServerSideProps = withPageAuthRequired({
@@ -305,10 +306,11 @@ const ViewReports = ({
       setIsInView((prev) => bottom <= innerHeight);
     }
   };
-  const handleFabClick = () => {
+
+  async function handleFabClick() {
     console.log("ViewReports HandleClick Clicked!");
-    goToPage("/missions/create-mission/briefing");
-  };
+    goToPage("/reports/folders/view-folders");
+  }
   const handleCardClick = (folder) => {
     console.log(folder);
     // console.log("handleCardClick");
@@ -518,6 +520,7 @@ const ViewReports = ({
           ></IntelliCardGroup>
         </Row>
       </div>
+      <IntelliFab fabType={"folder"} icon="+" onClick={handleFabClick} />
     </>
   );
 };

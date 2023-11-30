@@ -20,9 +20,10 @@ const IntelliFab = ({ onClick, icon, fabType }) => {
   console.log(fabType);
   if (logo == "") {
     if (fabType === "report") {
-      console.log("logo");
-      console.log(logo);
       setLogo(`bi bi-body-text`);
+    }
+    if (fabType === "folder") {
+      setLogo(`bi bi-folder`);
     }
     if (fabType === "agent") {
       setLogo(`bi bi-person-badge`);
