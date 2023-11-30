@@ -91,7 +91,6 @@ const IntelliCard = ({
 
   return (
     <>
-      {displayDatums.title}
       <Card
         onClick={handleClick}
         style={{ background: "black", cursor: "pointer" }}
