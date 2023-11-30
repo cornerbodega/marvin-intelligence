@@ -4,6 +4,7 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
+  Label,
 } from "reactstrap";
 
 const reportOptions = [
@@ -28,7 +29,7 @@ const IntelliReportLengthDropdown = ({ handleSelectedLength }) => {
 
   return (
     <>
-      <div style={{ fontSize: "0.75em" }}>How long should the report be?</div>
+      <Label style={{ fontSize: "0.75em" }}>Report Length? </Label>
       <Dropdown
         style={{ width: "108px", fontSize: "0.5em" }}
         isOpen={dropdownOpen}

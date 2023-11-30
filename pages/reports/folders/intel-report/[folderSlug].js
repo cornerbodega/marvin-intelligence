@@ -898,7 +898,7 @@ const ViewReports = ({
         {children &&
           children.map((item) => (
             <li key={item.id}>
-              {!item.id && <LoadingDots style={{ marginTop: "20px" }} />}
+              {!item.id && "loading..."}
               {item.id && (
                 <a
                   style={{
@@ -1544,9 +1544,9 @@ const ViewReports = ({
             </div>
           );
         })}
-      <IntelliReportLengthDropdown
+      {/* <IntelliReportLengthDropdown
         handleSelectedLength={handleSelectedLength}
-      />
+      /> */}
       <div
         onClick={() => goToPage("/account/tokens/get-tokens")}
         style={{

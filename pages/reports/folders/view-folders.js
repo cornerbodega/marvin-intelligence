@@ -191,7 +191,6 @@ const ViewReports = ({
       .filter("folderPicUrl", "neq", null)
       .limit(PAGE_COUNT)
       .order("folderId", { ascending: false });
-
     if (error) {
       console.error("Error loading paged results:", error);
       return;
@@ -430,7 +429,7 @@ const ViewReports = ({
     _reportCountsByFolderId
   );
   useEffect(() => {
-    if (!isLast && !searchInput) {
+    if (!isLast && !searchInput && userId) {
       const loadMoreReports = async () => {
         const from = offset * PAGE_COUNT;
         const to = from + PAGE_COUNT - 1;

@@ -120,16 +120,19 @@ const CreateMission = ({}) => {
     }
   }, [firebaseDraftData]);
 
+  const [showLoadingImage, setShowLoadingImage] = useState(false);
   useEffect(() => {
     if (firebaseSaveData) {
-      if (firebaseSaveData.folderId) {
-        if (hasSubmitted) {
+      if (hasSubmitted) {
+        if (firebaseSaveData.folderId) {
           // if (folderId) {
           goToPage(
             `/reports/folders/intel-report/${firebaseSaveData.folderId}`
           );
           //   }
           //   setFolderId(firebaseDraftData.folderId);
+        } else {
+          setShowLoadingImage(true);
         }
         // setFolderId(firebaseDraftData.folderId);
       }
@@ -214,112 +217,92 @@ const CreateMission = ({}) => {
         <BreadcrumbItem>Reports</BreadcrumbItem>
         <BreadcrumbItem>Quick Draft</BreadcrumbItem>
       </Breadcrumb>
-
-      {/* <div id="quickDraftBriefingInput">
+      {!showLoadingImage && (
         <div>
-          <textarea
-            autoFocus
-            value={briefingInput}
-            onChange={(e) => setBriefingInput(e.target.value)}
-            type="text"
-            placeholder="What would you like to know?"
-            lines="3"
-            style={{
-              padding: "12px 12px 13px 13px",
-              width: "100%",
-              borderRadius: "5px",
-            }}
-          />
-        </div>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <div
-            onClick={handleQuickDraftClick}
-            style={{
-              textAlign: "right",
-              alignContent: "right",
-              marginBottom: "40px",
-              marginRight: "10px",
-              cursor: "pointer",
-            }}
-            className="btn btn-primary"
-          >
-            Quick Draft
-          </div>
-        </div>
-      </div> */}
-      {/* immediately show the report typing out. The briefing is whatever the user
-      wrote. It's in a text field like the google results page and editable and
-      you can hit the button to create a new draft */}
-      {draft && (
-        <Card style={{ backgroundColor: "#131313", color: "white" }}>
-          {/* <div className="text-white">Draft</div> */}
-          <CardBody style={{ backgroundColor: "#131313", color: "white" }}>
-            <i className="bi bi-body-text"> New Draft </i>
-            <div
-              className="text-white"
-              dangerouslySetInnerHTML={{ __html: draft }}
-            />
-          </CardBody>
-        </Card>
-      )}
-      {(draft && isSubmitting) ||
-        hasSubmitted ||
-        (draft && draft.endsWith(" ".repeat(3)) && (
-          <>
-            <Form onSubmit={(e) => handleQuickDraftClick(e)}>
-              <FormGroup>
-                <div style={{ marginTop: "40px" }}></div>
-                <Label htmlFor="exampleText" className="text-white">
-                  Feedback
-                </Label>
-
-                <Input
-                  id="exampleText"
-                  placeholder="What do you think?"
-                  name="text"
-                  rows="5"
-                  type="textarea"
-                  style={{ backgroundColor: "#131313", color: "white" }}
-                  autoFocus
-                  value={feedbackInput}
-                  onChange={(e) => setFeedbackInput(e.target.value)}
-                />
+          {draft && (
+            <Card style={{ backgroundColor: "#131313", color: "white" }}>
+              {/* <div className="text-white">Draft</div> */}
+              <CardBody style={{ backgroundColor: "#131313", color: "white" }}>
+                <i className="bi bi-body-text"> New Draft </i>
                 <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "flex-start",
-                    paddingTop: "8px",
-                  }}
-                >
+                  className="text-white"
+                  dangerouslySetInnerHTML={{ __html: draft }}
+                />
+              </CardBody>
+            </Card>
+          )}
+          {(draft && isSubmitting) ||
+            hasSubmitted ||
+            (draft && draft.endsWith(" ".repeat(3)) && (
+              <>
+                <Form onSubmit={(e) => handleQuickDraftClick(e)}>
+                  <FormGroup>
+                    <div style={{ marginTop: "40px" }}></div>
+                    <Label htmlFor="exampleText" className="text-white">
+                      Feedback
+                    </Label>
+
+                    <Input
+                      id="exampleText"
+                      placeholder="What do you think?"
+                      name="text"
+                      rows="5"
+                      type="textarea"
+                      style={{ backgroundColor: "#131313", color: "white" }}
+                      autoFocus
+                      value={feedbackInput}
+                      onChange={(e) => setFeedbackInput(e.target.value)}
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "flex-start",
+                        paddingTop: "8px",
+                      }}
+                    >
+                      <Button
+                        color="primary"
+                        style={{
+                          border: "1px solid yellow",
+                          marginRight: "16px",
+                        }}
+                        disabled={
+                          !draft.endsWith(" ".repeat(3)) || !feedbackInput
+                        }
+                        onClick={(e) => handleQuickDraftClick(e)}
+                      >
+                        <i className="bi bi-arrow-clockwise"></i>
+                        &nbsp;Refine
+                      </Button>
+                      {/* <IntelliReportLengthDropdown
+                        handleSelectedLength={handleSelectedLength}
+                      /> */}
+                    </div>
+                  </FormGroup>
+                </Form>
+                <div style={{ textAlign: "center" }}>
                   <Button
                     color="primary"
-                    style={{ border: "1px solid yellow", marginRight: "16px" }}
-                    disabled={!draft.endsWith(" ".repeat(3)) || !feedbackInput}
-                    onClick={(e) => handleQuickDraftClick(e)}
+                    style={{ border: "3px solid green" }}
+                    disabled={
+                      isSubmitting ||
+                      hasSubmitted ||
+                      !draft.endsWith(" ".repeat(3))
+                    }
+                    onClick={(e) => handleAcceptReport(e)}
                   >
-                    <i className="bi bi-arrow-clockwise"></i>
-                    &nbsp;Refine
+                    <i className="bi bi-floppy"></i> Save & Visualize
                   </Button>
-                  <IntelliReportLengthDropdown
-                    handleSelectedLength={handleSelectedLength}
-                  />
                 </div>
-              </FormGroup>
-            </Form>
-            <div style={{ textAlign: "center" }}>
-              <Button
-                color="primary"
-                style={{ border: "3px solid green" }}
-                disabled={
-                  isSubmitting || hasSubmitted || !draft.endsWith(" ".repeat(3))
-                }
-                onClick={(e) => handleAcceptReport(e)}
-              >
-                <i className="bi bi-floppy"></i> Save & Visualize
-              </Button>
-            </div>
-          </>
-        ))}
+              </>
+            ))}
+        </div>
+      )}
+      {showLoadingImage && (
+        <div style={{ textAlign: "center" }}>
+          <img src="/library.png" style={{ width: "500px", height: "500px" }} />
+        </div>
+      )}
     </div>
   );
 };

@@ -14,105 +14,109 @@ import { slugify } from "../../../utils/slugify";
 import IntelliCardGroup from "../../../components/IntelliCardGroup";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
-export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps(context) {
-    const session = await getSession(context.req, context.res);
-    // const user = ;
-    const userId = session?.user.sub;
-    let { data: agency, agencyError } = await supabase
-      .from("users")
-      .select("agencyName")
-      .eq("userId", userId);
-    if (agencyError) {
-      console.log("agencyError");
-    }
-    console.log("agency");
-    console.log(agency);
-    if (!agency || agency.length === 0) {
-      return {
-        redirect: {
-          permanent: false,
-          destination: "/agency/create-agency",
-        },
-        props: {},
-      };
-    }
-    let { data: folders, error } = await supabase
-      .from("folders")
-      .select("*")
-      // .eq("userId", userId)
-      .filter("folderName", "neq", null)
-      .filter("folderPicUrl", "neq", null)
-      .filter("availability", "eq", "GLOBAL")
-      .limit(PAGE_COUNT)
-      .order("folderId", { ascending: false });
+//  const getServerSideProps = withPageAuthRequired({
+export async function getServerSideProps(context) {
+  const session = await getSession(context.req, context.res);
+  // const user = ;
+  let userId = session?.user.sub;
+  if (!userId) {
+    userId = "null";
+  }
+  let { data: agency, agencyError } = await supabase
+    .from("users")
+    .select("agencyName")
+    .eq("userId", userId);
+  if (agencyError) {
+    console.log("agencyError");
+  }
+  console.log("agency");
+  console.log(agency);
+  if (!agency || agency.length === 0) {
+    agency = [{ agencyName: "Guest Agency" }];
+    // return {
+    //   redirect: {
+    //     permanent: false,
+    //     destination: "/agency/create-agency",
+    //   },
+    //   props: {},
+    // };
+  }
+  let { data: folders, error } = await supabase
+    .from("folders")
+    .select("*")
+    // .eq("userId", userId)
+    .filter("folderName", "neq", null)
+    .filter("folderPicUrl", "neq", null)
+    .filter("availability", "eq", "GLOBAL")
+    .limit(PAGE_COUNT)
+    .order("folderId", { ascending: false });
 
-    console.log("folders");
-    console.log(folders);
+  console.log("folders");
+  console.log(folders);
 
-    // Extract folderIds from the obtained folders data
-    const folderIds = folders.map((folder) => folder.folderId);
+  // Extract folderIds from the obtained folders data
+  const folderIds = folders.map((folder) => folder.folderId);
 
-    let folderLikes = [];
+  let folderLikes = [];
 
-    // Check if there are any folderIds to avoid unnecessary query
-    if (folderIds.length > 0) {
-      let { data, folderLikesError } = await supabase
-        .from("folderLikes")
-        .select()
-        .in("folderId", folderIds); // Filter folderLikes by folderIds from the first query
+  // Check if there are any folderIds to avoid unnecessary query
+  if (folderIds.length > 0) {
+    let { data, folderLikesError } = await supabase
+      .from("folderLikes")
+      .select()
+      .in("folderId", folderIds); // Filter folderLikes by folderIds from the first query
 
-      if (!folderLikesError) {
-        folderLikes = data;
-        // console.log("folderLikes");
-        // console.log(folderLikes);
-      } else {
-        console.error("Error fetching folder likes:", folderLikesError);
-      }
+    if (!folderLikesError) {
+      folderLikes = data;
+      // console.log("folderLikes");
+      // console.log(folderLikes);
     } else {
-      console.log("No folders found for the given criteria");
+      console.error("Error fetching folder likes:", folderLikesError);
+    }
+  } else {
+    console.log("No folders found for the given criteria");
+  }
+
+  const _folderLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
+    if (!acc[folderLike.folderId]) {
+      acc[folderLike.folderId] = 0;
     }
 
-    const _folderLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
-      if (!acc[folderLike.folderId]) {
-        acc[folderLike.folderId] = 0;
-      }
+    acc[folderLike.folderId] += folderLike.likeValue; // Updated to sum the likeValue
+    return acc;
+  }, {});
 
-      acc[folderLike.folderId] += folderLike.likeValue; // Updated to sum the likeValue
-      return acc;
-    }, {});
+  console.log("folderLikesByFolderId");
+  console.log(_folderLikesByFolderId);
 
-    console.log("folderLikesByFolderId");
-    console.log(_folderLikesByFolderId);
+  // Query the reportFolders table to get the count of reports for each folderId
+  let { data: reportCountsData, error: reportCountsError } = await supabase
+    .from("folders")
+    .select(`folderId, reportFolders(count)`)
+    .in("folderId", folderIds);
+  console.log("reportCountsData");
+  console.log(reportCountsData);
+  // console.log("reportCountsData[0].reportFolders[0]");
+  // console.log(reportCountsData[0].reportFolders[0]);
 
-    // Query the reportFolders table to get the count of reports for each folderId
-    let { data: reportCountsData, error: reportCountsError } = await supabase
-      .from("folders")
-      .select(`folderId, reportFolders(count)`)
-      .in("folderId", folderIds);
-    console.log("reportCountsData");
-    console.log(reportCountsData);
-    // console.log("reportCountsData[0].reportFolders[0]");
-    // console.log(reportCountsData[0].reportFolders[0]);
+  if (reportCountsError) {
+    console.error("Error fetching report counts:", reportCountsError);
+  }
 
-    if (reportCountsError) {
-      console.error("Error fetching report counts:", reportCountsError);
-    }
+  const _reportCountsByFolderId = reportCountsData.reduce((acc, item) => {
+    acc[item.folderId] = item.reportFolders[0].count || null;
+    return acc;
+  }, {});
+  return {
+    props: {
+      folders,
+      userId,
+      _folderLikesByFolderId,
+      _reportCountsByFolderId,
+    },
+  };
+}
 
-    const _reportCountsByFolderId = reportCountsData.reduce((acc, item) => {
-      acc[item.folderId] = item.reportFolders[0].count || null;
-      return acc;
-    }, {});
-    return {
-      props: {
-        folders,
-        userId,
-        _folderLikesByFolderId,
-        _reportCountsByFolderId,
-      },
-    };
-  },
-});
 const ViewReports = ({
   folders,
   userId,

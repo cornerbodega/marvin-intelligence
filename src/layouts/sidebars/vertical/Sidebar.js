@@ -10,7 +10,11 @@ const navigation = [
   //   href: "/reports/folders/view-folders",
   //   icon: "bi bi-patch-check",
   // },
-
+  {
+    title: "Intel-Net",
+    href: "/intelnet/folders/view-intelnet",
+    icon: "bi bi-globe2",
+  },
   {
     title: "Reports",
     href: "/reports/folders/view-folders",
@@ -37,11 +41,6 @@ const navigation = [
   //   href: "/ui/badges",
   //   icon: "bi bi-link",
   // },
-  {
-    title: "Intel-Net",
-    href: "/intelnet/folders/view-intelnet",
-    icon: "bi bi-globe2",
-  },
 
   // {
   //   title: "Buttons",

@@ -35,6 +35,8 @@ import _ from "lodash";
 import IntelliPrint from "../../../components/IntelliPrint/IntelliPrint";
 import IntelliCopyUrl from "../../../components/IntelliCopyUrl/IntelliCopyUrl";
 import { getSupabase } from "../../../utils/supabase";
+import { LogIn } from "react-feather";
+import Auth0LoginButtons from "../../../components/Auth0LoginButtons";
 
 // import { useUser } from "@auth0/nextjs-auth0/client";
 // import { getSupabase } from "../../utils/supabase";
@@ -111,10 +113,12 @@ const ViewReports = ({ user, _agencyName, tokensRemaining }) => {
   return (
     <>
       <Row>
-        <Col md={{ size: 8, offset: 1 }}>
+        <div style={{ marginBottom: "40px" }}>
+          <Auth0LoginButtons></Auth0LoginButtons>
+        </div>
+        <Col md={{ size: 8, offset: 0 }}>
           <Form onSubmit={handleSubmit}>
             {/* <h3 className="mb-4">{agencyName}</h3> */}
-
             <FormGroup>
               <Label>
                 <i className="bi bi-briefcase" /> Intelligence Agency Name
