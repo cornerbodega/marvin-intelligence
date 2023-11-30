@@ -125,7 +125,7 @@ const ViewReports = ({
 }) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
-  const [offset, setOffset] = useState(0);
+  const [offset, setOffset] = useState(1);
   const [isInView, setIsInView] = useState(false);
   const [loadedReports, setLoadedReports] = useState(folders);
   const [briefingInput, setBriefingInput] = useState("");
@@ -133,8 +133,8 @@ const ViewReports = ({
   const [reportCountsByFolderId, setReportCountsByFolderId] = useState(
     _reportCountsByFolderId
   );
-  console.log("loadedReports");
-  console.log(loadedReports);
+  // console.log("loadedReports");
+  // console.log(loadedReports);
   async function loadPagedResults() {
     console.log("Loading paged results");
 
@@ -510,16 +510,14 @@ const ViewReports = ({
       {/* <div>{JSON.stringify(loadedReports)}</div> */}
       <div ref={containerRef}>
         <Row className="text-primary">
-          {loadedReports.length > 0 && (
-            <IntelliCardGroup
-              offset={offset}
-              handleCardClick={handleCardClick}
-              datums={loadedReports}
-              folderLikesByFolderId={folderLikesByFolderId}
-              reportCountsByFolderId={reportCountsByFolderId}
-              datumsType={"folders"}
-            ></IntelliCardGroup>
-          )}
+          <IntelliCardGroup
+            offset={offset}
+            handleCardClick={handleCardClick}
+            datums={loadedReports}
+            folderLikesByFolderId={folderLikesByFolderId}
+            reportCountsByFolderId={reportCountsByFolderId}
+            datumsType={"folders"}
+          ></IntelliCardGroup>
         </Row>
       </div>
       <IntelliFab fabType={"folder"} icon="+" onClick={handleFabClick} />
