@@ -1,10 +1,10 @@
-import Head from "next/head";
+// import Head from "next/head";
 
-import Mlogo from "../components/Mlogo";
-import { Button, Container, Row, Col } from "reactstrap";
+// import Mlogo from "../components/Mlogo";
+// import { Button, Container, Row, Col } from "reactstrap";
 
 import React from "react";
-import Logo from "../src/layouts/logo/Logo";
+// import Logo from "../src/layouts/logo/Logo";
 
 export async function getServerSideProps(context) {
   // redirect to login if no token

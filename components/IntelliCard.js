@@ -1,19 +1,6 @@
-import { useRouter } from "next/router";
 import Image from "next/image";
-import {
-  Badge,
-  Card,
-  CardGroup,
-  CardBody,
-  CardText,
-  Button,
-  CardTitle,
-  CardSubtitle,
-  Table,
-  CardImg,
-} from "reactstrap";
+import { Badge, Card, CardBody, CardSubtitle } from "reactstrap";
 import getCloudinaryImageUrlForHeight from "../utils/getCloudinaryImageUrlForHeight";
-
 const IntelliCard = ({
   imageSize,
   datums,
@@ -110,7 +97,7 @@ const IntelliCard = ({
         className="cardShadow text-white"
       >
         <div style={{ position: "relative" }}>
-          <CardImg
+          <Image
             // onClick={handleClick}
             src={displayDatums.picUrl} // insert image transformations based on imageSize here
             style={imageStyle}

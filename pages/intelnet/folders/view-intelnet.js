@@ -1,14 +1,13 @@
-import { Button, Row, Breadcrumb, BreadcrumbItem } from "reactstrap";
+import { Row, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import useRouter from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
 // other imports
-import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { getSession } from "@auth0/nextjs-auth0";
 // import IntelliCardGroup from "../../../components/IntelliCardGroup";
 // import IntelliCardGroup from "../../../components/IntelliCardGroup";
 import { getSupabase } from "../../../utils/supabase";
 
-import IntelliFab from "../../../components/IntelliFab";
 // rest of component
 import { slugify } from "../../../utils/slugify";
 import IntelliCardGroup from "../../../components/IntelliCardGroup";
