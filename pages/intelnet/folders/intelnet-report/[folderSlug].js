@@ -23,7 +23,7 @@ import Router from "next/router";
 import _ from "lodash";
 import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
 import IntelliCopyUrl from "../../../../components/IntelliCopyUrl/IntelliCopyUrl";
-
+import Image from "next/image";
 // import { child } from "@firebase/database";
 // export const getServerSideProps = withPageAuthRequired({
 // export const getServerSideProps = withPageAuthRequired({
@@ -1000,7 +1000,7 @@ const ViewReports = ({
                 alt={folderPicDescription}
                 title={folderPicDescription}
               >
-                <img
+                <Image
                   // className="report-image"
                   src={`${getCloudinaryImageUrlForHeight(folderPicUrl, 700)}`}
                   style={

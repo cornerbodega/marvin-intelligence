@@ -25,7 +25,7 @@ import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
 import { current } from "@reduxjs/toolkit";
 import IntelliReportLengthDropdown from "../../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
 import Head from "next/head";
-
+import Image from "next/image";
 // import { child } from "@firebase/database";
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
@@ -1249,7 +1249,7 @@ const ViewReports = ({
               alt={folderPicDescription}
               title={folderPicDescription}
             >
-              <img
+              <Image
                 // className="report-image"
                 src={`${getCloudinaryImageUrlForHeight(folderPicUrl, 700)}`}
                 style={{

@@ -1,5 +1,5 @@
 import HourglassAnimation from "./Hourglass";
-
+import Image from "next/image";
 export default function LoadingDots() {
   return (
     <div
@@ -17,7 +17,10 @@ export default function LoadingDots() {
         }}
       >
         <div style={{ textAlign: "center" }}>
-          <img src="/library.png" style={{ width: "500px", height: "500px" }} />
+          <Image
+            src="/library.png"
+            style={{ width: "500px", height: "500px" }}
+          />
         </div>
         {/* <HourglassAnimation /> */}
       </div>

@@ -26,7 +26,7 @@ import toast, { Toaster } from "react-hot-toast";
 
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
-
+import Image from "next/image";
 import { useRouter } from "next/router";
 
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
@@ -300,7 +300,10 @@ const CreateMission = ({}) => {
       )}
       {showLoadingImage && (
         <div style={{ textAlign: "center" }}>
-          <img src="/library.png" style={{ width: "500px", height: "500px" }} />
+          <Image
+            src="/library.png"
+            style={{ width: "500px", height: "500px" }}
+          />
         </div>
       )}
     </div>

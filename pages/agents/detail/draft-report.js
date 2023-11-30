@@ -36,7 +36,7 @@ import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 // import { getSupabase } from "../../utils/supabase";
 import { getSupabase } from "../../../utils/supabase";
 import { useState, useRef, useEffect } from "react";
-
+import Image from "next/image";
 import { slugify } from "../../../utils/slugify";
 // import { setupFirebaseListener } from "../../../utils/firebaseListener";
 import saveTask from "../../../utils/saveTask";
@@ -980,7 +980,7 @@ const CreateMission = ({
                     height: "100%",
                   }}
                 >
-                  <img
+                  <Image
                     src={`${agent.profilePicUrl}`}
                     style={{
                       width: "100%",
