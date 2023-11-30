@@ -163,7 +163,7 @@ const IntelliCard = ({
                 fontWeight: "800",
                 color: "white",
                 fontSize: "1em",
-                // height: "80px",
+                minHeight: "70px",
                 // marginTop: "4px",
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
