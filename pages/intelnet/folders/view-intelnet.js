@@ -510,14 +510,16 @@ const ViewReports = ({
       {/* <div>{JSON.stringify(loadedReports)}</div> */}
       <div ref={containerRef}>
         <Row className="text-primary">
-          <IntelliCardGroup
-            offset={offset}
-            handleCardClick={handleCardClick}
-            datums={loadedReports}
-            folderLikesByFolderId={folderLikesByFolderId}
-            reportCountsByFolderId={reportCountsByFolderId}
-            datumsType={"folders"}
-          ></IntelliCardGroup>
+          {loadedReports.length > 0 && (
+            <IntelliCardGroup
+              offset={offset}
+              handleCardClick={handleCardClick}
+              datums={loadedReports}
+              folderLikesByFolderId={folderLikesByFolderId}
+              reportCountsByFolderId={reportCountsByFolderId}
+              datumsType={"folders"}
+            ></IntelliCardGroup>
+          )}
         </Row>
       </div>
       <IntelliFab fabType={"folder"} icon="+" onClick={handleFabClick} />
