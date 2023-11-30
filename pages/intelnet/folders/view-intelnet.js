@@ -133,9 +133,8 @@ const ViewReports = ({
   const [reportCountsByFolderId, setReportCountsByFolderId] = useState(
     _reportCountsByFolderId
   );
-  // console.log("loadedReports");
-  // console.log(loadedReports);
-  loadPagedResults();
+  console.log("loadedReports");
+  console.log(loadedReports);
   async function loadPagedResults() {
     console.log("Loading paged results");
 
