@@ -12,7 +12,7 @@ import { getSupabase } from "../../../utils/supabase";
 import { slugify } from "../../../utils/slugify";
 import IntelliCardGroup from "../../../components/IntelliCardGroup";
 import IntelliFab from "../../../components/IntelliFab";
-const PAGE_COUNT = 6;
+const PAGE_COUNT = 3;
 const supabase = getSupabase();
 //  const getServerSideProps = withPageAuthRequired({
 export async function getServerSideProps(context) {

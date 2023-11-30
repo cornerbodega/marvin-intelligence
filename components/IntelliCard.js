@@ -44,13 +44,13 @@ const IntelliCard = ({
   if (datumsType === "missions") {
     displayDatums.picUrl = datums.reportPicUrl;
     displayDatums.title = datums.reportTitle;
-    titleClassName = "reportFont";
+    // titleClassName = "reportFont";
     icon = "bi bi-body-text";
   }
   if (datumsType === "folders") {
     displayDatums.picUrl = datums.folderPicUrl;
     displayDatums.title = datums.folderName;
-    titleClassName = "reportFont";
+    // titleClassName = "reportFont";
     icon = "bi bi-folder";
     if (folderLikesByFolderId) {
       likes = folderLikesByFolderId[datums.folderId];
@@ -172,7 +172,7 @@ const IntelliCard = ({
                 textOverflow: "ellipsis",
                 whiteSpace: "normal",
               }}
-              className={titleClassName}
+              className="reportFont"
             >
               {icon && <i className={icon}></i>} {displayDatums.title}{" "}
               {reportCount && (
