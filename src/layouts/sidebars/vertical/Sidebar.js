@@ -1,7 +1,7 @@
 import { Button, Nav, NavItem } from "reactstrap";
 import Logo from "../../logo/Logo";
-import Link from "next/link";
-import Mlogo from "../../../../components/Mlogo";
+// import Link from "next/link";
+// import Mlogo from "../../../../components/Mlogo";
 import { useRouter } from "next/router";
 
 const navigation = [
@@ -113,7 +113,7 @@ const Sidebar = ({ showMobilemenu }) => {
         </a>
       </div>
       <div className="d-flex align-items-center">
-        <div
+        {/* <div
           style={{
             position: "relative",
             marginLeft: "-100px",
@@ -122,7 +122,8 @@ const Sidebar = ({ showMobilemenu }) => {
           }}
         >
           <Mlogo />
-        </div>
+        </div> */}
+        <Logo />
       </div>
 
       <div className="pt-4 mt-2">
