@@ -62,10 +62,7 @@ const IntelliCard = ({
   if (imageSize === "small") {
     // imageStyle.width = "auto";
     imageStyle.objectFit = "cover";
-    displayDatums.picUrl = getCloudinaryImageUrlForHeight(
-      displayDatums.picUrl,
-      337
-    );
+    displayDatums.picUrl = displayDatums.picUrl;
   }
 
   // console.log("IntelliCard datums");
@@ -91,19 +88,20 @@ const IntelliCard = ({
 
   return (
     <>
+      {/* {displayDatums.picUrl} */}
       <Card
         onClick={handleClick}
         style={{ background: "black", cursor: "pointer" }}
         className="cardShadow text-white"
       >
         <div style={{ position: "relative", width: "100%" }}>
-          <Image
+          <img
             src={displayDatums.picUrl}
             style={{ maxWidth: "100%", height: "auto", ...imageStyle }}
             layout="responsive"
-            width={337} // You may need to provide a sensible default or calculate this based on the aspect ratio
-            height={337}
-            objectFit="contain"
+            // width={337} // You may need to provide a sensible default or calculate this based on the aspect ratio
+            // height={337}
+            // objectFit="contain"
             alt={displayDatums.title}
           />
         </div>

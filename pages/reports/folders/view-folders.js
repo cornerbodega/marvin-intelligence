@@ -687,7 +687,7 @@ const ViewReports = ({
                   <i className="bi bi-folder"></i>+ Quick Draft
                 </Button>
               </div>
-              <div style={{ marginBottom: "200px" }}>
+              <div style={{ marginBottom: "100px" }}>
                 {/* <IntelliReportLengthDropdown
                   handleSelectedLength={handleSelectedLength}
                 /> */}

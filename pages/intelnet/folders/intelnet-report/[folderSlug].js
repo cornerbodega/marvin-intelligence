@@ -1075,7 +1075,7 @@ const ViewReports = ({
           )} */}
         </div>
         {/* <div style={{ fontSize: "0.5em" }}>{folderPicDescription}</div> */}
-        <div style={{ marginTop: "-10px", marginBottom: "20px" }}>
+        <div style={{ marginTop: "-30px", marginBottom: "20px" }}>
           <Row>
             <Col style={{ whiteSpace: "nowrap" }}>
               <span
@@ -1099,13 +1099,13 @@ const ViewReports = ({
               <span style={{ marginRight: "20px" }}>
                 <IntelliPrint loadedReports={loadedReports} />
               </span>
-              <span>
+
+              <span style={{ marginRight: "20px" }}>
                 {/* <i className="bi bi-send" /> */}
                 <IntelliCopyUrl />
               </span>
+              {/* flex divider to push the next span to the right */}
             </Col>
-            {/* <Col> */}
-            {/* </Col> */}
           </Row>
         </div>
         <div> {folderDescription}</div>
@@ -1218,28 +1218,30 @@ const ViewReports = ({
                   )}
                 </div>
                 {/* Speech */}
-                <div>
-                  <div
-                    onClick={() => handleReadReportClick(index)}
-                    disabled={isLoadingAudio}
-                    style={{
-                      fontSize: "1.25em",
+                <Row>
+                  <Col>
+                    <div
+                      onClick={() => handleReadReportClick(index)}
+                      disabled={isLoadingAudio}
+                      style={{
+                        fontSize: "1.25em",
 
-                      marginTop: "10px",
-                    }}
-                  >
-                    {isLoadingAudio ? (
-                      <i className="bi bi-hourglass-split" />
-                    ) : isPlaying ? (
-                      <i className="bi bi-pause-btn" />
-                    ) : (
-                      <i
-                        style={{ cursor: "pointer" }}
-                        className="bi bi-speaker"
-                      />
-                    )}
-                  </div>
-                </div>
+                        marginTop: "10px",
+                      }}
+                    >
+                      {isLoadingAudio ? (
+                        <i className="bi bi-hourglass-split" />
+                      ) : isPlaying ? (
+                        <i className="bi bi-pause-btn" />
+                      ) : (
+                        <i
+                          style={{ cursor: "pointer" }}
+                          className="bi bi-speaker"
+                        />
+                      )}
+                    </div>
+                  </Col>
+                </Row>
                 <div
                   id={`reportRoot${index}`}
                   // onMouseUp={(e) => handleTextHighlight(e, report)}

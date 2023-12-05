@@ -5,20 +5,21 @@ import Logo from "../../logo/Logo";
 import { useRouter } from "next/router";
 
 const navigation = [
+  ,
   // {
   //   title: "Missions",
   //   href: "/reports/folders/view-folders",
   //   icon: "bi bi-patch-check",
   // },
   {
-    title: "Intel-Net",
-    href: "/intelnet/folders/view-intelnet",
-    icon: "bi bi-globe2",
-  },
-  {
     title: "Reports",
     href: "/reports/folders/view-folders",
     icon: "bi bi-folder",
+  },
+  {
+    title: "Intel-Net",
+    href: "/intelnet/folders/view-intelnet",
+    icon: "bi bi-globe2",
   },
   {
     title: "Agents",
@@ -123,7 +124,9 @@ const Sidebar = ({ showMobilemenu }) => {
         >
           <Mlogo />
         </div> */}
-        <Logo />
+        <div style={{ marginTop: "20px" }}>
+          <Logo />
+        </div>
       </div>
 
       <div className="pt-4 mt-2">

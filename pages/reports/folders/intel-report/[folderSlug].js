@@ -1196,6 +1196,35 @@ const ViewReports = ({
     }
   };
 
+  async function handleRefreshFolderImageClick() {
+    const newTask = {
+      type: "regenerateFolder",
+      status: "queued",
+      userId,
+      context: {
+        folderId,
+        userId,
+      },
+      createdAt: new Date().toISOString(),
+    };
+    const newTaskRef = await saveTask(newTask);
+  }
+  async function handleRefreshReportImageClick(index) {
+    const childReportId = loadedReports[index].reportId;
+    const draft = loadedReports[index].reportContent;
+    const newTask = {
+      type: "regenerateReportImage",
+      status: "queued",
+      userId,
+      context: {
+        childReportId,
+        userId,
+        draft,
+      },
+      createdAt: new Date().toISOString(),
+    };
+    const newTaskRef = await saveTask(newTask);
+  }
   return (
     <div style={{ maxWidth: "90%" }}>
       <Breadcrumb>
@@ -1236,7 +1265,7 @@ const ViewReports = ({
         {folderPicUrl && (
           <div
             style={{
-              height: "700px",
+              // height: "700px",
               width: "auto",
               position: "relative",
             }}
@@ -1249,15 +1278,17 @@ const ViewReports = ({
               alt={folderPicDescription}
               title={folderPicDescription}
             >
-              <Image
+              <img
                 // className="report-image"
-                src={`${getCloudinaryImageUrlForHeight(folderPicUrl, 700)}`}
-                fill={true}
-                style={{
-                  // objectFit: "contain",
-                  // width: "auto",
-                  objectPosition: "top",
-                }}
+                src={`${folderPicUrl}`}
+                // fill={true}
+                style={
+                  {
+                    // objectFit: "contain",
+                    // width: "auto",
+                    // objectPosition: "top",
+                  }
+                }
               />
             </a>
             {/* <div className="overlay"></div> */}
@@ -1314,7 +1345,26 @@ const ViewReports = ({
               </span>
             </Col>
 
-            <Col></Col>
+            <Col
+              style={{
+                width: "100%",
+                // background: "red",
+                textAlign: "right",
+                marginRight: "20px",
+              }}
+            >
+              <span
+                style={{
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                <i
+                  onClick={() => handleRefreshFolderImageClick()}
+                  className="bi bi-arrow-clockwise"
+                />
+              </span>
+            </Col>
           </Row>
         </div>
       )}
@@ -1436,7 +1486,7 @@ const ViewReports = ({
                   </a>
                 )}
               </div>
-              <div style={{ height: "700px" }} className="image-container">
+              <div className="image-container">
                 {!report.reportPicUrl && <LoadingDots />}
                 {report.reportPicUrl && (
                   <a
@@ -1447,10 +1497,7 @@ const ViewReports = ({
                     title={report.reportPicDescription}
                   >
                     <img
-                      src={getCloudinaryImageUrlForHeight(
-                        report.reportPicUrl,
-                        700
-                      )}
+                      src={report.reportPicUrl}
                       alt="Report Image"
                       className="report-image"
                       style={{ borderRadius: "10px" }}
@@ -1460,28 +1507,52 @@ const ViewReports = ({
                 )}
               </div>
               {/* Speech */}
-              <div>
-                <div
-                  onClick={() => handleReadReportClick(index)}
-                  disabled={isLoadingAudio}
-                  style={{
-                    fontSize: "1.25em",
+              <Row>
+                <Col>
+                  <div
+                    onClick={() => handleReadReportClick(index)}
+                    disabled={isLoadingAudio}
+                    style={{
+                      fontSize: "1.25em",
 
+                      marginTop: "10px",
+                    }}
+                  >
+                    {isLoadingAudio ? (
+                      <i className="bi bi-hourglass-split" />
+                    ) : isPlaying ? (
+                      <i className="bi bi-pause-btn" />
+                    ) : (
+                      <i
+                        style={{ cursor: "pointer" }}
+                        className="bi bi-speaker"
+                      />
+                    )}
+                  </div>
+                </Col>
+
+                <Col
+                  style={{
+                    width: "100%",
+                    // background: "red",
+                    textAlign: "right",
+                    marginRight: "20px",
                     marginTop: "10px",
+                    cursor: "pointer",
                   }}
                 >
-                  {isLoadingAudio ? (
-                    <i className="bi bi-hourglass-split" />
-                  ) : isPlaying ? (
-                    <i className="bi bi-pause-btn" />
-                  ) : (
+                  <span
+                    style={{
+                      color: "white",
+                    }}
+                  >
                     <i
-                      style={{ cursor: "pointer" }}
-                      className="bi bi-speaker"
+                      onClick={() => handleRefreshReportImageClick(index)}
+                      className="bi bi-arrow-clockwise"
                     />
-                  )}
-                </div>
-              </div>
+                  </span>
+                </Col>
+              </Row>
               <div
                 id={`reportRoot${index}`}
                 onMouseUp={(e) => handleTextHighlight(e, report)}
@@ -1548,7 +1619,7 @@ const ViewReports = ({
       {/* <IntelliReportLengthDropdown
         handleSelectedLength={handleSelectedLength}
       /> */}
-      <div
+      {/* <div
         onClick={() => goToPage("/account/tokens/get-tokens")}
         style={{
           marginBottom: "32px",
@@ -1560,7 +1631,7 @@ const ViewReports = ({
         }}
       >
         My Tokens: {tokensRemaining} <i className="bi bi-coin" />
-      </div>
+      </div> */}
       {/* Draft */}
       {/* Is streaming{JSON.stringify(isStreaming)} */}
       {/* {JSON.stringify(loadedReports)} */}

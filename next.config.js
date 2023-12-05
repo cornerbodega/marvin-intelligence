@@ -1,6 +1,6 @@
 module.exports = {
   images: {
-    domains: ["res.cloudinary.com"],
+    domains: ["res.cloudinary.com", "storage.googleapis.com"],
   },
   // ... any other existing configuration
 };
