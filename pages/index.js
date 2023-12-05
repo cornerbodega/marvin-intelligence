@@ -10,7 +10,7 @@ export async function getServerSideProps(context) {
   // redirect to login if no token
   return {
     redirect: {
-      destination: "/intelnet/folders/view-intelnet",
+      destination: "/reports/folders/view-folders",
       permanent: false,
     },
   };
