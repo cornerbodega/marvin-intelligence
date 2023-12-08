@@ -95,15 +95,17 @@ const IntelliCard = ({
         className="cardShadow text-white"
       >
         <div style={{ position: "relative", width: "100%" }}>
-          <img
-            src={displayDatums.picUrl}
-            style={{ maxWidth: "100%", height: "auto", ...imageStyle }}
-            layout="responsive"
-            // width={337} // You may need to provide a sensible default or calculate this based on the aspect ratio
-            // height={337}
-            // objectFit="contain"
-            alt={displayDatums.title}
-          />
+          {displayDatums.picUrl && (
+            <img
+              src={displayDatums.picUrl.replace("medium", "small")}
+              style={{ maxWidth: "100%", height: "auto", ...imageStyle }}
+              layout="responsive"
+              // width={337} // You may need to provide a sensible default or calculate this based on the aspect ratio
+              // height={337}
+              // objectFit="contain"
+              alt={displayDatums.title}
+            />
+          )}
         </div>
         {/* <div style={{ position: "relative", width: "100%", height: "337px" }}> */}
         {/* <Image

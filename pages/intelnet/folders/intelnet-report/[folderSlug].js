@@ -715,14 +715,15 @@ const ViewReports = ({
       <ul>
         {children &&
           children.map((item) => (
-            <li key={item.id}>
+            <li style={{ marginBottom: "8px", marginTop: "8px" }} key={item.id}>
               {!item.id && <LoadingDots style={{ marginTop: "20px" }} />}
               {item.id && (
                 <a
+                  className="linkFont"
                   style={{
-                    fontWeight: 800,
-                    color: "#E7007C",
-                    fontWeight: "200",
+                    // fontWeight: 800,
+                    // color: "#E7007C",
+                    fontWeight: "500",
                     textDecoration: "none",
                     cursor: "pointer",
                   }}
@@ -1126,14 +1127,15 @@ const ViewReports = ({
         {/* {JSON.stringify(parentChildIdMap)} */}
         {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
         {parentChildIdMap.id && (
-          <ul style={{ fontSize: "0.85em" }}>
-            <li key={parentChildIdMap.id}>
+          <ul className="linkFont" style={{ fontSize: "0.85em" }}>
+            <li style={{ marginBottom: "8px" }} key={parentChildIdMap.id}>
               <a
                 style={{
                   color: "#E7007C",
                   textDecoration: "none",
                   cursor: "pointer",
-                  // fontWeight: 400,
+                  fontWeight: 800,
+                  fontSize: "1.2em",
                 }}
                 href={`#${parentChildIdMap.id}`}
                 onClick={() => console.log("Navigating to parent report")}
@@ -1204,10 +1206,7 @@ const ViewReports = ({
                       rel="noopener noreferrer"
                     >
                       <img
-                        src={getCloudinaryImageUrlForHeight(
-                          report.reportPicUrl,
-                          700
-                        )}
+                        src={report.reportPicUrl}
                         alt={report.reportPicDescription}
                         title={report.reportPicDescription}
                         className="report-image"

@@ -3683,10 +3683,10 @@
   "resolved" "https://registry.npmjs.org/setprototypeof/-/setprototypeof-1.2.0.tgz"
   "version" "1.2.0"
 
-"sharp@^0.32.4":
-  "integrity" "sha512-exUnZewqVZC6UXqXuQ8fyJJv0M968feBi04jb9GcUHrWtkRoAKnbJt8IfwT4NJs7FskArbJ14JAFGVuooszoGg=="
-  "resolved" "https://registry.npmjs.org/sharp/-/sharp-0.32.4.tgz"
-  "version" "0.32.4"
+"sharp@^0.32.6":
+  "integrity" "sha512-KyLTWwgcR9Oe4d9HwCwNM2l7+J0dUQwn/yf7S0EnTtb0eVS4RxO0eUSvxPtzT4F3SY+C4K6fqdv/DO27sJ/v/w=="
+  "resolved" "https://registry.npmjs.org/sharp/-/sharp-0.32.6.tgz"
+  "version" "0.32.6"
   dependencies:
     "color" "^4.2.3"
     "detect-libc" "^2.0.2"

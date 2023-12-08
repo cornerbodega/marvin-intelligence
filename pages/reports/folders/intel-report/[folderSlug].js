@@ -81,6 +81,7 @@ export const getServerSideProps = withPageAuthRequired({
             reportId,
             reportContent,
             agentId,
+            createdAt,
             agent:agentId (
                 agentId,
                 agentName,
@@ -141,10 +142,10 @@ export const getServerSideProps = withPageAuthRequired({
         expertises.push(missionsResponse[0].reports.agent.expertise3);
       }
 
-      if (missionsResponse[0].reports.agent.specializedTraining) {
-        specializedTraining =
-          missionsResponse[0].reports.agent.specializedTraining;
-      }
+      // if (missionsResponse[0].reports.agent.specializedTraining) {
+      //   specializedTraining =
+      //     missionsResponse[0].reports.agent.specializedTraining;
+      // }
     }
 
     let { data: linksResponse, error: linksError } = await supabase
@@ -185,6 +186,14 @@ export const getServerSideProps = withPageAuthRequired({
       _availability = mission.folders.availability;
     });
 
+    // Sort Initial Loaded Reports by cretedAt
+    _loadedReports.sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+
+      return dateA - dateB; // For ascending order
+      // return dateB - dateA; // For descending order
+    });
     // My Tokens
     let { data: tokensResponse, error: tokensError } = await supabase
       .from("tokens")
@@ -342,15 +351,26 @@ const ViewReports = ({
   async function fetchUpdatedReports() {
     console.log("FETCH UPDATED REPORTS");
     // Fetch the updated data from the database using the folderId
+    // let { data: updatedMissionsResponse, error: updatedError } = await supabase
+    //   .from("reportFolders")
+    //   .select(
+    //     `
+    //           folders (folderName, folderDescription, folderPicUrl),
+    //           reports (reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, availability)
+    //       `
+    //   )
+    //   .eq("folderId", folderId);
     let { data: updatedMissionsResponse, error: updatedError } = await supabase
       .from("reportFolders")
       .select(
         `
-              folders (folderName, folderDescription, folderPicUrl),
-              reports (reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, availability)
-          `
+          folders (folderName, folderDescription, folderPicUrl),
+          reports (reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, availability, createdAt)
+      `
       )
       .eq("folderId", folderId);
+    // .order("createdAt", { foreignTable: "reports" }); // or "reports" depending on where the column is
+
     // .filter("reports.availability", "neq", "DELETED")
     // .or("reports.availability.is.null");
     console.log("updatedMissionsResponse");
@@ -366,15 +386,21 @@ const ViewReports = ({
         return;
       }
       updatedMissions.push({ ...mission.reports });
-      // console.log("mission.folders");
-      // console.log(mission.folders);
-      // setFolderName(mission.folders.folderName);
-      // setFolderDescription(mission.folders.folderDescription);
-      // console.log("mission.folders.folderDescription");
-      // console.log(mission.folders.folderDescription);
-      // setFolderPicUrl(mission.folders.folderPicUrl);
     });
+    updatedMissions.sort((a, b) => {
+      // Assuming createdAt is a date string, you can convert them to Date objects for comparison
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
 
+      // Compare the two dates
+      if (dateA < dateB) {
+        return -1; // return a negative value if dateA is earlier than dateB
+      }
+      if (dateA > dateB) {
+        return 1; // return a positive value if dateA is later than dateB
+      }
+      return 0; // return 0 if dates are equal
+    });
     console.log("SET LOADED REPORTS");
     console.log(updatedMissions);
     // Update the state with the newly fetched data
@@ -390,39 +416,39 @@ const ViewReports = ({
       query: { ...Router.query, agentId: agentId },
     });
   }
-  const [currentGeneration, setCurrentGeneration] = useState(0);
-  useEffect(() => {
-    if (firebaseDoContinuumData) {
-      console.log("firebaseDoContinuumData");
-      console.log(firebaseDoContinuumData);
+  // const [currentGeneration, setCurrentGeneration] = useState(0);
+  // useEffect(() => {
+  //   if (firebaseDoContinuumData) {
+  //     console.log("firebaseDoContinuumData");
+  //     console.log(firebaseDoContinuumData);
 
-      if (firebaseDoContinuumData.status == "complete" || "in-progress") {
-        // if (hasStartedContinuum) {
-        if (firebaseDoContinuumData.context) {
-          if (
-            firebaseDoContinuumData.context.currentGeneration !=
-            currentGeneration
-          ) {
-            setCurrentGeneration(
-              firebaseDoContinuumData.context.currentGeneration
-            );
-            setDraft(
-              firebaseDoContinuumData.context[
-                `draft${currentGeneration == 1 ? "" : currentGeneration - 1}`
-              ]
-            );
-          }
-          fetchUpdatedReports();
-          if (firebaseDoContinuumData.status == "complete") {
-            // setHasStartedContinuum(false);
-            setIsStreaming(false);
-            setContinuumCompleted(true);
-          }
-          // }
-        }
-      }
-    }
-  }, [firebaseDoContinuumData]);
+  //     if (firebaseDoContinuumData.status == "complete" || "in-progress") {
+  //       // if (hasStartedContinuum) {
+  //       if (firebaseDoContinuumData.context) {
+  //         if (
+  //           firebaseDoContinuumData.context.currentGeneration !=
+  //           currentGeneration
+  //         ) {
+  //           setCurrentGeneration(
+  //             firebaseDoContinuumData.context.currentGeneration
+  //           );
+  //           setDraft(
+  //             firebaseDoContinuumData.context[
+  //               `draft${currentGeneration == 1 ? "" : currentGeneration - 1}`
+  //             ]
+  //           );
+  //         }
+  //         fetchUpdatedReports();
+  //         if (firebaseDoContinuumData.status == "complete") {
+  //           // setHasStartedContinuum(false);
+  //           setIsStreaming(false);
+  //           setContinuumCompleted(true);
+  //         }
+  //         // }
+  //       }
+  //     }
+  //   }
+  // }, [firebaseDoContinuumData]);
 
   useEffect(() => {
     if (firebaseDraftData) {
@@ -897,14 +923,14 @@ const ViewReports = ({
         {/* {JSON.stringify(loadedReports)} */}
         {children &&
           children.map((item) => (
-            <li key={item.id}>
+            <li style={{ marginBottom: "8px", marginTop: "8px" }} key={item.id}>
               {!item.id && "loading..."}
               {item.id && (
                 <a
                   style={{
-                    fontWeight: 800,
+                    fontSize: "1rem",
                     color: "#E7007C",
-                    fontWeight: "200",
+                    fontWeight: "500",
                     textDecoration: "none",
                     cursor: "pointer",
                   }}
@@ -1056,11 +1082,11 @@ const ViewReports = ({
   async function handleGlobeClick() {
     console.log("handleGlobeClick");
     let _availability = availability;
-    if (availability === "") {
-      // setAvailability("GLOBAL");
+    if (availability !== "GLOBAL") {
       _availability = "GLOBAL";
+      setAvailability("GLOBAL");
     } else {
-      // setAvailability("");
+      setAvailability("");
       _availability = "";
     }
     setAvailability(_availability);
@@ -1308,7 +1334,7 @@ const ViewReports = ({
         )}
         {/* {JSON.stringify(folderPicUrls)} */}
       </div>
-      {folderPicUrl && (
+      {1 && (
         <div style={{ marginTop: "-10px", marginBottom: "20px" }}>
           <Row>
             <Col style={{ whiteSpace: "nowrap" }}>
@@ -1336,6 +1362,7 @@ const ViewReports = ({
                   className="bi bi-globe"
                   style={{
                     color: `${availability === "GLOBAL" ? "gold" : "white"}`,
+                    cursor: "pointer",
                   }}
                 />
                 {/* {availability} */}
@@ -1377,7 +1404,7 @@ const ViewReports = ({
           <Col>
             Table of Contents
             <span style={{ whiteSpace: "nowrap" }}>
-              &nbsp;[{loadedReports.length} <i className="bi bi-body-text"></i>]
+              &nbsp;[{loadedReports.length} <i className="bi bi-link"></i>]
             </span>
           </Col>
         </Row>
@@ -1385,23 +1412,22 @@ const ViewReports = ({
       {/* {JSON.stringify(parentChildIdMap)} */}
       {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
       {parentChildIdMap.id && (
-        <ul>
+        <ul className="linkFont">
           <li key={parentChildIdMap.id}>
             <a
               style={{
                 color: "#E7007C",
                 textDecoration: "none",
                 cursor: "pointer",
-                // fontWeight: 400,
-                fontSize: "0.85em",
+                // fontWeight: 500,
+                fontSize: "1.2em",
               }}
               href={`#${parentChildIdMap.id}`}
               onClick={() => console.log("Navigating to parent report")}
             >
               {loadedReports.find(
                 (report) => report.reportId === parentChildIdMap.id
-              )?.reportTitle ||
-                `Generating Images for Report ID: ${parentChildIdMap.id}`}
+              )?.reportTitle || ``}
             </a>
             <NestedList
               // children={parentChildIdMap.children}
@@ -1556,6 +1582,7 @@ const ViewReports = ({
               <div
                 id={`reportRoot${index}`}
                 onMouseUp={(e) => handleTextHighlight(e, report)}
+                onTouchEnd={(e) => handleTextHighlight(e, report)}
                 className="report text-primary reportFont"
                 dangerouslySetInnerHTML={{ __html }}
               />

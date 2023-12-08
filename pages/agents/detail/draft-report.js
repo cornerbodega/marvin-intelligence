@@ -940,7 +940,7 @@ const CreateMission = ({
                       <i className="bi bi-folder"></i>+ Create Report
                     </Button>
                   </div>
-                  <div style={{ marginTop: "10px" }}>
+                  {/* <div style={{ marginTop: "10px" }}>
                     <IntelliReportLengthDropdown
                       handleSelectedLength={handleSelectedLength}
                     />
@@ -957,7 +957,7 @@ const CreateMission = ({
                     }}
                   >
                     My Tokens: {tokensRemaining} <i className="bi bi-coin" />
-                  </div>
+                  </div> */}
                 </FormGroup>
               </div>
             </FormGroup>
@@ -987,7 +987,7 @@ const CreateMission = ({
                       position: "relative",
                     }}
                   >
-                    <Image
+                    <img
                       src={`${agent.profilePicUrl}`}
                       fill={true}
                       style={{
@@ -1192,7 +1192,7 @@ const CreateMission = ({
                       &nbsp;Refine
                     </Button>
                   </div>
-                  <div style={{ marginTop: "10px" }}>
+                  {/* <div style={{ marginTop: "10px" }}>
                     <IntelliReportLengthDropdown
                       handleSelectedLength={handleSelectedLength}
                     />
@@ -1211,7 +1211,7 @@ const CreateMission = ({
                     >
                       My Tokens: {tokensRemaining} <i className="bi bi-coin" />
                     </div>
-                  </div>
+                  </div> */}
                 </FormGroup>
               </Form>
               <Button
