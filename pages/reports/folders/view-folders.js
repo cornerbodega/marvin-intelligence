@@ -252,7 +252,7 @@ const ViewReports = ({
     if (!guestUserId) {
       guestUserId = uuidv4();
       localStorage.setItem("guestUserId", guestUserId);
-      console.log(savedUser);
+      // console.log(savedUser);
       // return guestUserId;
     }
     setUserId(guestUserId);
