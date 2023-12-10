@@ -1719,7 +1719,9 @@ const ViewReports = ({
               style={{
                 display: "flex",
                 justifyContent: "center",
-                height: "237px",
+                // mihHeight: "237px",
+                // maxHeight: "237px",
+                width: "auto",
                 objectFit: "cover",
                 marginBottom: "16px",
 
@@ -1727,10 +1729,7 @@ const ViewReports = ({
               }}
             >
               <img
-                src={`${getCloudinaryImageUrlForHeight(
-                  agent.profilePicUrl,
-                  237
-                )}`}
+                src={agent.profilePicUrl}
                 style={{ borderRadius: "20%", cursor: "pointer" }}
                 alt="agent"
               />
