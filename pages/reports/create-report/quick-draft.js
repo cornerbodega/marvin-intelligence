@@ -23,20 +23,11 @@ import { useRouter } from "next/router";
 
 import { useState, useEffect, useContext } from "react";
 
-// import { setupFirebaseListener } from "../../../utils/firebaseListener";
-
-// bring in original report's summary
-// bring in agent's memory of previous reports
-// bring in content of link from original report
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
-// import useUserId from "../../../hooks/useUserId";
-// import IntelliUserContext from "../../../context/IntelliUserContext/intelliUserContext";
 
 const CreateMission = ({}) => {
-  // const _userId = useContext(IntelliUserContext);
   const router = useRouter();
-  // const userId = useUserId(user?.sub);
-  // console.log("userId");
+
   const { user } = useUser();
   const [userId, setUserId] = useState(user?.sub);
 
@@ -44,9 +35,6 @@ const CreateMission = ({}) => {
   const [feedbackInput, setFeedbackInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  // const [briefingInput, setBriefingInput] = useState(
-  //   router.query.briefingInput
-  // );
 
   console.log("router.query.briefingInput");
   console.log(router.query.briefingInput);
@@ -54,18 +42,19 @@ const CreateMission = ({}) => {
   console.log(router.query);
   console.log("router.query.userId");
   console.log(router.query.userId);
+
   if (!router.query.briefingInput || router.query.briefingInput.length == 0) {
     console.log("no briefing input. ");
     console.log("router.query.briefingInput");
     console.log(router.query.briefingInput);
-    // goToPage("/reports/folders/view-folders");
   }
+
   if (!router.query.userId || router.query.userId.length == 0) {
     console.log("no briefing userId query param.");
     console.log("router.query.userId");
     console.log(router.query.userId);
-    // goToPage("/reports/folders/view-folders");
   }
+
   useEffect(() => {
     if (router.query.userId) {
       setUserId(router.query.userId);
@@ -73,7 +62,6 @@ const CreateMission = ({}) => {
   }, [router.query.userId]);
 
   const [expertiseOutput, setExpertiseOutput] = useState("");
-  // const [folderId, setFolderId] = useState("");
 
   const firebaseDraftData = useFirebaseListener(
     userId
@@ -105,59 +93,34 @@ const CreateMission = ({}) => {
         }/${userId}/finalizeAndVisualizeReport/context/`
       : null
   );
+
   useEffect(() => {
     if (firebaseDraftData) {
-      //   console.log("firebaseDraftData");
-      //   console.log(firebaseDraftData);
-      function cleanIncompleteHTML(input) {
-        // First, find the last complete tag.
-        const lastOpenBracket = input.lastIndexOf("<");
-        const lastCloseBracket = input.lastIndexOf(">");
-
-        // If the last '<' appears after the last '>', then we have an incomplete tag.
-        if (lastOpenBracket > lastCloseBracket) {
-          // setIsStreaming(false);
-          return input.substring(0, lastOpenBracket);
-        } else {
-          // setIsStreaming(true);
-        }
-      }
-      // console.log("isStreaming");
-      // console.log(isStreaming);
-      // if (briefingInput.length != 0) {
-      //   setBriefingInput(firebaseDraftData.briefingInput);
-      // }
       setDraft(firebaseDraftData.draft);
       setExpertiseOutput(firebaseDraftData.expertiseOutput);
-      // setSpecializedTraining(firebaseDraftData.);
-      //   if (isSubmitting) {
-      //     setIsSubmitting(false);
-      //   }
     }
   }, [firebaseDraftData]);
 
   const [showLoadingImage, setShowLoadingImage] = useState(false);
+
   useEffect(() => {
     if (firebaseSaveData) {
       if (hasSubmitted) {
         if (firebaseSaveData.folderId) {
-          // if (folderId) {
-          // goToPage();
           router.push({
             pathname: `/reports/folders/intel-report/${firebaseSaveData.folderId}`,
             query: { userId },
           });
-          //   }
-          //   setFolderId(firebaseDraftData.folderId);
         } else {
           setShowLoadingImage(true);
         }
-        // setFolderId(firebaseDraftData.folderId);
       }
     }
   }, [firebaseSaveData]);
+
   async function handleAcceptReport() {
     setHasSubmitted(true);
+
     const draftData = {
       briefingInput: router.query.briefingInput,
       draft,
@@ -166,6 +129,7 @@ const CreateMission = ({}) => {
       draftData.expertiseOutput = expertiseOutput;
       // specializedTraining,
     }
+
     const newTask = {
       type: "finalizeAndVisualizeReport",
       status: "queued",
@@ -180,17 +144,7 @@ const CreateMission = ({}) => {
     console.log("newTaskRef");
     console.log(newTaskRef);
   }
-  function goToPage(name) {
-    console.log("go to page");
-    console.log(name);
-    router.push(name);
-  }
-  const [reportLength, setReportLength] = useState("short");
-  function handleSelectedLength(length) {
-    console.log("handleselected length");
-    console.log(length);
-    setReportLength(length);
-  }
+
   const [feedbacks, setFeedbacks] = useState([]);
   async function handleQuickDraftClick() {
     console.log("handleQuickDraft userId");
@@ -219,46 +173,13 @@ const CreateMission = ({}) => {
       userId,
       context: {
         ...draftData,
-        reportLength,
         userId,
       },
       createdAt: new Date().toISOString(),
     };
     await saveTask(newTask);
   }
-  // async function handleQuickDraftClick() {
-  //   const draftData = { briefingInput: router.query.briefingInput };
-  //   console.log("feedbackInput");
-  //   console.log(feedbackInput);
-  //   if (feedbackInput) {
-  //     draftData.feedback = feedbackInput;
-  //     // draftData.previousDraft = draft;
-  //     let newFeedbacks = feedbacks;
-  //     newFeedbacks.push({ feedback: feedbackInput, draft });
-  //     console.log("newFeedbacks");
-  //     console.log(newFeedbacks);
-  //     setFeedbacks(newFeedbacks);
-  //     draftData.feedbacks = newFeedbacks;
-  //     // const newBriefingInput = `${briefingInput} ${draftData.feedback}`;
 
-  //     // setBriefingInput(newBriefingInput);
-
-  //     setFeedbackInput("");
-  //   }
-
-  //   const newTask = {
-  //     type: "quickDraft",
-  //     status: "queued",
-  //     userId,
-  //     context: {
-  //       ...draftData,
-  //       reportLength,
-  //       userId,
-  //     },
-  //     createdAt: new Date().toISOString(),
-  //   };
-  //   await saveTask(newTask);
-  // }
   return (
     <div>
       <Toaster position="bottom-center" />
@@ -269,13 +190,32 @@ const CreateMission = ({}) => {
         <BreadcrumbItem>Reports</BreadcrumbItem>
         <BreadcrumbItem>Quick Draft</BreadcrumbItem>
       </Breadcrumb>
+      {feedbacks &&
+        feedbacks.map((feedback, i) => (
+          <Card key={i} style={{ backgroundColor: "#131313", color: "white" }}>
+            <CardBody style={{ backgroundColor: "#131313", color: "white" }}>
+              <i className="bi bi-body-text"> Draft {i + 1} </i>
+              <div
+                className="text-white"
+                dangerouslySetInnerHTML={{ __html: feedback.draft }}
+              />
+              <i className="bi bi-pencil"> Feedback </i>
+              <div
+                className="text-white"
+                dangerouslySetInnerHTML={{
+                  __html: feedback.feedback,
+                }}
+              />
+            </CardBody>
+          </Card>
+        ))}
+
       {!showLoadingImage && (
         <div>
           {draft && (
             <Card style={{ backgroundColor: "#131313", color: "white" }}>
-              {/* <div className="text-white">Draft</div> */}
               <CardBody style={{ backgroundColor: "#131313", color: "white" }}>
-                <i className="bi bi-body-text"> New Draft </i>
+                <i className="bi bi-body-text"> Current Draft </i>
                 <div
                   className="text-white"
                   dangerouslySetInnerHTML={{ __html: draft }}
@@ -283,6 +223,24 @@ const CreateMission = ({}) => {
               </CardBody>
             </Card>
           )}
+          {/* {previousDrafts &&
+            previousDrafts.map((previousDraft, i) => (
+              <Card
+                key={i}
+                style={{ backgroundColor: "#131313", color: "white" }}
+              >
+                <CardBody
+                  style={{ backgroundColor: "#131313", color: "white" }}
+                >
+                  <i className="bi bi-body-text"> Previous Draft </i>
+                  <div
+                    className="text-white"
+                    dangerouslySetInnerHTML={{ __html: previousDraft }}
+                  />
+                </CardBody>
+              </Card>
+            ))} */}
+
           {(draft && isSubmitting) ||
             hasSubmitted ||
             (draft && draft.endsWith(" ".repeat(3)) && (
@@ -307,8 +265,9 @@ const CreateMission = ({}) => {
                     />
                     <div
                       style={{
-                        display: "flex",
-                        flexDirection: "flex-start",
+                        // display: "flex",
+                        // flexDirection: "flex-end",
+                        textAlign: "right",
                         paddingTop: "8px",
                       }}
                     >
@@ -316,7 +275,7 @@ const CreateMission = ({}) => {
                         color="primary"
                         style={{
                           border: "1px solid yellow",
-                          marginRight: "16px",
+                          // marginRight: "16px",
                         }}
                         disabled={
                           !draft.endsWith(" ".repeat(3)) || !feedbackInput
@@ -324,11 +283,8 @@ const CreateMission = ({}) => {
                         onClick={(e) => handleQuickDraftClick(e)}
                       >
                         <i className="bi bi-arrow-clockwise"></i>
-                        &nbsp;Refine
+                        &nbsp;Send
                       </Button>
-                      {/* <IntelliReportLengthDropdown
-                        handleSelectedLength={handleSelectedLength}
-                      /> */}
                     </div>
                   </FormGroup>
                 </Form>
