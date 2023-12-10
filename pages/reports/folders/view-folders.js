@@ -225,14 +225,15 @@ const ViewReports = ({
       console.error("An unexpected error occurred:", error);
     }
   }
-
+  const [triedToLoadReports, setTriedToLoadReports] = useState(false);
   // Fetch or Create User ID to allow for guest access
   useEffect(() => {
     const userId = fetchOrCreateUserId(_userId);
 
-    if (userId && loadedReports.length === 0) {
+    if (userId && loadedReports.length === 0 && !triedToLoadReports) {
       loadPagedResults();
     }
+    setTriedToLoadReports(true);
   });
   async function fetchOrCreateUserId(authUserId) {
     console.log("fetchOrCreateUserId");
