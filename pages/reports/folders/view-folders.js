@@ -679,8 +679,8 @@ const ViewReports = ({
                   onClick={handleQuickDraftClick}
                   style={{
                     textAlign: "left",
-                    borderColor: "#3fd000",
-                    borderWidth: "2px",
+                    borderColor: "#31A0D1",
+                    borderWidth: "4px",
                     alignContent: "right",
                     marginTop: "0px",
                     marginRight: "8px",

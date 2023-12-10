@@ -13,7 +13,7 @@ const navigation = [
   {
     title: "Reports",
     href: "/reports/folders/view-folders",
-    icon: "bi bi-folder",
+    icon: "bi bi-body-text",
   },
   {
     title: "Intel-Net",
