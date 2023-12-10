@@ -234,7 +234,8 @@ const ViewReports = ({
       loadPagedResults();
     }
     setTriedToLoadReports(true);
-  });
+  }, []);
+
   async function fetchOrCreateUserId(authUserId) {
     console.log("fetchOrCreateUserId");
     let guestUserId = authUserId || localStorage.getItem("guestUserId");
@@ -245,6 +246,8 @@ const ViewReports = ({
     if (!guestAgencyName) {
       const agencyName = await fetchFunnyAgencyName(guestUserId);
       localStorage.setItem("guestAgencyName", agencyName);
+      guestAgencyName = agencyName;
+
       console.log("funny guest agencyName");
       console.log(agencyName);
     }
