@@ -21,7 +21,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 // import { setupFirebaseListener } from "../../../utils/firebaseListener";
 
@@ -29,12 +29,17 @@ import { useState, useEffect } from "react";
 // bring in agent's memory of previous reports
 // bring in content of link from original report
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
+// import useUserId from "../../../hooks/useUserId";
+// import IntelliUserContext from "../../../context/IntelliUserContext/intelliUserContext";
 
 const CreateMission = ({}) => {
-  const { user, error, isLoading } = useUser();
+  // const _userId = useContext(IntelliUserContext);
   const router = useRouter();
+  // const userId = useUserId(user?.sub);
+  // console.log("userId");
+  const { user } = useUser();
+  const [userId, setUserId] = useState(user?.sub);
 
-  const userId = user ? user.sub : null;
   const [draft, setDraft] = useState("");
   const [feedbackInput, setFeedbackInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,19 +50,33 @@ const CreateMission = ({}) => {
 
   console.log("router.query.briefingInput");
   console.log(router.query.briefingInput);
+  console.log("router.query");
+  console.log(router.query);
+  console.log("router.query.userId");
+  console.log(router.query.userId);
   if (!router.query.briefingInput || router.query.briefingInput.length == 0) {
-    console.log(
-      "no briefing input. going back to /reports/folders/view-folders"
-    );
+    console.log("no briefing input. ");
     console.log("router.query.briefingInput");
     console.log(router.query.briefingInput);
     // goToPage("/reports/folders/view-folders");
   }
+  if (!router.query.userId || router.query.userId.length == 0) {
+    console.log("no briefing userId query param.");
+    console.log("router.query.userId");
+    console.log(router.query.userId);
+    // goToPage("/reports/folders/view-folders");
+  }
+  useEffect(() => {
+    if (router.query.userId) {
+      setUserId(router.query.userId);
+    }
+  }, [router.query.userId]);
+
   const [expertiseOutput, setExpertiseOutput] = useState("");
   // const [folderId, setFolderId] = useState("");
 
   const firebaseDraftData = useFirebaseListener(
-    user
+    userId
       ? `/${
           process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
@@ -65,8 +84,18 @@ const CreateMission = ({}) => {
         }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/quickDraft/context/`
       : null
   );
+  console.log("firebaseDraftData");
+  console.log(firebaseDraftData);
+  console.log("path");
+  console.log(
+    `/${
+      process.env.NEXT_PUBLIC_env === "production"
+        ? "asyncTasks"
+        : "localAsyncTasks"
+    }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/quickDraft/context/`
+  );
   const firebaseSaveData = useFirebaseListener(
-    user
+    userId
       ? `/${
           process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
@@ -113,9 +142,11 @@ const CreateMission = ({}) => {
       if (hasSubmitted) {
         if (firebaseSaveData.folderId) {
           // if (folderId) {
-          goToPage(
-            `/reports/folders/intel-report/${firebaseSaveData.folderId}`
-          );
+          // goToPage();
+          router.push({
+            pathname: `/reports/folders/intel-report/${firebaseSaveData.folderId}`,
+            query: { userId },
+          });
           //   }
           //   setFolderId(firebaseDraftData.folderId);
         } else {
@@ -162,25 +193,26 @@ const CreateMission = ({}) => {
   }
   const [feedbacks, setFeedbacks] = useState([]);
   async function handleQuickDraftClick() {
+    console.log("handleQuickDraft userId");
+    // return console.log(userId);
+
     const draftData = { briefingInput: router.query.briefingInput };
     console.log("feedbackInput");
     console.log(feedbackInput);
+
     if (feedbackInput) {
       draftData.feedback = feedbackInput;
-      // draftData.previousDraft = draft;
-      let newFeedbacks = feedbacks;
-      newFeedbacks.push({ feedback: feedbackInput, draft });
+      let newFeedbacks = [...feedbacks, { feedback: feedbackInput, draft }];
       console.log("newFeedbacks");
       console.log(newFeedbacks);
       setFeedbacks(newFeedbacks);
       draftData.feedbacks = newFeedbacks;
-      // const newBriefingInput = `${briefingInput} ${draftData.feedback}`;
-
-      // setBriefingInput(newBriefingInput);
 
       setFeedbackInput("");
     }
-
+    if (!userId) {
+      return console.log("Error 45: no user id");
+    }
     const newTask = {
       type: "quickDraft",
       status: "queued",
@@ -194,6 +226,39 @@ const CreateMission = ({}) => {
     };
     await saveTask(newTask);
   }
+  // async function handleQuickDraftClick() {
+  //   const draftData = { briefingInput: router.query.briefingInput };
+  //   console.log("feedbackInput");
+  //   console.log(feedbackInput);
+  //   if (feedbackInput) {
+  //     draftData.feedback = feedbackInput;
+  //     // draftData.previousDraft = draft;
+  //     let newFeedbacks = feedbacks;
+  //     newFeedbacks.push({ feedback: feedbackInput, draft });
+  //     console.log("newFeedbacks");
+  //     console.log(newFeedbacks);
+  //     setFeedbacks(newFeedbacks);
+  //     draftData.feedbacks = newFeedbacks;
+  //     // const newBriefingInput = `${briefingInput} ${draftData.feedback}`;
+
+  //     // setBriefingInput(newBriefingInput);
+
+  //     setFeedbackInput("");
+  //   }
+
+  //   const newTask = {
+  //     type: "quickDraft",
+  //     status: "queued",
+  //     userId,
+  //     context: {
+  //       ...draftData,
+  //       reportLength,
+  //       userId,
+  //     },
+  //     createdAt: new Date().toISOString(),
+  //   };
+  //   await saveTask(newTask);
+  // }
   return (
     <div>
       <Toaster position="bottom-center" />

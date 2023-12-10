@@ -5,7 +5,6 @@ import Logo from "../../logo/Logo";
 import { useRouter } from "next/router";
 
 const navigation = [
-  ,
   // {
   //   title: "Missions",
   //   href: "/reports/folders/view-folders",

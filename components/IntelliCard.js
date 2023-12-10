@@ -97,8 +97,12 @@ const IntelliCard = ({
         <div style={{ position: "relative", width: "100%" }}>
           {displayDatums.picUrl && (
             <img
-              src={displayDatums.picUrl.replace("medium", "small")}
-              style={{ maxWidth: "100%", height: "auto", ...imageStyle }}
+              src={
+                imageSize === "small"
+                  ? displayDatums.picUrl.replace("medium", "small")
+                  : displayDatums.picUrl
+              }
+              style={{ width: "100%", height: "auto", ...imageStyle }}
               layout="responsive"
               // width={337} // You may need to provide a sensible default or calculate this based on the aspect ratio
               // height={337}
@@ -178,7 +182,7 @@ const IntelliCard = ({
               {icon && <i className={icon}></i>} {displayDatums.title}{" "}
               {reportCount && (
                 <span style={{ whiteSpace: "nowrap" }}>
-                  [{reportCount} <i className="bi bi-body-text" />]
+                  [{reportCount} <i className="bi bi-link" />]
                 </span>
               )}
             </div>

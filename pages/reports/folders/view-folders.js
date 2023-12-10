@@ -1,8 +1,10 @@
 import { Button, Row, Breadcrumb, BreadcrumbItem, Col } from "reactstrap";
-import useRouter from "next/router";
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { debounce } from "lodash";
+import _, { debounce, set } from "lodash";
 // other imports
+import { v4 as uuidv4 } from "uuid"; // UUID library
+
 import { getSession } from "@auth0/nextjs-auth0";
 // import IntelliCardGroup from "../../../components/IntelliCardGroup";
 // import IntelliCardGroup from "../../../components/IntelliCardGroup";
@@ -14,6 +16,9 @@ import IntelliCardGroup from "../../../components/IntelliCardGroup";
 import Link from "next/link";
 
 import Head from "next/head";
+// import useUserId from "../../../hooks/useUserId";
+import { saveToSupabase } from "../../../utils/saveToSupabase";
+import { useUser } from "@auth0/nextjs-auth0/client";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 
@@ -131,8 +136,8 @@ export async function getServerSideProps(context) {
     return {
       props: {
         folders,
-        userId,
-        agencyName: agency[0].agencyName,
+        _userId: userId,
+        _agencyName: agency[0].agencyName,
         _folderLikesByFolderId,
         _reportCountsByFolderId,
         tokensRemaining,
@@ -142,8 +147,8 @@ export async function getServerSideProps(context) {
     return {
       props: {
         folders: [],
-        userId: null,
-        agencyName: "Guest Agency",
+        _userId: null,
+        _agencyName: null,
         _folderLikesByFolderId: null,
         _reportCountsByFolderId: null,
         tokensRemaining: 25,
@@ -153,8 +158,8 @@ export async function getServerSideProps(context) {
 }
 const ViewReports = ({
   folders,
-  userId,
-  agencyName,
+  _userId,
+  _agencyName,
   _folderLikesByFolderId,
   _reportCountsByFolderId,
   tokensRemaining,
@@ -166,9 +171,12 @@ const ViewReports = ({
   const [loadedReports, setLoadedReports] = useState(folders);
   const [briefingInput, setBriefingInput] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const [userId, setUserId] = useState(_userId);
+  // const userId = useUserId(_userId);
+  const [agencyName, setAgencyName] = useState(_agencyName);
   console.log("loadedReports");
   console.log(loadedReports);
-  function handleSelectedLength() {}
+  // function handleSelectedLength() {}
   async function loadPagedResults() {
     console.log("Loading paged results");
 
@@ -218,96 +226,91 @@ const ViewReports = ({
     }
   }
 
-  // async function handleSearch(searchInput) {
-  //   console.log("handleSearch");
-  //   console.log(searchInput);
-  //   setSearchInput(searchInput);
-  //   if (searchInput.trim() === "") {
-  //     // If the search input is empty, you might want to load the initial set of folders
-  //     // Or handle it accordingly based on your application's needs
-  //     console.log("Search input is empty");
-  //     return;
+  // Fetch or Create User ID to allow for guest access
+  useEffect(() => {
+    const userId = fetchOrCreateUserId(_userId);
+
+    if (userId && loadedReports.length === 0) {
+      loadPagedResults();
+    }
+  });
+  async function fetchOrCreateUserId(authUserId) {
+    console.log("fetchOrCreateUserId");
+    let guestUserId = authUserId || localStorage.getItem("guestUserId");
+    let guestAgencyName = agencyName || localStorage.getItem("guestAgencyName");
+    console.log("guestUserId");
+    console.log(guestUserId);
+    // set;
+    if (!guestAgencyName) {
+      const agencyName = await fetchFunnyAgencyName(guestUserId);
+      localStorage.setItem("guestAgencyName", agencyName);
+      console.log("funny guest agencyName");
+      console.log(agencyName);
+    }
+    setAgencyName(guestAgencyName);
+    if (!guestUserId) {
+      guestUserId = uuidv4();
+      localStorage.setItem("guestUserId", guestUserId);
+      console.log(savedUser);
+      // return guestUserId;
+    }
+    setUserId(guestUserId);
+
+    return guestUserId;
+  }
+
+  const fetchFunnyAgencyName = async (guestUserId) => {
+    if (_agencyName) {
+      return _agencyName;
+    }
+    try {
+      const response = await fetch("/api/agency/generate-guest-agency-name");
+      if (response.ok) {
+        const { agencyName } = await response.json();
+        console.log("fetchFunnyAgencyName agencyName");
+        console.log(agencyName);
+        setAgencyName(`Guest ${agencyName}`);
+        return agencyName;
+      }
+    } catch (error) {
+      console.error("Error fetching funny agency name:", error);
+    }
+  };
+  // const { user } = useUser();
+
+  // // const [userId, setUserId] = useState("");
+  // useEffect(() => {
+  //   const guestUserId = localStorage.getItem("guestUserId");
+  //   if (!userId) {
+  //     const newGuestUserId = guestUserId || uuidv4();
+  //     localStorage.setItem("guestUserId", newGuestUserId);
+  //     setUserId(newGuestUserId);
+  //   } else {
+  //     setUserId(user?.sub || guestUserId);
   //   }
+  // }, [user, userId]);
 
-  //   try {
-  //     let { data: filteredReports, error } = await supabase
-  //       .from("folders")
-  //       .select("*")
-  //       .ilike("folderName", `%${searchInput}%`)
-  //       .eq("userId", userId); // assuming userId is available in this scope
-
-  //     if (error) {
-  //       console.error("Error fetching data:", error);
-  //       return;
-  //     }
-
-  //     console.log("filteredReports");
-  //     console.log(filteredReports);
-  //     setLoadedReports(filteredReports); // assuming setLoadedReports is available in this scope
-  //   } catch (error) {
-  //     console.error("An unexpected error occurred:", error);
-  //   }
-  // }
-
-  // function handleSearch(searchInput) {
-  //   console.log("handleSearch");
-  //   console.log(searchInput);
-  //   // const filteredReports = folders.filter((folder) =>
-  //   //   folder.folderName.toLowerCase().includes(searchInput.toLowerCase())
-  //   // );
-  //   // console.log("filteredReports");
-  //   // console.log(filteredReports);
-  //   // setLoadedReports(filteredReports);
-  // }
   const [didClickQuickDraft, setDidClickQuickDraft] = useState(false);
   async function handleQuickDraftClick() {
+    console.log("view-folders handleQuickDraft userId");
+    console.log(userId);
+    // setDidClickQuickDraft(true);
+
     if (didClickQuickDraft) {
       return;
     }
+
     setDidClickQuickDraft(true);
-    if (!userId) {
-      // go to create agency page
-    }
-    // check if the user has enough tokens
-    // query supabase for the user's tokens
-    // check the cost of the proposed report
-    // if the user has enough tokens, proceed
-    // if the user does not have enough tokens, prompt them to buy more tokens
-    const { data: tokens, error } = await supabase
-      .from("tokens")
-      .select("tokens")
-      .eq("userId", userId);
-    if (error) {
-      console.log("error");
-      console.log(error);
-    }
-    console.log("tokens");
-    console.log(tokens);
-    let tokensRemaining = 0;
-    if (tokens) {
-      if (tokens[0]) {
-        tokensRemaining = tokens[0].tokens;
+
+    const createUserModel = {
+      userId,
+      agencyName,
+    };
+    const savedUser = await saveToSupabase("users", createUserModel).catch(
+      (error) => {
+        console.log(error);
       }
-    }
-    console.log("tokensRemaining");
-    console.log(tokensRemaining);
-    let cost = 0;
-    if (reportLength === "short") {
-      cost = 1;
-    }
-    if (reportLength === "standard") {
-      cost = 2;
-    }
-    if (reportLength === "super") {
-      cost = 4;
-    }
-    console.log("cost");
-    console.log(cost);
-    if (cost > tokensRemaining) {
-      // prompt the user to buy more tokens
-      console.log("prompt the user to buy more tokens");
-      return goToPage("/account/tokens/get-tokens");
-    }
+    );
 
     const draftData = { briefingInput };
     const newTask = {
@@ -343,7 +346,7 @@ const ViewReports = ({
         // goToPage("/reports/create-report/quick-draft");
         router.push({
           pathname: "/reports/create-report/quick-draft",
-          query: { ...router.query, briefingInput },
+          query: { ...router.query, briefingInput, userId },
         });
       } else {
         console.error("Failed to save the task");
@@ -392,6 +395,8 @@ const ViewReports = ({
   //   console.log("ViewReports HandleClick Clicked!");
   //   goToPage("/missions/create-mission/briefing");
   // };
+  const router = useRouter();
+
   const handleCardClick = (folder) => {
     console.log(folder);
     // console.log("handleCardClick");
@@ -402,14 +407,19 @@ const ViewReports = ({
     console.log("ViewReports HandleCardClick Clicked!");
     // setSelectedReport(report);
     const folderSlug = slugify(`${folderId}-${folderName}`);
-    goToPage(`/reports/folders/intel-report/${folderSlug}`);
+
+    router.push({
+      pathname: `/reports/folders/intel-report/${folderSlug}`,
+      query: { userId },
+    });
+
+    // goToPage(`/reports/folders/intel-report/${folderSlug}`);
   };
-  const router = useRouter;
-  function goToPage(name) {
-    console.log("go to page");
-    console.log(name);
-    router.push(name);
-  }
+  // function goToPage(name) {
+  //   console.log("go to page");
+  //   console.log(name);
+  //   router.push(name);
+  // }
 
   const [folderLikesByFolderId, setFolderLikesByFolderId] = useState(
     _folderLikesByFolderId
@@ -635,8 +645,8 @@ const ViewReports = ({
           </Link>
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
-          <i className={`bi bi-folder`}></i>
-          &nbsp;Reports
+          <i className={`bi bi-body-text`}></i>
+          &nbsp;Create Report
         </BreadcrumbItem>
       </Breadcrumb>
       <div id="quickDraftBriefingInput">
@@ -684,7 +694,7 @@ const ViewReports = ({
                   }
                   className="btn btn-primary "
                 >
-                  <i className="bi bi-folder"></i>+ Quick Draft
+                  <i className="bi bi-body-text"></i> Quick Draft
                 </Button>
               </div>
               <div style={{ marginBottom: "100px" }}>

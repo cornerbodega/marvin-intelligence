@@ -1,17 +1,10 @@
 import { getSupabase } from "../../../utils/supabase";
-import { v2 as cloudinary } from "cloudinary";
 import { saveToSupabase } from "../../../utils/saveToSupabase";
-cloudinary.config({
-  cloud_name: "dcf11wsow",
-  api_key: "525679258926845",
-  api_secret: "GfxhZesKW1PXljRLIh5Dz6-3XgM",
-  secure: true,
-});
+
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 export default async function handler(req, res) {
   console.log("CREATE AN AGENCY");

@@ -712,7 +712,7 @@ const ViewReports = ({
   }, [loadedReports, isStreaming, hasStartedContinuum]);
   const NestedList = ({ children, loadedReports }) => {
     return (
-      <ul>
+      <ol>
         {children &&
           children.map((item) => (
             <li style={{ marginBottom: "8px", marginTop: "8px" }} key={item.id}>
@@ -744,7 +744,7 @@ const ViewReports = ({
               )}
             </li>
           ))}
-      </ul>
+      </ol>
     );
   };
 
@@ -1112,15 +1112,15 @@ const ViewReports = ({
         <div> {folderDescription}</div>
         <div
           className="reportTitle reportFont section-title"
-          style={{ marginTop: "30px" }}
+          style={{ marginTop: "30px", fontSize: "1em" }}
         >
           <Row>
             <Col>
               Table of Contents
-              <span style={{ whiteSpace: "nowrap" }}>
+              {/* <span style={{ whiteSpace: "nowrap" }}>
                 &nbsp;[{loadedReports.length}{" "}
                 <i className="bi bi-body-text"></i>]
-              </span>
+              </span> */}
             </Col>
           </Row>
         </div>

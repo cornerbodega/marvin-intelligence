@@ -188,8 +188,11 @@ const CreateMission = ({
 
       // console.log("isStreaming");
       // console.log(isStreaming);
-
-      goToPage(`/reports/folders/intel-report/${firebaseFolderIdData}`);
+      router.push({
+        pathname: `/reports/folders/intel-report/${firebaseFolderIdData}`,
+        query: { userId },
+      });
+      // goToPage(`/reports/folders/intel-report/${firebaseFolderIdData}`);
     }
   }, [firebaseFolderIdData]);
   function goToPage(name) {
@@ -333,7 +336,7 @@ const CreateMission = ({
       };
       await saveTask(clearQuickDraftTask);
       const clearSaveReportTask = {
-        type: "saveReport",
+        type: "saveLinkedReport",
         status: "cleared",
         userId: user.sub,
         context: {},
@@ -839,7 +842,7 @@ const CreateMission = ({
           Agent {agent.agentName} | {agencyName}
         </title>
       </Head>
-      <Toaster position="bottom-center" />
+      {/* <Toaster position="bottom-center" /> */}
 
       <Breadcrumb
         style={{ fontWeight: "200", fontFamily: "monospace" }}
@@ -983,28 +986,25 @@ const CreateMission = ({
                   <div
                     style={{
                       height: "337px",
-                      width: "auto",
+                      width: "100%", // Make the width 100% to fill the container
                       position: "relative",
                     }}
                   >
                     <img
                       src={`${agent.profilePicUrl}`}
-                      fill={true}
                       style={{
-                        // width: "100%",
+                        height: "100%",
+                        width: "100%",
                         borderTopLeftRadius: "16px",
                         borderTopRightRadius: "16px",
-                        // borderRadiusTopLeft: "16px",
-                        // borderRadiusTopRight: "16px",
-                        // objectFit: "cover",
-                        // objectPosition: "top",
-                        // borderRadius: "20%",
-                        // border: "12px solid green",
+                        objectFit: "cover", // This is key for maintaining aspect ratio
+                        objectPosition: "center", // Adjusts the position of the image within its frame
                       }}
                       alt="agent"
                     />
                   </div>
                 </div>
+
                 <CardBody>
                   <CardTitle
                     style={{

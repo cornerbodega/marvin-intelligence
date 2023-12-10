@@ -1,5 +1,5 @@
 import { Button, Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
-import useRouter from "next/router";
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
 // import _, { debounce, get, has, set } from "lodash";
@@ -26,44 +26,55 @@ import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
 // import IntelliReportLengthDropdown from "../../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
 import Head from "next/head";
 import Image from "next/image";
+import IntelliNotificationsArea from "../../../../components/IntelliNotificationsArea/IntelliNotificationsArea";
 // import { child } from "@firebase/database";
-export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps(context) {
-    const folderId = context.params.folderSlug.split("-")[0];
-    const session = await getSession(context.req, context.res);
-    const user = session?.user;
-    const userId = user.sub;
-    if (!folderId) {
-      console.log("Error! No folder Id");
-      return {};
-    }
-    let { data: agency, agencyError } = await supabase
-      .from("users")
-      .select("agencyName")
-      .eq("userId", user.sub);
-    if (agencyError) {
-      console.log("agencyError");
-    }
-    console.log("agency");
-    console.log(agency);
-    if (!agency || agency.length === 0) {
-      return {
-        redirect: {
-          permanent: false,
-          destination: "/agency/create-agency",
-        },
-        props: {},
-      };
-    }
-    //   folderLikes:folderId (
-    //     userId,
-    //     folderId,
-    // ),
-    // const missionsResponse = "";
-    let { data: missionsResponse, error } = await supabase
-      .from("reportFolders")
-      .select(
-        `
+// export const getServerSideProps = withPageAuthRequired({
+
+export async function getServerSideProps(context) {
+  const folderId = context.params.folderSlug.split("-")[0];
+  const session = await getSession(context.req, context.res);
+  const user = session?.user;
+  let userId = user?.sub;
+  const query = context.query;
+
+  // For example, if the URL is /page?param=value
+  // you can access 'param' like this:
+  const userIdFromRouter = query.userId;
+  if (!userId && userIdFromRouter) {
+    userId = userIdFromRouter;
+  }
+
+  if (!folderId) {
+    console.log("Error! No folder Id");
+    return {};
+  }
+  let { data: agency, agencyError } = await supabase
+    .from("users")
+    .select("agencyName")
+    .eq("userId", userId);
+  if (agencyError) {
+    console.log("agencyError");
+  }
+  console.log("agency");
+  console.log(agency);
+  if (!agency || agency.length === 0) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/agency/create-agency",
+      },
+      props: {},
+    };
+  }
+  //   folderLikes:folderId (
+  //     userId,
+  //     folderId,
+  // ),
+  // const missionsResponse = "";
+  let { data: missionsResponse, error } = await supabase
+    .from("reportFolders")
+    .select(
+      `
         reportId,
         folderId,
         folders:folders (
@@ -92,151 +103,151 @@ export const getServerSideProps = withPageAuthRequired({
             )
         )
     `
-      )
-      .eq("folderId", folderId);
+    )
+    .eq("folderId", folderId);
 
-    // Get the list fo users who have liked this folder
-    let { data: _folderLikes, folderLikesError } = await supabase
-      .from("folderLikes")
-      .select()
-      .eq("folderId", folderId);
+  // Get the list fo users who have liked this folder
+  let { data: _folderLikes, folderLikesError } = await supabase
+    .from("folderLikes")
+    .select()
+    .eq("folderId", folderId);
 
-    if (!_folderLikes) {
-      _folderLikes = [];
+  if (!_folderLikes) {
+    _folderLikes = [];
+  }
+  if (folderLikesError) {
+    console.error("folderLikesError");
+    console.error(folderLikesError);
+  }
+
+  // let { data: missionsResponse, error } = await supabase
+  //   .from("reportFolders")
+  //   .select(
+  //     `
+  //   folders (folderName, folderDescription, folderPicUrl),
+  //   reports (reportTitle, reportPicUrl, reportId, reportContent, agentId)
+  //   ))
+  // `
+  //   )
+  //   .eq("folderId", folderId);
+  // // .limit(3);
+  console.log("missionsResponse");
+  console.log(missionsResponse);
+  if (!missionsResponse || missionsResponse.length === 0) {
+    return console.log("No missions found");
+  }
+  let expertises = [];
+  let agentId = 0;
+  let specializedTraining = "";
+
+  if (missionsResponse[0].reports.agent) {
+    agentId = missionsResponse[0].reports.agent.agentId;
+
+    if (missionsResponse[0].reports.agent.expertise1) {
+      expertises.push(missionsResponse[0].reports.agent.expertise1);
     }
-    if (folderLikesError) {
-      console.error("folderLikesError");
-      console.error(folderLikesError);
+    if (missionsResponse[0].reports.agent.expertise2) {
+      expertises.push(missionsResponse[0].reports.agent.expertise2);
     }
-
-    // let { data: missionsResponse, error } = await supabase
-    //   .from("reportFolders")
-    //   .select(
-    //     `
-    //   folders (folderName, folderDescription, folderPicUrl),
-    //   reports (reportTitle, reportPicUrl, reportId, reportContent, agentId)
-    //   ))
-    // `
-    //   )
-    //   .eq("folderId", folderId);
-    // // .limit(3);
-    console.log("missionsResponse");
-    console.log(missionsResponse);
-    if (!missionsResponse || missionsResponse.length === 0) {
-      return console.log("No missions found");
-    }
-    let expertises = [];
-    let agentId = 0;
-    let specializedTraining = "";
-
-    if (missionsResponse[0].reports.agent) {
-      agentId = missionsResponse[0].reports.agent.agentId;
-
-      if (missionsResponse[0].reports.agent.expertise1) {
-        expertises.push(missionsResponse[0].reports.agent.expertise1);
-      }
-      if (missionsResponse[0].reports.agent.expertise2) {
-        expertises.push(missionsResponse[0].reports.agent.expertise2);
-      }
-      if (missionsResponse[0].reports.agent.expertise3) {
-        expertises.push(missionsResponse[0].reports.agent.expertise3);
-      }
-
-      // if (missionsResponse[0].reports.agent.specializedTraining) {
-      //   specializedTraining =
-      //     missionsResponse[0].reports.agent.specializedTraining;
-      // }
+    if (missionsResponse[0].reports.agent.expertise3) {
+      expertises.push(missionsResponse[0].reports.agent.expertise3);
     }
 
-    let { data: linksResponse, error: linksError } = await supabase
-      .from("links")
-      .select("parentReportId, childReportId");
+    // if (missionsResponse[0].reports.agent.specializedTraining) {
+    //   specializedTraining =
+    //     missionsResponse[0].reports.agent.specializedTraining;
+    // }
+  }
 
-    if (error || linksError) {
-      // handle errors
-      console.error(error);
-      console.error(linksError);
+  let { data: linksResponse, error: linksError } = await supabase
+    .from("links")
+    .select("parentReportId, childReportId");
+
+  if (error || linksError) {
+    // handle errors
+    console.error(error);
+    console.error(linksError);
+  }
+
+  const _loadedReports = [];
+  let _folderName = "";
+  let _folderDescription = "";
+  let _folderPicDescription = "";
+  let _folderPicUrl = "";
+  // let _folderPicUrls = "";
+
+  let _availability = "";
+  missionsResponse.forEach((mission) => {
+    if (mission.reports.availability == "DELETED") {
+      return;
     }
+    _loadedReports.push(mission.reports);
 
-    const _loadedReports = [];
-    let _folderName = "";
-    let _folderDescription = "";
-    let _folderPicDescription = "";
-    let _folderPicUrl = "";
-    // let _folderPicUrls = "";
+    // console.log("mission.folders");
+    // console.log(mission.folders);
+    _folderName = mission.folders.folderName;
+    _folderDescription = mission.folders.folderDescription;
+    _folderPicDescription = mission.folders.folderPicDescription;
+    _folderPicUrl = mission.folders.folderPicUrl;
+    // _folderPicUrls = mission.folders.folderPicUrls;
+    // if (_folderPicUrls) {
+    //   _folderPicUrls = JSON.parse(_folderPicUrls);
+    // }
 
-    let _availability = "";
-    missionsResponse.forEach((mission) => {
-      if (mission.reports.availability == "DELETED") {
-        return;
-      }
-      _loadedReports.push(mission.reports);
+    _availability = mission.folders.availability;
+  });
 
-      // console.log("mission.folders");
-      // console.log(mission.folders);
-      _folderName = mission.folders.folderName;
-      _folderDescription = mission.folders.folderDescription;
-      _folderPicDescription = mission.folders.folderPicDescription;
-      _folderPicUrl = mission.folders.folderPicUrl;
-      // _folderPicUrls = mission.folders.folderPicUrls;
-      // if (_folderPicUrls) {
-      //   _folderPicUrls = JSON.parse(_folderPicUrls);
-      // }
+  // Sort Initial Loaded Reports by cretedAt
+  _loadedReports.sort((a, b) => {
+    const dateA = new Date(a.createdAt);
+    const dateB = new Date(b.createdAt);
 
-      _availability = mission.folders.availability;
-    });
-
-    // Sort Initial Loaded Reports by cretedAt
-    _loadedReports.sort((a, b) => {
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
-
-      return dateA - dateB; // For ascending order
-      // return dateB - dateA; // For descending order
-    });
-    // My Tokens
-    let { data: tokensResponse, error: tokensError } = await supabase
-      .from("tokens")
-      .select("tokens")
-      .eq("userId", userId);
-    if (tokensError) {
-      console.log("tokensError");
+    return dateA - dateB; // For ascending order
+    // return dateB - dateA; // For descending order
+  });
+  // My Tokens
+  let { data: tokensResponse, error: tokensError } = await supabase
+    .from("tokens")
+    .select("tokens")
+    .eq("userId", userId);
+  if (tokensError) {
+    console.log("tokensError");
+  }
+  console.log("tokensResponse");
+  console.log(tokensResponse);
+  let _tokensRemaining = 0;
+  if (tokensResponse) {
+    if (tokensResponse[0]) {
+      _tokensRemaining = tokensResponse[0].tokens;
     }
-    console.log("tokensResponse");
-    console.log(tokensResponse);
-    let _tokensRemaining = 0;
-    if (tokensResponse) {
-      if (tokensResponse[0]) {
-        _tokensRemaining = tokensResponse[0].tokens;
-      }
-    }
-    console.log("tokensRemaining");
-    console.log(_tokensRemaining);
-    // console.log("missions");
-    // console.log(missions);
-    // const _currentfolderPicUrlIndex = _folderPicUrls
-    //   ? Math.floor(Math.random() * _folderPicUrls.length)
-    //   : 0;
-    return {
-      props: {
-        _loadedReports,
-        _folderName,
-        folderId,
-        _folderDescription,
-        _folderPicDescription,
-        _folderPicUrl,
-        // _folderPicUrls,
-        agentId,
-        expertises,
-        specializedTraining,
-        // _currentfolderPicUrlIndex,
-        _folderLikes,
-        _availability,
-        _tokensRemaining,
-      },
-    };
-  },
-});
+  }
+  console.log("tokensRemaining");
+  console.log(_tokensRemaining);
+  // console.log("missions");
+  // console.log(missions);
+  // const _currentfolderPicUrlIndex = _folderPicUrls
+  //   ? Math.floor(Math.random() * _folderPicUrls.length)
+  //   : 0;
+  return {
+    props: {
+      _loadedReports,
+      _folderName,
+      folderId,
+      _folderDescription,
+      _folderPicDescription,
+      _folderPicUrl,
+      // _folderPicUrls,
+      agentId,
+      expertises,
+      specializedTraining,
+      // _currentfolderPicUrlIndex,
+      _folderLikes,
+      _availability,
+      _tokensRemaining,
+    },
+  };
+}
+// });
 const ViewReports = ({
   _loadedReports,
   _folderName,
@@ -263,7 +274,15 @@ const ViewReports = ({
   // specializedTraining,
 
   const { user, error, isLoading } = useUser();
-  const userId = user ? user.sub : null;
+  // const userId = user ? user.sub : null;
+  const [userId, setUserId] = useState(user?.sub);
+  const router = useRouter();
+  const userIdFromRouter = router.query.userId;
+  useEffect(() => {
+    if (!userId && userIdFromRouter) {
+      setUserId(userIdFromRouter);
+    }
+  }, [userIdFromRouter]);
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(1);
@@ -284,7 +303,7 @@ const ViewReports = ({
   const [folderPicDescription, setFolderPicDescription] = useState(
     _folderPicDescription
   );
-  const [folderPicUrl, setFolderPicUrl] = useState(_folderPicUrl);
+  const [folderPicUrl, setFolderPicUrl] = useState(_folderPicUrl || "");
   const [reportLinksMap, setReportLinksMap] = useState({});
   const [reportPicUrl, setReportPicUrl] = useState("");
   const [continuumCompleted, setContinuumCompleted] = useState(false);
@@ -312,9 +331,9 @@ const ViewReports = ({
   //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png",
   //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png",
   // ];
-  const [currentfolderPicUrlIndex, setCurrentfolderPicUrlIndex] = useState(
-    _currentfolderPicUrlIndex
-  );
+  // const [currentfolderPicUrlIndex, setCurrentfolderPicUrlIndex] = useState(
+  //   _currentfolderPicUrlIndex
+  // );
   const firebaseFolderData = useFirebaseListener(
     user
       ? `/${
@@ -335,15 +354,15 @@ const ViewReports = ({
         }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/continuum/`
       : null
   );
-  const firebaseDoContinuumData = useFirebaseListener(
-    user
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/doContinuum/`
-      : null
-  );
+  // const firebaseDoContinuumData = useFirebaseListener(
+  //   user
+  //     ? `/${
+  //         process.env.NEXT_PUBLIC_env === "production"
+  //           ? "asyncTasks"
+  //           : "localAsyncTasks"
+  //       }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/doContinuum/`
+  //     : null
+  // );
   // const firebaseContinuumStatus = useFirebaseListener(
   //   user ? `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
   // );
@@ -580,11 +599,13 @@ const ViewReports = ({
     setIsStreaming(true);
     const parentReportId = parentReport.reportId;
     const parentReportContent = parentReport.reportContent;
+    const briefingInput = parentReport.reportTitle;
     await saveTask({
       type: "continuum",
       status: "queued",
       userId,
       context: {
+        briefingInput,
         parentReportId,
         userId,
         parentReportContent,
@@ -659,7 +680,7 @@ const ViewReports = ({
     });
   };
 
-  const router = useRouter;
+  // const router = useRouter;
   function goToPage(name) {
     console.log("go to page");
     console.log(name);
@@ -917,20 +938,31 @@ const ViewReports = ({
       setParentChildIdMap(map);
     });
   }, [loadedReports, isStreaming, hasStartedContinuum]);
-  const NestedList = ({ children, loadedReports }) => {
+  const NestedList = ({ children, loadedReports, level = 0 }) => {
+    // Function to calculate font weight based on level
+    const calculateFontWeight = (level) => {
+      // Example: Starting with 600 for level 0 and decrease by 100 for each level
+      return Math.max(500, 600 - level * 100);
+    };
+
     return (
-      <ul>
-        {/* {JSON.stringify(loadedReports)} */}
+      <ol>
         {children &&
           children.map((item) => (
-            <li style={{ marginBottom: "8px", marginTop: "8px" }} key={item.id}>
+            <li
+              style={{
+                marginBottom: "8px",
+                marginTop: "8px",
+              }}
+              key={item.id}
+            >
               {!item.id && "loading..."}
               {item.id && (
                 <a
                   style={{
                     fontSize: "1rem",
                     color: "#E7007C",
-                    fontWeight: "500",
+                    fontWeight: calculateFontWeight(level),
                     textDecoration: "none",
                     cursor: "pointer",
                   }}
@@ -943,17 +975,55 @@ const ViewReports = ({
               )}
               {item.children && (
                 <NestedList
-                  // children={item.children}
                   loadedReports={loadedReports}
+                  level={level + 1} // Increment level for nested lists
                 >
                   {item.children}
                 </NestedList>
               )}
             </li>
           ))}
-      </ul>
+      </ol>
     );
   };
+
+  // const NestedList = ({ children, loadedReports }) => {
+  //   return (
+  //     <ul>
+  //       {/* {JSON.stringify(loadedReports)} */}
+  //       {children &&
+  //         children.map((item) => (
+  //           <li style={{ marginBottom: "8px", marginTop: "8px" }} key={item.id}>
+  //             {!item.id && "loading..."}
+  //             {item.id && (
+  //               <a
+  //                 style={{
+  //                   fontSize: "1rem",
+  //                   color: "#E7007C",
+  //                   fontWeight: "500",
+  //                   textDecoration: "none",
+  //                   cursor: "pointer",
+  //                 }}
+  //                 href={`#${item.id}`}
+  //                 onClick={() => console.log(`Navigating to report ${item.id}`)}
+  //               >
+  //                 {loadedReports.find((report) => report.reportId === item.id)
+  //                   ?.reportTitle || `Generating Report Artwork`}
+  //               </a>
+  //             )}
+  //             {item.children && (
+  //               <NestedList
+  //                 // children={item.children}
+  //                 loadedReports={loadedReports}
+  //               >
+  //                 {item.children}
+  //               </NestedList>
+  //             )}
+  //           </li>
+  //         ))}
+  //     </ul>
+  //   );
+  // };
 
   // const NestedList = ({ children }) => {
   //   // console.log("children");
@@ -1251,418 +1321,379 @@ const ViewReports = ({
     };
     const newTaskRef = await saveTask(newTask);
   }
+
   return (
-    <div style={{ maxWidth: "90%" }}>
-      <Breadcrumb>
-        <BreadcrumbItem
-          className="text-white reportFont"
-          style={{ fontWeight: "800", fontSize: "2em" }}
-          active
-        >
-          {folderName}
-        </BreadcrumbItem>
-      </Breadcrumb>
-      <div className="folder-section report-section">
-        {/* {folderPicUrl} */}
-        {/* ["http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png"] */}
-        {/* {folderPicUrls} */}
-        {folderPicUrl && (
-          <Head>
-            <title>{folderName}</title>
+    <>
+      {/* Notifications Area */}
 
-            {/* General tags */}
-            <meta name="title" content={folderName} />
-            <meta name="description" content={folderDescription} />
-            <meta name="image" content={folderPicUrl} />
-
-            {/* Open Graph tags */}
-            <meta property="og:title" content={folderName} />
-            <meta property="og:description" content={folderDescription} />
-            <meta property="og:image" content={folderPicUrl} />
-            <meta property="og:url" content={folderPicUrl} />
-
-            {/* Twitter Card tags */}
-            <meta name="twitter:title" content={folderName} />
-            <meta name="twitter:description" content={folderDescription} />
-            <meta name="twitter:image" content={folderPicUrl} />
-            <meta name="twitter:card" content="summary_large_image" />
-          </Head>
-        )}
-        {folderPicUrl && (
-          <div
-            style={{
-              // height: "700px",
-              width: "auto",
-              position: "relative",
-            }}
-            className="image-container"
-          >
-            <a
-              href={folderPicUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              alt={folderPicDescription}
-              title={folderPicDescription}
-            >
-              <img
-                // className="report-image"
-                src={`${folderPicUrl}`}
-                // fill={true}
-                style={
-                  {
-                    // objectFit: "contain",
-                    // width: "auto",
-                    // objectPosition: "top",
-                  }
-                }
-              />
-            </a>
-            {/* <div className="overlay"></div> */}
-          </div>
-          // <div>
-          //   <div
-          //     style={{
-          //       height: "500px",
-          //     }}
-          //   >
-          //     <img src={`${folderPicUrl}`} />
-          //     {!folderPicUrl && (
-          //       <LoadingDots style={{ position: "absolute", top: "125px" }} />
-          //     )}
-          //   </div>
-          // </div>
-        )}
-        {/* {JSON.stringify(folderPicUrls)} */}
-      </div>
-      {1 && (
-        <div style={{ marginTop: "-10px", marginBottom: "20px" }}>
-          <Row>
-            <Col style={{ whiteSpace: "nowrap" }}>
-              <span
-                style={{
-                  whiteSpace: "nowrap",
-                  marginRight: "20px",
-                  color: "gold",
-                }}
-              >
-                <i
-                  style={{
-                    color: `${likes > 0 ? "gold" : "white"}`,
-                  }}
-                  onClick={handleLike}
-                  className={`bi bi-star${
-                    likes === 0 ? "bi bi-star" : "bi bi-star-fill"
-                  }`}
-                />
-                {likes < 2 ? "" : likes}
-              </span>
-              <span style={{ marginRight: "20px" }}>
-                <i
-                  onClick={handleGlobeClick}
-                  className="bi bi-globe"
-                  style={{
-                    color: `${availability === "GLOBAL" ? "gold" : "white"}`,
-                    cursor: "pointer",
-                  }}
-                />
-                {/* {availability} */}
-              </span>
-              <span>
-                <IntelliPrint loadedReports={loadedReports} />
-              </span>
-            </Col>
-
-            <Col
-              style={{
-                width: "100%",
-                // background: "red",
-                textAlign: "right",
-                marginRight: "20px",
-              }}
-            >
-              <span
-                style={{
-                  color: "white",
-                  cursor: "pointer",
-                }}
-              >
-                <i
-                  onClick={() => handleRefreshFolderImageClick()}
-                  className="bi bi-arrow-clockwise"
-                />
-              </span>
-            </Col>
-          </Row>
-        </div>
-      )}
-      <div> {folderDescription}</div>
-      <div
-        className="reportTitle reportFont section-title"
-        style={{ marginTop: "30px" }}
-      >
-        <Row>
-          <Col>
-            Table of Contents
-            <span style={{ whiteSpace: "nowrap" }}>
-              &nbsp;[{loadedReports.length} <i className="bi bi-link"></i>]
-            </span>
-          </Col>
-        </Row>
-      </div>
-      {/* {JSON.stringify(parentChildIdMap)} */}
-      {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
-      {parentChildIdMap.id && (
-        <ul className="linkFont">
-          <li key={parentChildIdMap.id}>
-            <a
-              style={{
-                color: "#E7007C",
-                textDecoration: "none",
-                cursor: "pointer",
-                // fontWeight: 500,
-                fontSize: "1.2em",
-              }}
-              href={`#${parentChildIdMap.id}`}
-              onClick={() => console.log("Navigating to parent report")}
-            >
-              {loadedReports.find(
-                (report) => report.reportId === parentChildIdMap.id
-              )?.reportTitle || ``}
-            </a>
-            <NestedList
-              // children={parentChildIdMap.children}
-              loadedReports={loadedReports}
-            >
-              {parentChildIdMap.children}
-            </NestedList>
-          </li>
-        </ul>
-      )}
-      <div style={{ marginLeft: "auto", textAlign: "right" }}>
-        <i
-          style={{
-            color: `${showFolderDeleteQuestion ? "white" : "grey"}`,
-            cursor: "pointer",
-          }}
-          className="bi bi-trash"
-          onClick={handleFolderDeleteClick}
-        />
-        &nbsp;
-        {showFolderDeleteQuestion && (
+      <IntelliNotificationsArea />
+      <div style={{ maxWidth: "90%" }}>
+        {folderPicUrl.length > 0 && (
           <>
-            Delete Folder?{" "}
-            <span
-              style={{ color: "white", cursor: "pointer" }}
-              onClick={handleFolderDeleteYes}
-            >
-              Yes
-            </span>{" "}
-            /{" "}
-            <span
-              style={{ color: "white", cursor: "pointer" }}
-              onClick={handleFolderDeleteNo}
-            >
-              No
-            </span>
-          </>
-        )}
-      </div>
-      {/* <ul>
-        <li key={parentChildIdMap.id}>
-          {parentChildIdMap.id}
-          <NestedList children={parentChildIdMap.children} />
-        </li>
-      </ul> */}
-      {/* {Object.keys(parentChildIdMap)} */}
-      {loadedReports &&
-        loadedReports.map((cols, index) => {
-          const report = loadedReports[index];
-          const reportId = loadedReports[index].reportId;
-          if (
-            !loadedReports[index].reportContent.includes(
-              `<h2 id="reportTitle">`
-            )
-          ) {
-            return;
-          }
-          const reportTitle = loadedReports[index].reportContent
-            .split(`<h2 id="reportTitle">`)[1]
-            .split(`</h2>`)[0];
-          const __html = `<div className="report">${
-            loadedReports[index].reportContent
-              .split(`<h2 id="reportTitle">`)[1]
-              .split(`</h2>`)[1]
-          }`;
+            <Breadcrumb>
+              <BreadcrumbItem
+                className="text-white reportFont"
+                style={{ fontWeight: "800", fontSize: "2em" }}
+                active
+              >
+                {folderName}
+              </BreadcrumbItem>
+            </Breadcrumb>
+            <div className="folder-section report-section">
+              {/* {folderPicUrl} */}
+              {/* ["http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png"] */}
+              {/* {folderPicUrls} */}
+              <Head>
+                <title>{folderName}</title>
 
-          // console.log("reportTitle");
-          // console.log(reportTitle);
-          // console.log("__html");
-          // console.log(__html);
+                {/* General tags */}
+                <meta name="title" content={folderName} />
+                <meta name="description" content={folderDescription} />
+                <meta name="image" content={folderPicUrl} />
 
-          return (
-            <div key={index} id={reportId} className="report-section">
-              <div className="title-container">
-                <div className="reportTitle reportFont section-title">
-                  {reportTitle}
-                </div>
+                {/* Open Graph tags */}
+                <meta property="og:title" content={folderName} />
+                <meta property="og:description" content={folderDescription} />
+                <meta property="og:image" content={folderPicUrl} />
+                <meta property="og:url" content={folderPicUrl} />
 
-                {index !== 0 && (
-                  <a href="#top" className="top-button text-white">
-                    {/* 🔝 */}⇧
-                  </a>
-                )}
+                {/* Twitter Card tags */}
+                <meta name="twitter:title" content={folderName} />
+                <meta name="twitter:description" content={folderDescription} />
+                <meta name="twitter:image" content={folderPicUrl} />
+                <meta name="twitter:card" content="summary_large_image" />
+              </Head>
+              <div
+                style={{
+                  width: "auto",
+                  position: "relative",
+                }}
+                className="image-container"
+              >
+                <a
+                  href={folderPicUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  alt={folderPicDescription}
+                  title={folderPicDescription}
+                >
+                  <img src={`${folderPicUrl}`} />
+                </a>
               </div>
-              <div className="image-container">
-                {!report.reportPicUrl && <LoadingDots />}
-                {report.reportPicUrl && (
-                  <a
-                    href={report.reportPicUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    alt={report.reportPicDescription}
-                    title={report.reportPicDescription}
-                  >
-                    <img
-                      src={report.reportPicUrl}
-                      alt="Report Image"
-                      className="report-image"
-                      style={{ borderRadius: "10px" }}
-                    />
-                    {/* <div className="overlay"></div> */}
-                  </a>
-                )}
-              </div>
-              {/* Speech */}
+            </div>
+
+            <div style={{ marginTop: "-10px", marginBottom: "20px" }}>
               <Row>
-                <Col>
-                  <div
-                    onClick={() => handleReadReportClick(index)}
-                    disabled={isLoadingAudio}
+                <Col style={{ whiteSpace: "nowrap" }}>
+                  <span
                     style={{
-                      fontSize: "1.25em",
-
-                      marginTop: "10px",
+                      whiteSpace: "nowrap",
+                      marginRight: "20px",
+                      color: "gold",
                     }}
                   >
-                    {isLoadingAudio ? (
-                      <i className="bi bi-hourglass-split" />
-                    ) : isPlaying ? (
-                      <i className="bi bi-pause-btn" />
-                    ) : (
-                      <i
-                        style={{ cursor: "pointer" }}
-                        className="bi bi-speaker"
-                      />
-                    )}
-                  </div>
+                    <i
+                      style={{
+                        color: `${likes > 0 ? "gold" : "white"}`,
+                      }}
+                      onClick={handleLike}
+                      className={`bi bi-star${
+                        likes === 0 ? "bi bi-star" : "bi bi-star-fill"
+                      }`}
+                    />
+                    {likes < 2 ? "" : likes}
+                  </span>
+                  <span style={{ marginRight: "20px" }}>
+                    <i
+                      onClick={handleGlobeClick}
+                      className="bi bi-globe"
+                      style={{
+                        color: `${
+                          availability === "GLOBAL" ? "gold" : "white"
+                        }`,
+                        cursor: "pointer",
+                      }}
+                    />
+                  </span>
+                  <span>
+                    <IntelliPrint loadedReports={loadedReports} />
+                  </span>
                 </Col>
 
                 <Col
                   style={{
                     width: "100%",
-                    // background: "red",
                     textAlign: "right",
                     marginRight: "20px",
-                    marginTop: "10px",
-                    cursor: "pointer",
                   }}
                 >
                   <span
                     style={{
                       color: "white",
+                      cursor: "pointer",
                     }}
                   >
                     <i
-                      onClick={() => handleRefreshReportImageClick(index)}
+                      onClick={() => handleRefreshFolderImageClick()}
                       className="bi bi-arrow-clockwise"
                     />
                   </span>
                 </Col>
               </Row>
-              <div
-                id={`reportRoot${index}`}
-                onMouseUp={(e) => handleTextHighlight(e, report)}
-                onTouchEnd={(e) => handleTextHighlight(e, report)}
-                className="report text-primary reportFont"
-                dangerouslySetInnerHTML={{ __html }}
-              />
-              <div style={{ display: "flex", flexDirection: "flex-start" }}>
-                <Button
-                  className="btn btn-primary"
-                  style={{ marginRight: "16px", textAlign: "left" }}
-                  onClick={() => {
-                    handleContinuumClick(report);
-                  }}
-                  disabled={isStreaming}
-                >
-                  <i className="bi bi-link"></i> Continuum
-                </Button>
+            </div>
 
-                {/* Report Delete Button */}
-                <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                  <Button disabled={isStreaming}>
-                    <i
-                      style={{
-                        color: `${showReportDeleteQuestion ? "white" : "grey"}`,
-                        cursor: "pointer",
-                      }}
-                      className="bi bi-trash"
-                      disabled={isStreaming}
-                      onClick={handleReportDeleteClick}
-                    />
-                  </Button>
-                  &nbsp;
-                  {showReportDeleteQuestion}
-                  {showReportDeleteQuestion && (
-                    <>
-                      Delete Report?{" "}
-                      <span
-                        style={{ color: "white", cursor: "pointer" }}
-                        onClick={() => {
-                          handleReportDeleteYes(reportId);
+            <div> {folderDescription}</div>
+            <div
+              className="reportTitle reportFont section-title"
+              style={{ marginTop: "30px", fontSize: "1em" }}
+            >
+              <Row>
+                <Col>
+                  Table of Contents
+                  {/* <span style={{ whiteSpace: "nowrap" }}>
+              &nbsp;[{loadedReports.length} <i className="bi bi-link"></i>]
+            </span> */}
+                </Col>
+              </Row>
+            </div>
+            {/* {JSON.stringify(parentChildIdMap)} */}
+            {!parentChildIdMap.id && (
+              <LoadingDots style={{ marginTop: "30px" }} />
+            )}
+            {parentChildIdMap.id && (
+              <ul className="linkFont">
+                <li key={parentChildIdMap.id}>
+                  <a
+                    style={{
+                      color: "#E7007C",
+                      textDecoration: "none",
+                      cursor: "pointer",
+                      // fontWeight: 500,
+                      fontSize: "1.2em",
+                    }}
+                    href={`#${parentChildIdMap.id}`}
+                    onClick={() => console.log("Navigating to parent report")}
+                  >
+                    {loadedReports.find(
+                      (report) => report.reportId === parentChildIdMap.id
+                    )?.reportTitle || ``}
+                  </a>
+                  <NestedList
+                    // children={parentChildIdMap.children}
+                    loadedReports={loadedReports}
+                  >
+                    {parentChildIdMap.children}
+                  </NestedList>
+                </li>
+              </ul>
+            )}
+            <div style={{ marginLeft: "auto", textAlign: "right" }}>
+              <i
+                style={{
+                  color: `${showFolderDeleteQuestion ? "white" : "grey"}`,
+                  cursor: "pointer",
+                }}
+                className="bi bi-trash"
+                onClick={handleFolderDeleteClick}
+              />
+              &nbsp;
+              {showFolderDeleteQuestion && (
+                <>
+                  Delete Folder?{" "}
+                  <span
+                    style={{ color: "white", cursor: "pointer" }}
+                    onClick={handleFolderDeleteYes}
+                  >
+                    Yes
+                  </span>{" "}
+                  /{" "}
+                  <span
+                    style={{ color: "white", cursor: "pointer" }}
+                    onClick={handleFolderDeleteNo}
+                  >
+                    No
+                  </span>
+                </>
+              )}
+            </div>
+          </>
+        )}
+        {loadedReports &&
+          loadedReports.map((cols, index) => {
+            const report = loadedReports[index];
+            const reportId = loadedReports[index].reportId;
+            if (
+              !loadedReports[index].reportContent.includes(
+                `<h2 id="reportTitle">`
+              )
+            ) {
+              return;
+            }
+            const reportTitle = loadedReports[index].reportContent
+              .split(`<h2 id="reportTitle">`)[1]
+              .split(`</h2>`)[0];
+            const __html = `<div className="report">${
+              loadedReports[index].reportContent
+                .split(`<h2 id="reportTitle">`)[1]
+                .split(`</h2>`)[1]
+            }`;
+
+            // console.log("reportTitle");
+            // console.log(reportTitle);
+            // console.log("__html");
+            // console.log(__html);
+
+            return (
+              <div key={index} id={reportId} className="report-section">
+                {report.reportPicUrl && (
+                  <>
+                    <div className="title-container">
+                      <div className="reportTitle reportFont section-title">
+                        {reportTitle}
+                      </div>
+
+                      {index !== 0 && (
+                        <a href="#top" className="top-button text-white">
+                          {/* 🔝 */}⇧
+                        </a>
+                      )}
+                    </div>
+                    <div className="image-container">
+                      {!report.reportPicUrl && <LoadingDots />}
+                      {report.reportPicUrl && (
+                        <a
+                          href={report.reportPicUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          alt={report.reportPicDescription}
+                          title={report.reportPicDescription}
+                        >
+                          <img
+                            src={report.reportPicUrl}
+                            alt="Report Image"
+                            className="report-image"
+                            style={{ borderRadius: "10px" }}
+                          />
+                          {/* <div className="overlay"></div> */}
+                        </a>
+                      )}
+                    </div>
+                    {/* Speech */}
+                    <Row>
+                      <Col>
+                        <div
+                          onClick={() => handleReadReportClick(index)}
+                          disabled={isLoadingAudio}
+                          style={{
+                            fontSize: "1.25em",
+
+                            marginTop: "10px",
+                          }}
+                        >
+                          {isLoadingAudio ? (
+                            <i className="bi bi-hourglass-split" />
+                          ) : isPlaying ? (
+                            <i className="bi bi-pause-btn" />
+                          ) : (
+                            <i
+                              style={{ cursor: "pointer" }}
+                              className="bi bi-speaker"
+                            />
+                          )}
+                        </div>
+                      </Col>
+
+                      <Col
+                        style={{
+                          width: "100%",
+                          // background: "red",
+                          textAlign: "right",
+                          marginRight: "20px",
+                          marginTop: "10px",
+                          cursor: "pointer",
                         }}
                       >
-                        Yes
-                      </span>{" "}
-                      /{" "}
-                      <span
-                        style={{ color: "white", cursor: "pointer" }}
-                        onClick={handleReportDeleteNo}
-                      >
-                        No
-                      </span>
-                    </>
-                  )}
-                </div>
-                {/* <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                        <span
+                          style={{
+                            color: "white",
+                          }}
+                        >
+                          <i
+                            onClick={() => handleRefreshReportImageClick(index)}
+                            className="bi bi-arrow-clockwise"
+                          />
+                        </span>
+                      </Col>
+                    </Row>
+                  </>
+                )}
+                <div
+                  id={`reportRoot${index}`}
+                  onMouseUp={(e) => handleTextHighlight(e, report)}
+                  onTouchEnd={(e) => handleTextHighlight(e, report)}
+                  className="report text-primary reportFont"
+                  dangerouslySetInnerHTML={{ __html }}
+                />
+                <div style={{ display: "flex", flexDirection: "flex-start" }}>
+                  <Button
+                    className="btn btn-primary"
+                    style={{ marginRight: "16px", textAlign: "left" }}
+                    onClick={() => {
+                      handleContinuumClick(report);
+                    }}
+                    disabled={isStreaming}
+                  >
+                    <i className="bi bi-link"></i> Continuum
+                  </Button>
+
+                  {/* Report Delete Button */}
+                  <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                    <Button disabled={isStreaming}>
+                      <i
+                        style={{
+                          color: `${
+                            showReportDeleteQuestion ? "white" : "grey"
+                          }`,
+                          cursor: "pointer",
+                        }}
+                        className="bi bi-trash"
+                        disabled={isStreaming}
+                        onClick={handleReportDeleteClick}
+                      />
+                    </Button>
+                    &nbsp;
+                    {showReportDeleteQuestion}
+                    {showReportDeleteQuestion && (
+                      <>
+                        Delete Report?{" "}
+                        <span
+                          style={{ color: "white", cursor: "pointer" }}
+                          onClick={() => {
+                            handleReportDeleteYes(reportId);
+                          }}
+                        >
+                          Yes
+                        </span>{" "}
+                        /{" "}
+                        <span
+                          style={{ color: "white", cursor: "pointer" }}
+                          onClick={handleReportDeleteNo}
+                        >
+                          No
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  {/* <div style={{ marginLeft: "auto", textAlign: "right" }}>
                   <i style={{ color: "grey" }} className="bi bi-trash" />
         
         
                 </div> */}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      {/* <IntelliReportLengthDropdown
-        handleSelectedLength={handleSelectedLength}
-      /> */}
-      {/* <div
-        onClick={() => goToPage("/account/tokens/get-tokens")}
-        style={{
-          marginBottom: "32px",
-          marginTop: "22px",
-          fontSize: "0.75em",
-          color: "lightblue",
-          cursor: "pointer",
-          width: "148px",
-        }}
-      >
-        My Tokens: {tokensRemaining} <i className="bi bi-coin" />
-      </div> */}
-      {/* Draft */}
-      {/* Is streaming{JSON.stringify(isStreaming)} */}
-      {/* {JSON.stringify(loadedReports)} */}
-      {isStreaming && (
+            );
+          })}
+        {/* {isStreaming && (
         <div id="draft">
           <div className="reportTitle reportFont section-title">Draft</div>
           <div
@@ -1677,51 +1708,52 @@ const ViewReports = ({
             </div>
           )}
         </div>
-      )}
-      {/* {JSON.stringify(agent)} */}
-      {agent.profilePicUrl && !isStreaming && (
-        <div
-          style={{ textAlign: "center", marginTop: "116px" }}
-          onClick={() => goToAgentProfile({ agentId: agent.agentId })}
-        >
+      )} */}
+        {/* {JSON.stringify(agent)} */}
+        {agent.profilePicUrl && !isStreaming && (
           <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              height: "237px",
-              objectFit: "cover",
-              marginBottom: "16px",
-
-              textAlign: "center",
-            }}
+            style={{ textAlign: "center", marginTop: "116px" }}
+            onClick={() => goToAgentProfile({ agentId: agent.agentId })}
           >
-            <img
-              src={`${getCloudinaryImageUrlForHeight(
-                agent.profilePicUrl,
-                237
-              )}`}
-              style={{ borderRadius: "20%", cursor: "pointer" }}
-              alt="agent"
-            />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                height: "237px",
+                objectFit: "cover",
+                marginBottom: "16px",
+
+                textAlign: "center",
+              }}
+            >
+              <img
+                src={`${getCloudinaryImageUrlForHeight(
+                  agent.profilePicUrl,
+                  237
+                )}`}
+                style={{ borderRadius: "20%", cursor: "pointer" }}
+                alt="agent"
+              />
+            </div>
+
+            <a
+              style={{
+                fontWeight: 800,
+                color: "#E7007C",
+                fontWeight: "200",
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+            >
+              Agent {agent.agentName}
+            </a>
           </div>
-
-          <a
-            style={{
-              fontWeight: 800,
-              color: "#E7007C",
-              fontWeight: "200",
-              textDecoration: "none",
-              cursor: "pointer",
-            }}
-          >
-            Agent {agent.agentName}
-          </a>
-        </div>
-      )}
-      {highlight.highlightedText && loadedAgentId != 0 && (
-        <IntelliFab onClick={handleFabClick} icon="+" fabType="report" />
-      )}
-    </div>
+        )}
+        {highlight.highlightedText && loadedAgentId != 0 && (
+          <IntelliFab onClick={handleFabClick} icon="" fabType="report" />
+        )}
+      </div>
+    </>
   );
 };
 

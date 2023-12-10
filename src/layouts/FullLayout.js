@@ -1,50 +1,48 @@
 import React from "react";
-import { Container } from "reactstrap";
+import { Container, Row, Col } from "reactstrap";
 import Header from "./header/Header";
 import Sidebar from "./sidebars/vertical/Sidebar";
+import IntelliNotificationsArea from "../../components/IntelliNotificationsArea/IntelliNotificationsArea";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 const FullLayout = ({ children }) => {
   const [open, setOpen] = React.useState(false);
   const showMobilemenu = () => {
     setOpen(!open);
   };
-
+  const { user, error, isLoading } = useUser();
+  const userId = user?.sub;
   return (
     <main>
-      <div
-        style={{
-          backgroundColor: "black",
-        }}
-        className="pageWrapper d-md-block d-lg-flex text-white"
+      <Row
+        noGutters
+        className="pageWrapper text-white"
+        style={{ backgroundColor: "black", marginLeft: "10px" }}
       >
-        {/******** Sidebar **********/}
-        <aside
-          style={{ zIndex: "100" }}
-          className={`sidebarArea shadow  bg-black ${
+        {/* Sidebar */}
+        <Col
+          md="auto"
+          className={`sidebarArea shadow bg-black ${
             !open ? "" : "showSidebar"
           }`}
+          style={{ zIndex: 100 }}
         >
-          <Sidebar showMobilemenu={() => showMobilemenu()} />
-        </aside>
-        {/********Content Area**********/}
+          <Sidebar showMobilemenu={showMobilemenu} />
+        </Col>
 
-        <div
-          // className="contentArea gradient-background"
-          className=""
-          style={{
-            width: "100%",
-            overflowX: "hidden",
-          }}
-        >
-          {/********header**********/}
-          <Header showMobmenu={() => showMobilemenu()} />
+        {/* Main Content Area */}
+        <Col onClick={(open && showMobilemenu) || (() => {})}>
+          {/* Notifications Area */}
 
-          {/********Middle Content**********/}
-          <Container className="p-4 wrapper" fluid>
-            <div>{children}</div>
+          {/* Header */}
+          <Header showMobmenu={showMobilemenu} />
+
+          {/* Middle Content */}
+          <Container fluid className="p-4 wrapper">
+            {children}
           </Container>
-        </div>
-      </div>
+        </Col>
+      </Row>
     </main>
   );
 };

@@ -20,7 +20,7 @@ const IntelliFab = ({ onClick, icon, fabType }) => {
   console.log(fabType);
   if (logo == "") {
     if (fabType === "report") {
-      setLogo(`bi bi-body-text`);
+      setLogo(`bi bi-link`);
     }
     if (fabType === "folder") {
       setLogo(`bi bi-folder`);
