@@ -645,8 +645,8 @@ const ViewReports = ({
           </Link>
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
-          <i className={`bi bi-body-text`}></i>
-          &nbsp;Create Report
+          {/* <i className={`bi bi-body-text`}></i> */}
+          Create Report
         </BreadcrumbItem>
       </Breadcrumb>
       <div id="quickDraftBriefingInput">
