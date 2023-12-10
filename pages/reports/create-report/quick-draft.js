@@ -351,8 +351,8 @@ const CreateMission = ({}) => {
         </div>
       )}
       {showLoadingImage && (
-        <div style={{ textAlign: "center", width: "auto", height: "500px" }}>
-          <Image fill={true} src="/library.png" />
+        <div style={{ textAlign: "center", width: "100%" }}>
+          <img style={{ width: "100%", height: "auto" }} src="/library.png" />
         </div>
       )}
     </div>

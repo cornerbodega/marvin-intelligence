@@ -574,10 +574,10 @@ const ViewReports = ({
     setReportLength(length);
   }
   async function handleContinuumClick(parentReport) {
-    if (tokensRemaining < 1) {
-      goToPage("/account/tokens/buy-tokens");
-    }
-    setTokensRemaining(tokensRemaining - 1);
+    // if (tokensRemaining < 1) {
+    // goToPage("/account/tokens/buy-tokens");
+    // }
+    // setTokensRemaining(tokensRemaining - 1);
     // "parentReportId",
     // "userId",
     // "parentReportContent",
