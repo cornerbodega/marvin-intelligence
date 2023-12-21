@@ -100,6 +100,7 @@ export async function getServerSideProps(context) {
       .from("folders")
       .select(`folderId, reportFolders(count)`)
       .in("folderId", folderIds);
+
     console.log("reportCountsData");
     console.log(reportCountsData);
     // console.log("reportCountsData[0].reportFolders[0]");
@@ -110,6 +111,7 @@ export async function getServerSideProps(context) {
     }
 
     const _reportCountsByFolderId = reportCountsData.reduce((acc, item) => {
+      // remove folder.status == "DELETED"
       acc[item.folderId] = item.reportFolders[0].count || null;
       return acc;
     }, {});
@@ -660,6 +662,12 @@ const ViewReports = ({
             autoFocus
             value={briefingInput}
             onChange={(e) => setBriefingInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleQuickDraftClick();
+              }
+            }}
             placeholder="What would you like to know?"
             style={{
               padding: "12px 12px 13px 13px",

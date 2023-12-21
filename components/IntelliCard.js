@@ -18,8 +18,8 @@ const IntelliCard = ({
   // console.log(index);
   const imageStyle = {
     borderTop: "2px solid #31A0D1",
-    borderLeft: "1px solid #31A0D1",
-    borderRight: "1px solid #31A0D1",
+    borderLeft: "2px solid #31A0D1",
+    borderRight: "2px solid #31A0D1",
   };
   // if (index === 0) {
   imageStyle.borderTopLeftRadius = "16px";
@@ -140,8 +140,8 @@ const IntelliCard = ({
             // padding: "20px",
             padding: "10px 20px 10px 20px",
             borderBottom: "2px solid #31A0D1",
-            borderLeft: "1px solid #31A0D1",
-            borderRight: "1px solid #31A0D1",
+            borderLeft: "2px solid #31A0D1",
+            borderRight: "2px solid #31A0D1",
             // border: "2px 2px 0px 0px solid #BFBFBF",
             boxShadow: `
             0 8px 0 -2px black, 
