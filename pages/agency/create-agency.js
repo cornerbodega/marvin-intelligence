@@ -8,7 +8,7 @@ import {
   Label,
   Input,
 } from "reactstrap";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 // This is where an agency is founded and named.
 // There will be another page for editing the agency.
 // This page is important because
@@ -49,25 +49,10 @@ export const getServerSideProps = withPageAuthRequired({
   },
 });
 function CreateAgency() {
-  const supabase = getSupabase();
   const router = useRouter();
 
   const { user, error, isLoading } = useUser();
-  // useEffect(() => {
-  //   if (user) {
-  //     const subscription = supabase
-  //       .from(`users:userId=eq.${user.sub}`)
-  //       .on("INSERT", (payload) => {
-  //         console.log("New matching userId added:", payload.new);
-  //         // Handle the new userId data as required
-  //       })
-  //       .subscribe();
 
-  //     // Cleanup the subscription on component unmount
-  //     return () => supabase.removeSubscription(subscription);
-  //   }
-  // }, []);
-  // HANDLE USER TABLE HERE AS WELL
   async function handleSubmit(e) {
     setIsSubmitting(true);
     const res = await fetch("/api/agency/create-agency-endpoint", {
@@ -80,7 +65,6 @@ function CreateAgency() {
     setIsSubmitting(false);
 
     if (res.status === 200) {
-      // alert("Agent created successfully!");
       console.log("Agency created successfully!");
       router.push("/reports/folders/view-folders");
     } else {
@@ -98,7 +82,6 @@ function CreateAgency() {
           <Col md={{ size: 6, offset: 3 }}>
             <Form onSubmit={handleSubmit}>
               <div style={{ marginBottom: "40px" }}>
-                {/* <Link href="#"> */}
                 <h3>Create Intelligence Agency</h3>
                 <p className="lead">
                   This is where you will name your Intelligence Agency. Choose a

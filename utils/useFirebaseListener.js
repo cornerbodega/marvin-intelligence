@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { getDatabase, onValue } from "firebase/database";
-import { db, ref } from "./firebase";
+import { db, ref } from "./_firebase";
 export function useFirebaseListener(path) {
   const [firebaseData, setFirebaseData] = useState(null);
 
   useEffect(() => {
-    console.log("path");
+    console.log("firebase listener path");
     console.log(path);
     if (!path) return;
     // const db = getDatabase();

@@ -12,10 +12,6 @@ const credentialsJSON = JSON.parse(
 const client = new TextToSpeechClient({
   credentials: credentialsJSON,
 });
-// Initialize the client with your credentials
-// const client = new TextToSpeechClient({
-//   keyFilename: "./pages/api/reports/speech/missions-server-d87f87bd62b4.json",
-// });
 
 export default async (req, res) => {
   // Parse the text from the request body

@@ -1,16 +1,3 @@
-import { useRouter } from "next/router";
-import Image from "next/image";
-import {
-  Card,
-  CardGroup,
-  CardBody,
-  CardText,
-  Button,
-  CardTitle,
-  CardSubtitle,
-  Table,
-} from "reactstrap";
-// import IntelliCard from "./IntelliCard";
 import styles from "./IntelliFab.module.css";
 import { useState } from "react";
 
@@ -33,7 +20,6 @@ const IntelliFab = ({ onClick, icon, fabType }) => {
   return (
     <button className={styles.fab} onClick={onClick}>
       {logo && <i className={logo}></i>} {icon}
-      {/* {logo} {icon} */}
     </button>
   );
 };

@@ -36,27 +36,6 @@ export async function getSuggestionFunction({
     return;
   }
 
-  console.log(agentMissionHistory);
-  // let { data: agentMissionHistory, error } = await supabase
-  //   .from("reports")
-  //   .select("reportTitle, reportSummary, reportId")
-  //   .eq("agentId", agentId)
-  //   .limit(3);
-  // let { data: agentReports, agentReportsError } = await supabase
-  //   .from("reports")
-  //   .select("reportTitle, reportSummary, reportId")
-  //   .eq("agentId", agentId);
-  // if (!agentReports)
-  //   return res.status(500).json({
-  //     error: `Internal Server Error. No reports for agent ${agentId} returned in get-suggestions`,
-  //   });
-  // if (reports.length > 0) {
-  //   if (reports[0].reportSummary) {
-  //     parentReportSummary = reports[0].reportSummary;
-  //   }
-  // }
-  console.log("agentMissionHistory");
-  console.log(agentMissionHistory);
   if (agentMissionHistory.length > 0) {
     responseObj.agentMissionHistory = agentMissionHistory;
   }
@@ -69,7 +48,7 @@ export async function getSuggestionFunction({
   // #######################
   let parentReportSummary = undefined;
   if (parentReportId) {
-    let { data: reports, error } = await supabase
+    let { data: reports } = await supabase
       .from("reports")
       .select("reportSummary")
       .eq("reportId", parentReportId);
@@ -112,10 +91,6 @@ export async function getSuggestionFunction({
     const suggestionResponseContent =
       chat_completion.data.choices[0].message.content;
     if (suggestionResponseContent) {
-      console.log("suggestionResponseContent");
-      console.log(suggestionResponseContent);
-      console.log("typeof suggestionResponseContent");
-      console.log(typeof suggestionResponseContent);
       if (typeof suggestionResponseContent === "object") {
         briefingSuggestion = suggestionResponseContent.suggestion;
       } else if (
@@ -129,8 +104,6 @@ export async function getSuggestionFunction({
       } else if (typeof suggestionResponseContent === "string") {
         briefingSuggestion = suggestionResponseContent;
       }
-
-      // briefingSuggestion = suggestionResponseContent.split("suggestion:")[1];
     }
     if (briefingSuggestion) {
       responseObj.briefingSuggestion = briefingSuggestion;
@@ -142,13 +115,10 @@ export async function getSuggestionFunction({
 
     return responseObj;
   } catch (error) {
-    console.error("getSuggestion error");
-    console.log(error);
     if (error.response) {
       const errorObject = error.response.data.error;
       console.log(errorObject); // this will log the error object
     } else {
-      console.log("1234error");
       console.log(error);
       // Handle other types of errors (e.g., network errors)
     }

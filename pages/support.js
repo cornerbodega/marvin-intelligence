@@ -8,10 +8,8 @@ export default function SupportPage() {
       className="d-flex flex-column align-items-center justify-content-center"
       style={{
         height: "100vh",
-        // backgroundColor: "#505650"
       }}
     >
-      {/* <h2>Need Support?</h2> */}
       <p>
         Please reach out via the <code>#support</code> channel on Discord
       </p>

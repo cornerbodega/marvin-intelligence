@@ -2,33 +2,25 @@ import { Button, Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
-// import _, { debounce, get, has, set } from "lodash";
-// other imports
-import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
-// import IntelliCardGroup from "../../../../components/IntelliCardGroup";
+import { getSession } from "@auth0/nextjs-auth0";
+
 import { getSupabase } from "../../../../utils/supabase";
-// import Link from "next/link";
+
 import IntelliFab from "../../../../components/IntelliFab";
-import getCloudinaryImageUrlForHeight from "../../../../utils/getCloudinaryImageUrlForHeight";
-// rest of component
-// import { slugify } from "../../../../utils/slugify";
-// const PAGE_COUNT = 6;
+
 const supabase = getSupabase();
 import { useUser } from "@auth0/nextjs-auth0/client";
-import LoadingDots from "../../../../components/LoadingDots";
+import LibraryImage from "../../../../components/LibraryImage";
 import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
 
 import Router from "next/router";
-// import _ from "lodash";
+
 import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
-// import { current } from "@reduxjs/toolkit";
-// import IntelliReportLengthDropdown from "../../../../components/IntelliReportLengthDropdown/IntelliReportLengthDropdown";
+
 import Head from "next/head";
-import Image from "next/image";
+
 import IntelliNotificationsArea from "../../../../components/IntelliNotificationsArea/IntelliNotificationsArea";
-// import { child } from "@firebase/database";
-// export const getServerSideProps = withPageAuthRequired({
 
 export async function getServerSideProps(context) {
   const folderId = context.params.folderSlug.split("-")[0];
@@ -37,8 +29,6 @@ export async function getServerSideProps(context) {
   let userId = user?.sub;
   const query = context.query;
 
-  // For example, if the URL is /page?param=value
-  // you can access 'param' like this:
   const userIdFromRouter = query.userId;
   if (!userId && userIdFromRouter) {
     userId = userIdFromRouter;
@@ -66,11 +56,7 @@ export async function getServerSideProps(context) {
       props: {},
     };
   }
-  //   folderLikes:folderId (
-  //     userId,
-  //     folderId,
-  // ),
-  // const missionsResponse = "";
+
   let { data: missionsResponse, error } = await supabase
     .from("reportFolders")
     .select(
@@ -120,17 +106,6 @@ export async function getServerSideProps(context) {
     console.error(folderLikesError);
   }
 
-  // let { data: missionsResponse, error } = await supabase
-  //   .from("reportFolders")
-  //   .select(
-  //     `
-  //   folders (folderName, folderDescription, folderPicUrl),
-  //   reports (reportTitle, reportPicUrl, reportId, reportContent, agentId)
-  //   ))
-  // `
-  //   )
-  //   .eq("folderId", folderId);
-  // // .limit(3);
   console.log("missionsResponse");
   console.log(missionsResponse);
   if (!missionsResponse || missionsResponse.length === 0) {
@@ -152,11 +127,6 @@ export async function getServerSideProps(context) {
     if (missionsResponse[0].reports.agent.expertise3) {
       expertises.push(missionsResponse[0].reports.agent.expertise3);
     }
-
-    // if (missionsResponse[0].reports.agent.specializedTraining) {
-    //   specializedTraining =
-    //     missionsResponse[0].reports.agent.specializedTraining;
-    // }
   }
 
   let { data: linksResponse, error: linksError } = await supabase
@@ -164,7 +134,7 @@ export async function getServerSideProps(context) {
     .select("parentReportId, childReportId");
 
   if (error || linksError) {
-    // handle errors
+    console.log("intel-report error");
     console.error(error);
     console.error(linksError);
   }
@@ -174,7 +144,6 @@ export async function getServerSideProps(context) {
   let _folderDescription = "";
   let _folderPicDescription = "";
   let _folderPicUrl = "";
-  // let _folderPicUrls = "";
 
   let _availability = "";
   missionsResponse.forEach((mission) => {
@@ -183,16 +152,10 @@ export async function getServerSideProps(context) {
     }
     _loadedReports.push(mission.reports);
 
-    // console.log("mission.folders");
-    // console.log(mission.folders);
     _folderName = mission.folders.folderName;
     _folderDescription = mission.folders.folderDescription;
     _folderPicDescription = mission.folders.folderPicDescription;
     _folderPicUrl = mission.folders.folderPicUrl;
-    // _folderPicUrls = mission.folders.folderPicUrls;
-    // if (_folderPicUrls) {
-    //   _folderPicUrls = JSON.parse(_folderPicUrls);
-    // }
 
     _availability = mission.folders.availability;
   });
@@ -201,33 +164,9 @@ export async function getServerSideProps(context) {
   _loadedReports.sort((a, b) => {
     const dateA = new Date(a.createdAt);
     const dateB = new Date(b.createdAt);
-
-    return dateA - dateB; // For ascending order
-    // return dateB - dateA; // For descending order
+    return dateA - dateB; // sort by date ascending
   });
-  // My Tokens
-  let { data: tokensResponse, error: tokensError } = await supabase
-    .from("tokens")
-    .select("tokens")
-    .eq("userId", userId);
-  if (tokensError) {
-    console.log("tokensError");
-  }
-  console.log("tokensResponse");
-  console.log(tokensResponse);
-  let _tokensRemaining = 0;
-  if (tokensResponse) {
-    if (tokensResponse[0]) {
-      _tokensRemaining = tokensResponse[0].tokens;
-    }
-  }
-  console.log("tokensRemaining");
-  console.log(_tokensRemaining);
-  // console.log("missions");
-  // console.log(missions);
-  // const _currentfolderPicUrlIndex = _folderPicUrls
-  //   ? Math.floor(Math.random() * _folderPicUrls.length)
-  //   : 0;
+
   return {
     props: {
       _loadedReports,
@@ -236,18 +175,14 @@ export async function getServerSideProps(context) {
       _folderDescription,
       _folderPicDescription,
       _folderPicUrl,
-      // _folderPicUrls,
       agentId,
       expertises,
       specializedTraining,
-      // _currentfolderPicUrlIndex,
       _folderLikes,
       _availability,
-      _tokensRemaining,
     },
   };
 }
-// });
 const ViewReports = ({
   _loadedReports,
   _folderName,
@@ -255,26 +190,14 @@ const ViewReports = ({
   _folderDescription,
   _folderPicDescription,
   _folderPicUrl,
-  // _folderPicUrls,
   agentId,
   expertises,
   specializedTraining,
-  _currentfolderPicUrlIndex,
   _folderLikes,
   _availability,
-  _tokensRemaining,
 }) => {
-  // console.log("useUser");
-  // console.log(useUser);
-  // parentReportId,
-  // userId,
-  // parentReportContent,
-  // agentId,
-  // expertises,
-  // specializedTraining,
+  const { user } = useUser();
 
-  const { user, error, isLoading } = useUser();
-  // const userId = user ? user.sub : null;
   const [userId, setUserId] = useState(user?.sub);
   const router = useRouter();
   const userIdFromRouter = router.query.userId;
@@ -283,12 +206,7 @@ const ViewReports = ({
       setUserId(userIdFromRouter);
     }
   }, [userIdFromRouter]);
-  const [isLast, setIsLast] = useState(false);
-  const containerRef = useRef(null);
-  const [offset, setOffset] = useState(1);
-  const [isInView, setIsInView] = useState(false);
   const [loadedReports, setLoadedReports] = useState(_loadedReports);
-  const [tokensRemaining, setTokensRemaining] = useState(_tokensRemaining);
 
   const [highlight, setHighlight] = useState({
     text: "",
@@ -296,7 +214,6 @@ const ViewReports = ({
     endIndex: undefined,
   });
   const [isStreaming, setIsStreaming] = useState(false);
-  // let folderName = "";
   const [folderName, setFolderName] = useState(_folderName);
   const [folderDescription, setFolderDescription] =
     useState(_folderDescription);
@@ -304,14 +221,10 @@ const ViewReports = ({
     _folderPicDescription
   );
   const [folderPicUrl, setFolderPicUrl] = useState(_folderPicUrl || "");
-  const [reportLinksMap, setReportLinksMap] = useState({});
-  const [reportPicUrl, setReportPicUrl] = useState("");
   const [continuumCompleted, setContinuumCompleted] = useState(false);
-  const [draft, setDraft] = useState("");
   const [hasStartedContinuum, setHasStartedContinuum] = useState(false);
   const [loadedAgentId, setLoadedAgentId] = useState(agentId);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(1); // Default to 1 for "Short"
+
   const firebaseSaveData = useFirebaseListener(
     user
       ? `/${
@@ -319,21 +232,13 @@ const ViewReports = ({
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${
-          process.env.NEXT_PUBLIC_serverUid
+          process.env.NEXT_PUBLIC_SERVER_UID
         }/${userId}/finalizeAndVisualizeReport/context/`
       : null
   );
-  // const [folderPicUrls, setFolderPicUrls] = useState(_folderPicUrls);
+
   const [agent, setAgent] = useState({});
-  // const folderPicUrls = [
-  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png",
-  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png",
-  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png",
-  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png",
-  // ];
-  // const [currentfolderPicUrlIndex, setCurrentfolderPicUrlIndex] = useState(
-  //   _currentfolderPicUrlIndex
-  // );
+
   const firebaseFolderData = useFirebaseListener(
     user
       ? `/${
@@ -341,7 +246,7 @@ const ViewReports = ({
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${
-          process.env.NEXT_PUBLIC_serverUid
+          process.env.NEXT_PUBLIC_SERVER_UID
         }/${userId}/regenerateFolder/context`
       : null
   );
@@ -351,34 +256,13 @@ const ViewReports = ({
           process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
-        }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/continuum/`
+        }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/continuum/`
       : null
   );
-  // const firebaseDoContinuumData = useFirebaseListener(
-  //   user
-  //     ? `/${
-  //         process.env.NEXT_PUBLIC_env === "production"
-  //           ? "asyncTasks"
-  //           : "localAsyncTasks"
-  //       }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/doContinuum/`
-  //     : null
-  // );
-  // const firebaseContinuumStatus = useFirebaseListener(
-  //   user ? `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
-  // );
 
   async function fetchUpdatedReports() {
     console.log("FETCH UPDATED REPORTS");
-    // Fetch the updated data from the database using the folderId
-    // let { data: updatedMissionsResponse, error: updatedError } = await supabase
-    //   .from("reportFolders")
-    //   .select(
-    //     `
-    //           folders (folderName, folderDescription, folderPicUrl),
-    //           reports (reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, availability)
-    //       `
-    //   )
-    //   .eq("folderId", folderId);
+
     let { data: updatedMissionsResponse, error: updatedError } = await supabase
       .from("reportFolders")
       .select(
@@ -388,10 +272,7 @@ const ViewReports = ({
       `
       )
       .eq("folderId", folderId);
-    // .order("createdAt", { foreignTable: "reports" }); // or "reports" depending on where the column is
 
-    // .filter("reports.availability", "neq", "DELETED")
-    // .or("reports.availability.is.null");
     console.log("updatedMissionsResponse");
     console.log(updatedMissionsResponse);
     if (updatedError) {
@@ -406,11 +287,10 @@ const ViewReports = ({
       }
       updatedMissions.push({ ...mission.reports });
     });
+    // Sort Updated Reports by cretedAt
     updatedMissions.sort((a, b) => {
-      // Assuming createdAt is a date string, you can convert them to Date objects for comparison
       const dateA = new Date(a.createdAt);
       const dateB = new Date(b.createdAt);
-
       // Compare the two dates
       if (dateA < dateB) {
         return -1; // return a negative value if dateA is earlier than dateB
@@ -427,61 +307,19 @@ const ViewReports = ({
     updateReports(updatedMissions); // this one sets links on initial load
   }
   function goToAgentProfile({ agentId }) {
-    // console.log("goToAgentProfile");
-    // console.log(agentId);
-
     Router.push({
       pathname: "/agents/detail/draft-report",
       query: { ...Router.query, agentId: agentId },
     });
   }
-  // const [currentGeneration, setCurrentGeneration] = useState(0);
-  // useEffect(() => {
-  //   if (firebaseDoContinuumData) {
-  //     console.log("firebaseDoContinuumData");
-  //     console.log(firebaseDoContinuumData);
-
-  //     if (firebaseDoContinuumData.status == "complete" || "in-progress") {
-  //       // if (hasStartedContinuum) {
-  //       if (firebaseDoContinuumData.context) {
-  //         if (
-  //           firebaseDoContinuumData.context.currentGeneration !=
-  //           currentGeneration
-  //         ) {
-  //           setCurrentGeneration(
-  //             firebaseDoContinuumData.context.currentGeneration
-  //           );
-  //           setDraft(
-  //             firebaseDoContinuumData.context[
-  //               `draft${currentGeneration == 1 ? "" : currentGeneration - 1}`
-  //             ]
-  //           );
-  //         }
-  //         fetchUpdatedReports();
-  //         if (firebaseDoContinuumData.status == "complete") {
-  //           // setHasStartedContinuum(false);
-  //           setIsStreaming(false);
-  //           setContinuumCompleted(true);
-  //         }
-  //         // }
-  //       }
-  //     }
-  //   }
-  // }, [firebaseDoContinuumData]);
 
   useEffect(() => {
     if (firebaseDraftData) {
-      // console.log("firebaseDraftData");
-      // console.log(firebaseDraftData);
-      if (firebaseDraftData.context) {
-        setDraft(firebaseDraftData.context.draft);
-      }
       if (firebaseDraftData.status == "complete") {
         if (hasStartedContinuum) {
           fetchUpdatedReports();
           setHasStartedContinuum(false);
           setIsStreaming(false);
-          // updateReports();
           setContinuumCompleted(true);
         }
       }
@@ -499,14 +337,9 @@ const ViewReports = ({
         firebaseFolderData.folderPicUrl
       ) {
         console.log("FOUND PHOTO FOR FOLDER");
-        // fetchUpdatedReports();
         setFolderName(firebaseFolderData.folderName);
         setFolderDescription(firebaseFolderData.folderDescription);
         setFolderPicUrl(firebaseFolderData.folderPicUrl);
-        // if (firebaseFolderData.folderPicUrls) {
-        //   setFolderPicUrls(firebaseFolderData.folderPicUrls);
-        //   setCurrentfolderPicUrlIndex(folderPicUrls.length - 1);
-        // }
       }
     }
   }, [firebaseFolderData, folderId]); // Added folderId as a dependency
@@ -521,7 +354,6 @@ const ViewReports = ({
         firebaseSaveData.reportPicUrl
       ) {
         fetchUpdatedReports();
-        // updateReports();
       }
       if (firebaseSaveData.agentId && !agentId) {
         setLoadedAgentId(firebaseSaveData.agentId);
@@ -551,22 +383,6 @@ const ViewReports = ({
     }
   }
 
-  // useEffect(() => {
-  //   if (firebaseSaveData) {
-  //     console.log("firebase save data");
-  //     console.log(firebaseSaveData);
-  //     console.log(folderId);
-  //     if (firebaseSaveData.folderId) {
-  //       if (firebaseSaveData.folderId == folderId) {
-  //         if (firebaseSaveData.reportPicUrl) {
-  //           console.log("FOUND IMAGE!!");
-  //           setReportPicUrl(firebaseSaveData.reportPicUrl);
-  //           // updateReports();
-  //         }
-  //       }
-  //     }
-  //   }
-  // }, [firebaseSaveData]);
   const [reportLength, setReportLength] = useState("short");
   function handleSelectedLength(length) {
     console.log("handleselected length");
@@ -574,22 +390,6 @@ const ViewReports = ({
     setReportLength(length);
   }
   async function handleContinuumClick(parentReport) {
-    // if (tokensRemaining < 1) {
-    // goToPage("/account/tokens/buy-tokens");
-    // }
-    // setTokensRemaining(tokensRemaining - 1);
-    // "parentReportId",
-    // "userId",
-    // "parentReportContent",
-    // "agentId",
-    // "expertises",
-    // "specializedTraining",
-    // console.log("parentReport");
-    // console.log(parentReport.reportId);
-    // console.log("reportLinksMap");
-    // console.log(reportLinksMap);
-    // console.log("reportLinksMap[parentReport.reportId]");
-    // console.log(reportLinksMap[parentReport.reportId]);
     const existingHyperlinks = await getLinksForContinuum(
       parentReport.reportId
     );
@@ -652,8 +452,6 @@ const ViewReports = ({
     console.log("selection.toString()", selection.toString());
     setHighlight({
       highlightedText: selection.toString(),
-      // startIndex,
-      // endIndex,
       elementId,
       parentReportId: report.reportId,
       parentReportTitle: report.reportTitle,
@@ -680,7 +478,6 @@ const ViewReports = ({
     });
   };
 
-  // const router = useRouter;
   function goToPage(name) {
     console.log("go to page");
     console.log(name);
@@ -690,10 +487,10 @@ const ViewReports = ({
   useEffect(() => {
     // This conditional check ensures that updateReports is only called
     // when all necessary conditions are met
-    // if (supabase && isStreaming && continuumCompleted) {
-    console.log("Continuum Completed. Calling updateReports");
-    updateReports(); // this one makes links happen for existing reports
-    // }
+    if (supabase && isStreaming && continuumCompleted) {
+      console.log("Continuum Completed. Calling updateReports");
+      updateReports(); // this one makes links happen for existing reports
+    }
   }, [supabase, isStreaming, continuumCompleted]); // The dependencies are narrowed down
 
   async function updateReports(newestReports) {
@@ -709,49 +506,10 @@ const ViewReports = ({
       })
     );
 
-    // This checks if any report content has changed
-    // const isChanged = updatedReports.some(
-    //   (report, index) =>
-    //     report.reportContent !== loadedReports[index].reportContent
-    // );
-
-    // if (isChanged) {
     console.log("Setting Loaded Reports");
     setLoadedReports(updatedReports); // Simply setting the whole updatedReports array
-    // }
   }
-  // useEffect(() => {
-  //   updateReports();
-  // }, [supabase, isStreaming, continuumCompleted]);
-  // async function updateReports() {
-  //   console.log("UPDATE REPORTS");
-  //   if (!loadedReports) return;
-  //   const updatedReports = await Promise.all(
-  //     loadedReports.map(async (report) => {
-  //       const clonedReport = { ...report }; // Create a shallow copy
-  //       await getLinks(clonedReport); // Update the cloned report's content
-  //       return clonedReport; // Return the updated report
-  //     })
-  //   );
 
-  //   // Compare if there’s a change in the reports, then only update the state
-  //   const isChanged = updatedReports.some(
-  //     (report, index) =>
-  //       report.reportContent !== loadedReports[index].reportContent
-  //   );
-
-  //   if (isChanged) {
-  //     console.log("Setting Loaded Reports");
-  //     setLoadedReports((prevReports) => {
-  //       return updatedReports.map((report, index) => {
-  //         return report.reportContent !== prevReports[index].reportContent
-  //           ? report
-  //           : prevReports[index]; // Avoid updating the item if there's no change
-  //       });
-  //     });
-  //   }
-  //   // setIsStreaming(false);
-  // }
   async function getLinksForContinuum(reportId) {
     console.log("getLinksForContinuum");
     let { data: links, error: linksError } = await supabase
@@ -764,17 +522,6 @@ const ViewReports = ({
       return;
     }
 
-    // if (links && links.length > 0) {
-    //   links.forEach((link) => {
-    //     let highlightedText = (() => {
-    //       try {
-    //         return JSON.parse(link.highlightedText);
-    //       } catch {
-    //         return link.highlightedText;
-    //       }
-    //     })();
-    //   });
-    // }
     console.log("links");
     console.log(links);
     return links;
@@ -805,8 +552,6 @@ const ViewReports = ({
         })();
 
         if (element) {
-          // const newLink = `<a href="/missions/report/${link.childReportId}">${highlightedText}</a>`;
-
           const newLink = `<a href="#${link.childReportId}">${highlightedText}</a>`;
 
           const updatedHTML = element.innerHTML.replace(
@@ -843,8 +588,7 @@ const ViewReports = ({
         }
 
         const { childReports } = await response.json();
-        // console.log("childReports");
-        // console.log(childReports);
+
         return childReports;
       } catch (error) {
         console.error("Error:", error);
@@ -986,146 +730,10 @@ const ViewReports = ({
       </ol>
     );
   };
-
-  // const NestedList = ({ children, loadedReports }) => {
-  //   return (
-  //     <ul>
-  //       {/* {JSON.stringify(loadedReports)} */}
-  //       {children &&
-  //         children.map((item) => (
-  //           <li style={{ marginBottom: "8px", marginTop: "8px" }} key={item.id}>
-  //             {!item.id && "loading..."}
-  //             {item.id && (
-  //               <a
-  //                 style={{
-  //                   fontSize: "1rem",
-  //                   color: "#E7007C",
-  //                   fontWeight: "500",
-  //                   textDecoration: "none",
-  //                   cursor: "pointer",
-  //                 }}
-  //                 href={`#${item.id}`}
-  //                 onClick={() => console.log(`Navigating to report ${item.id}`)}
-  //               >
-  //                 {loadedReports.find((report) => report.reportId === item.id)
-  //                   ?.reportTitle || `Generating Report Artwork`}
-  //               </a>
-  //             )}
-  //             {item.children && (
-  //               <NestedList
-  //                 // children={item.children}
-  //                 loadedReports={loadedReports}
-  //               >
-  //                 {item.children}
-  //               </NestedList>
-  //             )}
-  //           </li>
-  //         ))}
-  //     </ul>
-  //   );
-  // };
-
-  // const NestedList = ({ children }) => {
-  //   // console.log("children");
-  //   // console.log(children);
-  //   return (
-  //     <ul>
-  //       {children &&
-  //         children.map((item) => (
-  //           <li key={item.id}>
-  //             Report ID: {item.id}
-  //             {item.children && <NestedList children={item.children} />}
-  //           </li>
-  //         ))}
-  //     </ul>
-  //   );
-  // };
-
-  //   return (
-  //     <li key={report.id}>
-  //       <a
-  //         href={`#${report.id}`}
-  //         className="no-underline"
-  //         style={{ fontWeight: "200", textDecoration: "none" }}
-  //       >
-  //         {report.title}
-  //       </a>
-  //       {report.children && report.children.length > 0 && (
-  //         <ol>{report.children.map((child) => renderNestedReports(child))}</ol>
-  //       )}
-  //     </li>
-  //   );
-  // };
-
-  // useEffect(() => {
-  //   async function fetchChildReports(parentReportId) {
-  //     try {
-  //       const response = await fetch("/api/reports/get-child-reports", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ parentReportId }),
-  //       });
-
-  //       if (response.ok) {
-  //         const { children } = await response.json();
-  //         return children;
-  //       }
-
-  //       console.error("Error fetching child reports");
-  //       return [];
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //       return [];
-  //     }
-  //   }
-
-  //   async function buildTableOfContents() {
-  //     const reportWithChildren = await Promise.all(
-  //       loadedReports.map(async (report) => {
-  //         const children = await fetchChildReports(report.reportId);
-  //         return {
-  //           ...report,
-  //           children: children.map((child) => ({ ...child, children: [] })), // Add a children property to each child report
-  //         };
-  //       })
-  //     );
-
-  //     setTableOfContents(reportWithChildren);
-  //   }
-
-  //   buildTableOfContents();
-  // }, [loadedReports]);
-  // const renderNestedReports = (report) => {
-  //   if (!report.title) return null; // Prevent rendering if there is no title
-
-  //   return (
-  //     <li key={report.id}>
-  //       <a
-  //         href={`#${report.id}`}
-  //         className="no-underline"
-  //         style={{ fontWeight: "200", textDecoration: "none" }}
-  //       >
-  //         {report.title}
-  //       </a>
-  //       {report.children && report.children.length > 0 ? (
-  //         <ol>{report.children.map((child) => renderNestedReports(child))}</ol>
-  //       ) : null}
-  //     </li>
-  //   );
-  // };
-  // console.log("process.env.NEXT_PUBLIC_serverUid");
-  // console.log(process.env.NEXT_PUBLIC_serverUid);
   const [likes, setLikes] = useState(
     _folderLikes.map((like) => like.likeValue).reduce((a, b) => a + b, 0)
   );
   async function handleLike() {
-    // console.log("handleLike");
-    // console.log("_folderLikes");
-    // console.log(_folderLikes);
-    // console.log("likes");
-    // console.log(likes);
     let _likes = likes;
     let likeValue = 0;
     if (likes === 0) {
@@ -1221,11 +829,8 @@ const ViewReports = ({
       return;
     } else {
       console.log("DELTEED reportId");
-      // router.replace(router.asPath);
-
       setShowReportDeleteQuestion(false);
       fetchUpdatedReports();
-      // goToPage("/reports/folders/view-folders");
     }
   }
   function handleReportDeleteNo() {
@@ -1340,9 +945,6 @@ const ViewReports = ({
               </BreadcrumbItem>
             </Breadcrumb>
             <div className="folder-section report-section">
-              {/* {folderPicUrl} */}
-              {/* ["http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png"] */}
-              {/* {folderPicUrls} */}
               <Head>
                 <title>{folderName}</title>
 
@@ -1448,17 +1050,11 @@ const ViewReports = ({
               style={{ marginTop: "30px", fontSize: "1em" }}
             >
               <Row>
-                <Col>
-                  Table of Contents
-                  {/* <span style={{ whiteSpace: "nowrap" }}>
-              &nbsp;[{loadedReports.length} <i className="bi bi-link"></i>]
-            </span> */}
-                </Col>
+                <Col>Table of Contents</Col>
               </Row>
             </div>
-            {/* {JSON.stringify(parentChildIdMap)} */}
             {!parentChildIdMap.id && (
-              <LoadingDots style={{ marginTop: "30px" }} />
+              <LibraryImage style={{ marginTop: "30px" }} />
             )}
             {parentChildIdMap.id && (
               <ul className="linkFont">
@@ -1468,7 +1064,6 @@ const ViewReports = ({
                       color: "#E7007C",
                       textDecoration: "none",
                       cursor: "pointer",
-                      // fontWeight: 500,
                       fontSize: "1.2em",
                     }}
                     href={`#${parentChildIdMap.id}`}
@@ -1478,10 +1073,7 @@ const ViewReports = ({
                       (report) => report.reportId === parentChildIdMap.id
                     )?.reportTitle || ``}
                   </a>
-                  <NestedList
-                    // children={parentChildIdMap.children}
-                    loadedReports={loadedReports}
-                  >
+                  <NestedList loadedReports={loadedReports}>
                     {parentChildIdMap.children}
                   </NestedList>
                 </li>
@@ -1538,11 +1130,6 @@ const ViewReports = ({
                 .split(`</h2>`)[1]
             }`;
 
-            // console.log("reportTitle");
-            // console.log(reportTitle);
-            // console.log("__html");
-            // console.log(__html);
-
             return (
               <div key={index} id={reportId} className="report-section">
                 {report.reportPicUrl && (
@@ -1554,12 +1141,12 @@ const ViewReports = ({
 
                       {index !== 0 && (
                         <a href="#top" className="top-button text-white">
-                          {/* 🔝 */}⇧
+                          ⇧
                         </a>
                       )}
                     </div>
                     <div className="image-container">
-                      {!report.reportPicUrl && <LoadingDots />}
+                      {!report.reportPicUrl && <LibraryImage />}
                       {report.reportPicUrl && (
                         <a
                           href={report.reportPicUrl}
@@ -1574,7 +1161,6 @@ const ViewReports = ({
                             className="report-image"
                             style={{ borderRadius: "10px" }}
                           />
-                          {/* <div className="overlay"></div> */}
                         </a>
                       )}
                     </div>
@@ -1684,32 +1270,11 @@ const ViewReports = ({
                       </>
                     )}
                   </div>
-                  {/* <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                  <i style={{ color: "grey" }} className="bi bi-trash" />
-        
-        
-                </div> */}
                 </div>
               </div>
             );
           })}
-        {/* {isStreaming && (
-        <div id="draft">
-          <div className="reportTitle reportFont section-title">Draft</div>
-          <div
-            className="report text-primary reportFont"
-            dangerouslySetInnerHTML={{ __html: draft }}
-          ></div>
-          {draft && !draft.endsWith(" ".repeat(3)) && (
-            <div className="scroll-downs">
-              <div className="mousey">
-                <div className="scroller"></div>
-              </div>
-            </div>
-          )}
-        </div>
-      )} */}
-        {/* {JSON.stringify(agent)} */}
+
         {agent.profilePicUrl && !isStreaming && (
           <div
             style={{ textAlign: "center", marginTop: "116px" }}
@@ -1719,8 +1284,7 @@ const ViewReports = ({
               style={{
                 display: "flex",
                 justifyContent: "center",
-                // mihHeight: "237px",
-                // maxHeight: "237px",
+
                 width: "auto",
                 objectFit: "cover",
                 marginBottom: "16px",

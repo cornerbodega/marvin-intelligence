@@ -9,12 +9,8 @@ const IntelliCardGroup = ({
   folderLikesByFolderId,
   reportCountsByFolderId,
 }) => {
-  // const [cardsModel, setCardsModel] = useState(datums);
   const cardsModel = datums;
-  // console.log("cardsModel");
-  // console.log(cardsModel);
-  // console.log("datums");
-  // console.log(datums);
+
   const rowsInThrees = cardsModel
     ? cardsModel.reduce((acc, item, index) => {
         if (index % 3 === 0) {
@@ -24,11 +20,6 @@ const IntelliCardGroup = ({
         return acc;
       }, [])
     : [];
-  // console.log("rowsInThrees");
-  // console.log(rowsInThrees);
-  // console.log("intelli card group");
-  // console.log("Intellicard handleCardClick");
-  // console.log(handleCardClick);
   const PAGE_COUNT = 6;
   return (
     <>

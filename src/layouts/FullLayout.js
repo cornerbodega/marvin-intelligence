@@ -2,16 +2,12 @@ import React from "react";
 import { Container, Row, Col } from "reactstrap";
 import Header from "./header/Header";
 import Sidebar from "./sidebars/vertical/Sidebar";
-import IntelliNotificationsArea from "../../components/IntelliNotificationsArea/IntelliNotificationsArea";
-import { useUser } from "@auth0/nextjs-auth0/client";
 
 const FullLayout = ({ children }) => {
   const [open, setOpen] = React.useState(false);
   const showMobilemenu = () => {
     setOpen(!open);
   };
-  const { user, error, isLoading } = useUser();
-  const userId = user?.sub;
   return (
     <main>
       <Row

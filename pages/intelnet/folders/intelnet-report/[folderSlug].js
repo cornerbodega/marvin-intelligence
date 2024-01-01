@@ -1,62 +1,27 @@
-import { Button, Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
-import useRouter from "next/router";
+import { Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import { useEffect, useRef, useState } from "react";
 
-// import _, { debounce, get, has, set } from "lodash";
-// other imports
-// import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
-// import IntelliCardGroup from "../../../../components/IntelliCardGroup";
 import { getSupabase } from "../../../../utils/supabase";
-// import Link from "next/link";
 
-import getCloudinaryImageUrlForHeight from "../../../../utils/getCloudinaryImageUrlForHeight";
-// rest of component
-// import { slugify } from "../../../../utils/slugify";
-// const PAGE_COUNT = 6;
 const supabase = getSupabase();
 import { useUser } from "@auth0/nextjs-auth0/client";
-import LoadingDots from "../../../../components/LoadingDots";
+import LibraryImage from "../../../../components/LibraryImage";
 import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
-// import saveTask from "../../../../utils/saveTask";
+
 import Head from "next/head";
-import Router from "next/router";
-// import _ from "lodash";
+
 import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
 import IntelliCopyUrl from "../../../../components/IntelliCopyUrl/IntelliCopyUrl";
 import Image from "next/image";
-// import { child } from "@firebase/database";
-// export const getServerSideProps = withPageAuthRequired({
-// export const getServerSideProps = withPageAuthRequired({
 export async function getServerSideProps(context) {
   console.log("context.params.folderSlug");
   console.log(context.params.folderSlug);
-  console.log(context.params);
   const folderId = context.params.folderSlug.split("-")[0];
   if (!folderId) {
     console.log("Error! No folder Id");
     return {};
   }
-  // const session = await getSession(context.req, context.res);
-  // const user = session?.user;
 
-  // let { data: agency, agencyError } = await supabase
-  //   .from("users")
-  //   .select("agencyName")
-  //   .eq("userId", user.sub);
-  // if (agencyError) {
-  //   console.log("agencyError");
-  // }
-  // console.log("agency");
-  // console.log(agency);
-  // if (!agency || agency.length === 0) {
-  //   return {
-  //     redirect: {
-  //       permanent: false,
-  //       destination: "/agency/create-agency",
-  //     },
-  //     props: {},
-  //   };
-  // }
   let { data: missionsResponse, error } = await supabase
     .from("reportFolders")
     .select(
@@ -89,7 +54,6 @@ export async function getServerSideProps(context) {
     `
     )
     .eq("folderId", folderId);
-  // .limit(3);  // You can uncomment this and adjust as needed
 
   // Get the list fo users who have liked this folder
   // Get the list fo users who have liked this folder
@@ -106,24 +70,13 @@ export async function getServerSideProps(context) {
     console.error(folderLikesError);
   }
   // Log the results and errors for debugging
-  console.log("missionsResponse");
+  console.log("missionsResponse1");
   console.log(missionsResponse);
   console.log("folderId");
   console.log(folderId);
   console.error(error);
 
-  // let { data: missionsResponse, error } = await supabase
-  //   .from("reportFolders")
-  //   .select(
-  //     `
-  //   folders (folderName, folderDescription, folderPicUrl),
-  //   reports (reportTitle, reportPicUrl, reportId, reportContent, agentId)
-  //   ))
-  // `
-  //   )
-  //   .eq("folderId", folderId);
-  // // .limit(3);
-  console.log("missionsResponse");
+  console.log("missionsResponse2");
   console.log(missionsResponse);
   if (!missionsResponse || missionsResponse.length === 0) {
     return console.log("No missions found");
@@ -164,26 +117,15 @@ export async function getServerSideProps(context) {
   let _folderDescription = "";
   let _folderPicDescription = "";
   let _folderPicUrl = "";
-  let _folderPicUrls = "";
 
   missionsResponse.forEach((mission) => {
     _loadedReports.push(mission.reports);
-    // console.log("mission.folders");
-    // console.log(mission.folders);
+
     _folderName = mission.folders.folderName;
     _folderDescription = mission.folders.folderDescription;
     _folderPicDescription = mission.folders.folderPicDescription;
     _folderPicUrl = mission.folders.folderPicUrl;
-    // _folderPicUrls = mission.folders.folderPicUrls;
-    // if (_folderPicUrls) {
-    //   _folderPicUrls = JSON.parse(_folderPicUrls);
-    // }
-    // if (_folderPicUrls) {
-    //   _folderPicUrls = JSON.parse(_folderPicUrls);
-    // }
   });
-  // console.log("missions");
-  // console.log(missions);
 
   return {
     props: {
@@ -193,12 +135,10 @@ export async function getServerSideProps(context) {
       _folderDescription,
       _folderPicDescription,
       _folderPicUrl,
-      // _folderPicUrls,
       agentId,
       expertises,
       specializedTraining,
       _folderLikes,
-      // structuredData,
     },
   };
 }
@@ -210,49 +150,22 @@ const ViewReports = ({
   _folderDescription,
   _folderPicDescription,
   _folderPicUrl,
-  // _folderPicUrls,
   agentId,
-  expertises,
-  specializedTraining,
   _folderLikes,
 }) => {
-  // console.log("useUser");
-  // console.log(useUser);
-  // parentReportId,
-  // userId,
-  // parentReportContent,
-  // agentId,
-  // expertises,
-  // specializedTraining,
-
-  const { user, error } = useUser();
+  const { user } = useUser();
   const userId = user ? user.sub : null;
-  const [isLast, setIsLast] = useState(false);
-  const containerRef = useRef(null);
-  const [offset, setOffset] = useState(1);
-  const [isInView, setIsInView] = useState(false);
   const [loadedReports, setLoadedReports] = useState(_loadedReports);
-  // const [tableOfContents, setTableOfContents] = useState([]);
-  const [highlight, setHighlight] = useState({
-    text: "",
-    startIndex: undefined,
-    endIndex: undefined,
-  });
+
   const [isStreaming, setIsStreaming] = useState(false);
-  // let folderName = "";
+
   const [folderName, setFolderName] = useState(_folderName);
   const [folderDescription, setFolderDescription] =
     useState(_folderDescription);
-  const [folderPicDescription, setFolderPicDescription] = useState(
-    _folderPicDescription
-  );
+  const [folderPicDescription] = useState(_folderPicDescription);
   const [folderPicUrl, setFolderPicUrl] = useState(_folderPicUrl);
-  const [reportLinksMap, setReportLinksMap] = useState({});
-  const [reportPicUrl, setReportPicUrl] = useState("");
-  const [continuumCompleted, setContinuumCompleted] = useState(false);
-  const [draft, setDraft] = useState("");
+
   const [hasStartedContinuum, setHasStartedContinuum] = useState(false);
-  const [loadedAgentId, setLoadedAgentId] = useState(agentId);
   const firebaseSaveData = useFirebaseListener(
     user
       ? `/${
@@ -260,21 +173,13 @@ const ViewReports = ({
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${
-          process.env.NEXT_PUBLIC_serverUid
+          process.env.NEXT_PUBLIC_SERVER_UID
         }/${userId}/finalizeAndVisualizeReport/context/`
       : null
   );
-  // const [folderPicUrls, setFolderPicUrls] = useState(_folderPicUrls);
-  const [agent, setAgent] = useState({});
-  // const folderPicUrls = [
-  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png",
-  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png",
-  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png",
-  //   "http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png",
-  // ];
-  // const [currentfolderPicUrlIndex, setCurrentfolderPicUrlIndex] = useState(
-  //   folderPicUrls ? Math.floor(Math.random() * folderPicUrls.length) : 0
-  // );
+
+  const [agent] = useState({});
+
   const firebaseFolderData = useFirebaseListener(
     user
       ? `/${
@@ -282,7 +187,7 @@ const ViewReports = ({
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${
-          process.env.NEXT_PUBLIC_serverUid
+          process.env.NEXT_PUBLIC_SERVER_UID
         }/${userId}/regenerateFolder/context`
       : null
   );
@@ -292,22 +197,17 @@ const ViewReports = ({
           process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
-        }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/continuum/`
+        }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/continuum/`
       : null
   );
-  // const firebaseContinuumStatus = useFirebaseListener(
-  //   user ? `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${userId}/contu/status` : null
-  // );
+
   const [likes, setLikes] = useState(
     _folderLikes.map((like) => like.likeValue).reduce((a, b) => a + b, 0)
-  ); // const [hasLiked, setHasLiked] = useState(likes === 0 ? false : true);
-  // console.log("_folderLikes");
-  // console.log(_folderLikes);
-  // console.log("likes");
-  // console.log(likes);
+  );
+
   async function fetchUpdatedReports() {
     console.log("FETCH UPDATED REPORTS");
-    // Fetch the updated data from the database using the folderId
+
     let { data: updatedMissionsResponse, error: updatedError } = await supabase
       .from("reportFolders")
       .select(
@@ -327,43 +227,24 @@ const ViewReports = ({
     const updatedMissions = [];
     updatedMissionsResponse.forEach((mission) => {
       updatedMissions.push({ ...mission.reports });
-      // console.log("mission.folders");
-      // console.log(mission.folders);
-      // setFolderName(mission.folders.folderName);
-      // setFolderDescription(mission.folders.folderDescription);
-      // console.log("mission.folders.folderDescription");
-      // console.log(mission.folders.folderDescription);
-      // setFolderPicUrl(mission.folders.folderPicUrl);
     });
 
-    console.log("SET LOADED REPORTS");
-    console.log(updatedMissions);
     // Update the state with the newly fetched data
     setLoadedReports(updatedMissions);
     updateReports(updatedMissions); // this one sets links on initial load
   }
-  function goToAgentProfile({ agentId }) {
-    // console.log("goToAgentProfile");
-    // console.log(agentId);
 
-    Router.push({
-      pathname: "/agents/detail/draft-report",
-      query: { ...Router.query, agentId: agentId },
-    });
-  }
   useEffect(() => {
     if (firebaseDraftData) {
-      // console.log("firebaseDraftData");
-      // console.log(firebaseDraftData);
       if (firebaseDraftData.context) {
-        setDraft(firebaseDraftData.context.draft);
+        // setDraft(firebaseDraftData.context.draft);
       }
       if (firebaseDraftData.status == "complete") {
         if (hasStartedContinuum) {
           fetchUpdatedReports();
           setHasStartedContinuum(false);
           setIsStreaming(false);
-          // updateReports();
+
           setContinuumCompleted(true);
         }
       }
@@ -372,26 +253,17 @@ const ViewReports = ({
 
   useEffect(() => {
     if (firebaseFolderData) {
-      console.log("firebaseFolderData save data");
-      console.log(firebaseFolderData);
-
       if (
         firebaseFolderData.folderId &&
         firebaseFolderData.folderId == folderId &&
         firebaseFolderData.folderPicUrl
       ) {
-        console.log("FOUND PHOTO FOR FOLDER");
-        // fetchUpdatedReports();
         setFolderName(firebaseFolderData.folderName);
         setFolderDescription(firebaseFolderData.folderDescription);
         setFolderPicUrl(firebaseFolderData.folderPicUrl);
-        // if (firebaseFolderData.folderPicUrls) {
-        // setFolderPicUrls(firebaseFolderData.folderPicUrls);
-        // setCurrentfolderPicUrlIndex(folderPicUrls.length - 1);
-        // }
       }
     }
-  }, [firebaseFolderData, folderId]); // Added folderId as a dependency
+  }, [firebaseFolderData, folderId]);
 
   useEffect(() => {
     if (firebaseSaveData) {
@@ -405,70 +277,8 @@ const ViewReports = ({
         fetchUpdatedReports();
         updateReports();
       }
-      if (firebaseSaveData.agentId && !agentId) {
-        setLoadedAgentId(firebaseSaveData.agentId);
-      }
     }
-  }, [firebaseSaveData, folderId]); // Added folderId as a dependency
-
-  useEffect(() => {
-    // get agent from supabase by agentId
-    // set agent name
-    updateAgent(loadedAgentId);
-  }, [loadedAgentId]);
-  async function updateAgent(loadedAgentId) {
-    let { data: agents, error: agentsError } = await supabase
-      .from("agents")
-      .select("*")
-      .eq("agentId", loadedAgentId);
-
-    if (agentsError) {
-      console.log("agentError", agentError);
-      return;
-    }
-    console.log("agent");
-    console.log(agents);
-    if (agents && agents.length > 0) {
-      setAgent(agents[0]);
-    }
-  }
-
-  // useEffect(() => {
-  //   if (firebaseSaveData) {
-  //     console.log("firebase save data");
-  //     console.log(firebaseSaveData);
-  //     console.log(folderId);
-  //     if (firebaseSaveData.folderId) {
-  //       if (firebaseSaveData.folderId == folderId) {
-  //         if (firebaseSaveData.reportPicUrl) {
-  //           console.log("FOUND IMAGE!!");
-  //           setReportPicUrl(firebaseSaveData.reportPicUrl);
-  //           // updateReports();
-  //         }
-  //       }
-  //     }
-  //   }
-  // }, [firebaseSaveData]);
-
-  useEffect(() => {
-    console.log("Updated highlight.text", highlight);
-  }, [highlight]);
-
-  const router = useRouter;
-  function goToPage(name) {
-    console.log("go to page");
-    console.log(name);
-    router.push(name);
-  }
-
-  useEffect(() => {
-    // This conditional check ensures that updateReports is only called
-    // when all necessary conditions are met
-    // if (supabase && isStreaming && continuumCompleted) {
-    console.log("Continuum Completed. Calling updateReports");
-    updateReports(); // this one makes links happen for existing reports
-    // }
-  }, [supabase, isStreaming, continuumCompleted]); // The dependencies are narrowed down
+  }, [firebaseSaveData, folderId]);
 
   async function updateReports(newestReports) {
     console.log("UPDATE REPORTS");
@@ -483,76 +293,10 @@ const ViewReports = ({
       })
     );
 
-    // This checks if any report content has changed
-    // const isChanged = updatedReports.some(
-    //   (report, index) =>
-    //     report.reportContent !== loadedReports[index].reportContent
-    // );
-
-    // if (isChanged) {
     console.log("Setting Loaded Reports");
-    setLoadedReports(updatedReports); // Simply setting the whole updatedReports array
-    // }
+    setLoadedReports(updatedReports);
   }
-  // useEffect(() => {
-  //   updateReports();
-  // }, [supabase, isStreaming, continuumCompleted]);
-  // async function updateReports() {
-  //   console.log("UPDATE REPORTS");
-  //   if (!loadedReports) return;
-  //   const updatedReports = await Promise.all(
-  //     loadedReports.map(async (report) => {
-  //       const clonedReport = { ...report }; // Create a shallow copy
-  //       await getLinks(clonedReport); // Update the cloned report's content
-  //       return clonedReport; // Return the updated report
-  //     })
-  //   );
 
-  //   // Compare if there’s a change in the reports, then only update the state
-  //   const isChanged = updatedReports.some(
-  //     (report, index) =>
-  //       report.reportContent !== loadedReports[index].reportContent
-  //   );
-
-  //   if (isChanged) {
-  //     console.log("Setting Loaded Reports");
-  //     setLoadedReports((prevReports) => {
-  //       return updatedReports.map((report, index) => {
-  //         return report.reportContent !== prevReports[index].reportContent
-  //           ? report
-  //           : prevReports[index]; // Avoid updating the item if there's no change
-  //       });
-  //     });
-  //   }
-  //   // setIsStreaming(false);
-  // }
-  async function getLinksForContinuum(reportId) {
-    console.log("getLinksForContinuum");
-    let { data: links, error: linksError } = await supabase
-      .from("links")
-      .select("*")
-      .eq("parentReportId", reportId);
-
-    if (linksError) {
-      console.log("linksError", linksError);
-      return;
-    }
-
-    // if (links && links.length > 0) {
-    //   links.forEach((link) => {
-    //     let highlightedText = (() => {
-    //       try {
-    //         return JSON.parse(link.highlightedText);
-    //       } catch {
-    //         return link.highlightedText;
-    //       }
-    //     })();
-    //   });
-    // }
-    console.log("links");
-    console.log(links);
-    return links;
-  }
   async function getLinks(report) {
     let { data: links, error: linksError } = await supabase
       .from("links")
@@ -579,8 +323,6 @@ const ViewReports = ({
         })();
 
         if (element) {
-          // const newLink = `<a href="/missions/report/${link.childReportId}">${highlightedText}</a>`;
-
           const newLink = `<a href="#${link.childReportId}">${highlightedText}</a>`;
 
           const updatedHTML = element.innerHTML.replace(
@@ -592,7 +334,6 @@ const ViewReports = ({
       });
 
       report.reportContent = container.innerHTML; // Update the reportContent directly
-      console.log(report.reportContent);
     }
   }
 
@@ -615,8 +356,7 @@ const ViewReports = ({
         }
 
         const { childReports } = await response.json();
-        // console.log("childReports");
-        // console.log(childReports);
+
         return childReports;
       } catch (error) {
         console.error("Error:", error);
@@ -640,7 +380,7 @@ const ViewReports = ({
         console.log("parentReportId");
         const childReports = parentChildIdMap[parentReportId];
         console.log(parentReportId);
-        // if (!childReports) continue;
+
         if (!seenReportIds.includes(parentReportId)) {
           seenReportIds.push(parentReportId);
           if (!resultParentChildMap[parentReportId]) {
@@ -716,13 +456,11 @@ const ViewReports = ({
         {children &&
           children.map((item) => (
             <li style={{ marginBottom: "8px", marginTop: "8px" }} key={item.id}>
-              {!item.id && <LoadingDots style={{ marginTop: "20px" }} />}
+              {!item.id && <LibraryImage style={{ marginTop: "20px" }} />}
               {item.id && (
                 <a
                   className="linkFont"
                   style={{
-                    // fontWeight: 800,
-                    // color: "#E7007C",
                     fontWeight: "500",
                     textDecoration: "none",
                     cursor: "pointer",
@@ -748,99 +486,6 @@ const ViewReports = ({
     );
   };
 
-  // const NestedList = ({ children }) => {
-  //   // console.log("children");
-  //   // console.log(children);
-  //   return (
-  //     <ul>
-  //       {children &&
-  //         children.map((item) => (
-  //           <li key={item.id}>
-  //             Report ID: {item.id}
-  //             {item.children && <NestedList children={item.children} />}
-  //           </li>
-  //         ))}
-  //     </ul>
-  //   );
-  // };
-
-  //   return (
-  //     <li key={report.id}>
-  //       <a
-  //         href={`#${report.id}`}
-  //         className="no-underline"
-  //         style={{ fontWeight: "200", textDecoration: "none" }}
-  //       >
-  //         {report.title}
-  //       </a>
-  //       {report.children && report.children.length > 0 && (
-  //         <ol>{report.children.map((child) => renderNestedReports(child))}</ol>
-  //       )}
-  //     </li>
-  //   );
-  // };
-
-  // useEffect(() => {
-  //   async function fetchChildReports(parentReportId) {
-  //     try {
-  //       const response = await fetch("/api/reports/get-child-reports", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ parentReportId }),
-  //       });
-
-  //       if (response.ok) {
-  //         const { children } = await response.json();
-  //         return children;
-  //       }
-
-  //       console.error("Error fetching child reports");
-  //       return [];
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //       return [];
-  //     }
-  //   }
-
-  //   async function buildTableOfContents() {
-  //     const reportWithChildren = await Promise.all(
-  //       loadedReports.map(async (report) => {
-  //         const children = await fetchChildReports(report.reportId);
-  //         return {
-  //           ...report,
-  //           children: children.map((child) => ({ ...child, children: [] })), // Add a children property to each child report
-  //         };
-  //       })
-  //     );
-
-  //     setTableOfContents(reportWithChildren);
-  //   }
-
-  //   buildTableOfContents();
-  // }, [loadedReports]);
-  // const renderNestedReports = (report) => {
-  //   if (!report.title) return null; // Prevent rendering if there is no title
-
-  //   return (
-  //     <li key={report.id}>
-  //       <a
-  //         href={`#${report.id}`}
-  //         className="no-underline"
-  //         style={{ fontWeight: "200", textDecoration: "none" }}
-  //       >
-  //         {report.title}
-  //       </a>
-  //       {report.children && report.children.length > 0 ? (
-  //         <ol>{report.children.map((child) => renderNestedReports(child))}</ol>
-  //       ) : null}
-  //     </li>
-  //   );
-  // };
-  // console.log("process.env.NEXT_PUBLIC_serverUid");
-  // console.log(process.env.NEXT_PUBLIC_serverUid);
-  // const [likes, setLikes] = useState(0); // initial likes state, assuming it starts from 0
   const [hasLiked, setHasLiked] = useState(false);
   async function handleLike() {
     // Query the folderLikes table to check if the user has already liked or disliked the folder
@@ -982,10 +627,6 @@ const ViewReports = ({
           </BreadcrumbItem>
         </Breadcrumb>
         <div className="folder-section report-section">
-          {/* {folderPicUrl} */}
-          {/* ["http://res.cloudinary.com/dcf11wsow/image/upload/v1696728907/ft5rhqfvmq8mh4dszaut.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729485/tyohgp0u2yhppkudbs0k.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696729819/xxqdjwhogtlhhyzhxrdf.png","http://res.cloudinary.com/dcf11wsow/image/upload/v1696731503/n3pif850qts0vhaflssc.png"] */}
-          {/* {folderPicUrls} */}
-
           {folderPicUrl && (
             <div
               style={{
@@ -1002,80 +643,12 @@ const ViewReports = ({
                 alt={folderPicDescription}
                 title={folderPicDescription}
               >
-                <Image
-                  // className="report-image"
-                  src={`${getCloudinaryImageUrlForHeight(folderPicUrl, 700)}`}
-                  fill={true}
-                  style={
-                    {
-                      // objectFit: "contain",
-                      // width: "auto",
-                      // objectPosition: "top",
-                    }
-                  }
-                />
+                <Image src={`${folderPicUrl}`} fill={true} />
               </a>
-              {/* <div className="overlay"></div> */}
             </div>
-            // <div>
-            //   <div
-            //     style={{
-            //       height: "500px",
-            //     }}
-            //   >
-            //     <img src={`${folderPicUrl}`} />
-            //     {!folderPicUrl && (
-            //       <LoadingDots style={{ position: "absolute", top: "125px" }} />
-            //     )}
-            //   </div>
-            // </div>
           )}
-          {/* works */}
-          {/* {folderPicUrls && (
-          <div>
-            <div
-              style={{
-                height: "500px",
-              }}
-            >
-              <img src={`${folderPicUrl}`} />
-              {!folderPicUrl && (
-                <LoadingDots style={{ position: "absolute", top: "125px" }} />
-              )}
-            </div>
-          </div>
-        )} */}
-          {/* {JSON.stringify(folderPicUrls)} */}
-          {/* {!folderPicUrls && (
-            <div
-              style={{
-                height: "700px",
-              }}
-            >
-              {!folderPicUrl && (
-                <LoadingDots style={{ position: "absolute", top: "125px" }} />
-              )}
-              {folderPicUrl && (
-                <div className="content-container">
-                  <a
-                    href={folderPicUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="image-container">
-                      <img
-                        src={folderPicUrl}
-                        className="middle-image "
-                        alt="Folder"
-                      />
-                    </div>
-                  </a>
-                </div>
-              )}
-            </div>
-          )} */}
         </div>
-        {/* <div style={{ fontSize: "0.5em" }}>{folderPicDescription}</div> */}
+
         <div style={{ marginTop: "-30px", marginBottom: "20px" }}>
           <Row>
             <Col style={{ whiteSpace: "nowrap" }}>
@@ -1102,10 +675,8 @@ const ViewReports = ({
               </span>
 
               <span style={{ marginRight: "20px" }}>
-                {/* <i className="bi bi-send" /> */}
                 <IntelliCopyUrl />
               </span>
-              {/* flex divider to push the next span to the right */}
             </Col>
           </Row>
         </div>
@@ -1115,17 +686,10 @@ const ViewReports = ({
           style={{ marginTop: "30px", fontSize: "1em" }}
         >
           <Row>
-            <Col>
-              Table of Contents
-              {/* <span style={{ whiteSpace: "nowrap" }}>
-                &nbsp;[{loadedReports.length}{" "}
-                <i className="bi bi-body-text"></i>]
-              </span> */}
-            </Col>
+            <Col>Table of Contents</Col>
           </Row>
         </div>
-        {/* {JSON.stringify(parentChildIdMap)} */}
-        {!parentChildIdMap.id && <LoadingDots style={{ marginTop: "30px" }} />}
+        {!parentChildIdMap.id && <LibraryImage style={{ marginTop: "30px" }} />}
         {parentChildIdMap.id && (
           <ul className="linkFont" style={{ fontSize: "0.85em" }}>
             <li style={{ marginBottom: "8px" }} key={parentChildIdMap.id}>
@@ -1144,22 +708,13 @@ const ViewReports = ({
                   (report) => report.reportId === parentChildIdMap.id
                 )?.reportTitle || `Report ID: ${parentChildIdMap.id}`}
               </a>
-              <NestedList
-                // children={parentChildIdMap.children}
-                loadedReports={loadedReports}
-              >
+              <NestedList loadedReports={loadedReports}>
                 {parentChildIdMap.children}
               </NestedList>
             </li>
           </ul>
         )}
-        {/* <ul>
-        <li key={parentChildIdMap.id}>
-          {parentChildIdMap.id}
-          <NestedList children={parentChildIdMap.children} />
-        </li>
-      </ul> */}
-        {/* {Object.keys(parentChildIdMap)} */}
+
         {loadedReports &&
           loadedReports.map((cols, index) => {
             const report = loadedReports[index];
@@ -1180,10 +735,6 @@ const ViewReports = ({
                 .split(`</h2>`)[1]
             }`;
 
-            // console.log("reportTitle");
-            // console.log(reportTitle);
-            // console.log("__html");
-            // console.log(__html);
             return (
               <div key={index} id={reportId} className="report-section">
                 <div className="title-container">
@@ -1192,13 +743,12 @@ const ViewReports = ({
                   </div>
                   {index !== 0 && (
                     <a href="#top" className="top-button text-white">
-                      {/* 🔝 */}⇧
+                      ⇧
                     </a>
                   )}
                 </div>
                 <div style={{ height: "700px" }} className="image-container">
-                  {/* {report.reportPicDescription} */}
-                  {!report.reportPicUrl && <LoadingDots />}
+                  {!report.reportPicUrl && <LibraryImage />}
                   {report.reportPicUrl && (
                     <a
                       href={report.reportPicUrl}
@@ -1212,7 +762,6 @@ const ViewReports = ({
                         className="report-image"
                         style={{ borderRadius: "10px" }}
                       />
-                      {/* <div className="overlay" /> */}
                     </a>
                   )}
                 </div>
@@ -1243,74 +792,12 @@ const ViewReports = ({
                 </Row>
                 <div
                   id={`reportRoot${index}`}
-                  // onMouseUp={(e) => handleTextHighlight(e, report)}
                   className="report text-primary reportFont"
                   dangerouslySetInnerHTML={{ __html }}
                 />
-                {/* <div style={{ display: "flex" }}>
-                <div
-                  className="btn btn-primary"
-                  style={{ marginLeft: "auto", textAlign: "right" }}
-                  onClick={() => {
-                    handleContinuumClick(report);
-                  }}
-                >
-                  <i className="bi bi-link"></i> Continuum
-                </div>
-              </div> */}
               </div>
             );
           })}
-        {/* Draft */}
-        {/* Is streaming{JSON.stringify(isStreaming)} */}
-        {/* {JSON.stringify(loadedReports)} */}
-        {/* {isStreaming && (
-        <div id="draft">
-          <div className="reportTitle reportFont section-title">Draft</div>
-          <div
-            className="report text-primary reportFont"
-            dangerouslySetInnerHTML={{ __html: draft }}
-          ></div>
-        </div>
-      )} */}
-        {/* {JSON.stringify(agent)} */}
-        {agent && !isStreaming && (
-          <div
-            style={{ textAlign: "center" }}
-            // onClick={() => goToAgentProfile({ agentId: agent.agentId })}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                height: "237px",
-                objectFit: "cover",
-                textAlign: "center",
-              }}
-            >
-              <img
-                src={`${agent.profilePicUrl}`}
-                style={{ borderRadius: "50%" }} //cursor: "pointer"
-                alt="agent"
-              />
-            </div>
-            <div
-              style={{
-                marginTop: "16px",
-                // fontWeight: 800,
-                // color: "#E7007C",
-                // fontWeight: "200",
-                // textDecoration: "none",
-                // cursor: "pointer",
-              }}
-            >
-              Agent {agent.agentName}
-            </div>
-          </div>
-        )}
-        {/* {highlight.text && loadedAgentId != 0 && (
-        <IntelliFab onClick={handleFabClick} icon="+" fabType="report" />
-      )} */}
       </div>
     </>
   );

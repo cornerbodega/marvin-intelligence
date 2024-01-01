@@ -20,36 +20,36 @@ export default function IntelliNotificationsArea() {
   const [notificationString, setNotificationString] = useState(
     defaultLoadingMessage
   );
-  const [loadingDots, setLoadingDots] = useState("");
+  const [LibraryImage, setLibraryImage] = useState("");
   const [briefingInput, setBriefingInput] = useState("");
   // Firebase listeners - always called
   const firebaseContinuumStatus = useFirebaseListener(
-    `/${getEnv()}/${process.env.NEXT_PUBLIC_serverUid}/${
+    `/${getEnv()}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
       userId || "default"
     }/continuum/status`
   );
   const firebaseVisualizeAndSaveStatus = useFirebaseListener(
-    `/${getEnv()}/${process.env.NEXT_PUBLIC_serverUid}/${
+    `/${getEnv()}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
       userId || "default"
     }/finalizeAndVisualizeReport/status`
   );
   const firebaseContinuumBriefingInput = useFirebaseListener(
-    `/${getEnv()}/${process.env.NEXT_PUBLIC_serverUid}/${
+    `/${getEnv()}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
       userId || "default"
     }/continuum/context/briefingInput`
   );
   const firebaseVisualizeAndSaveBriefingInput = useFirebaseListener(
-    `/${getEnv()}/${process.env.NEXT_PUBLIC_serverUid}/${
+    `/${getEnv()}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
       userId || "default"
     }/continuum/context/briefingInput`
   );
   const firebaseVisualizeAndSaveSubtasks = useFirebaseListener(
-    `/${getEnv()}/${process.env.NEXT_PUBLIC_serverUid}/${
+    `/${getEnv()}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
       userId || "default"
     }/finalizeAndVisualizeReport/subtasks`
   );
   const firebaseContinuumSubtasks = useFirebaseListener(
-    `/${getEnv()}/${process.env.NEXT_PUBLIC_serverUid}/${
+    `/${getEnv()}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
       userId || "default"
     }/continuum/subtasks`
   );
@@ -147,7 +147,7 @@ export default function IntelliNotificationsArea() {
   // }, [notificationString]);
   // useEffect(() => {
   //   const dotInterval = setInterval(() => {
-  //     setLoadingDots((dots) => (dots.length < 3 ? dots + "." : ""));
+  //     setLibraryImage((dots) => (dots.length < 3 ? dots + "." : ""));
   //   }, 500); // Adjust timing as needed
 
   //   return () => clearInterval(dotInterval);

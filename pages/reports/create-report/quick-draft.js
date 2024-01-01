@@ -1,7 +1,7 @@
 // @author Marvin-Rhone
 // quick-draft.js is the page where the user can create a mission for an
 // agent to complete.
-// import { saveToFirebase } from "../../../utils/saveToFirebase";
+
 import saveTask from "../../../utils/saveTask";
 import {
   Card,
@@ -14,14 +14,12 @@ import {
   Breadcrumb,
   BreadcrumbItem,
 } from "reactstrap";
-import toast, { Toaster } from "react-hot-toast";
 
 import { useUser } from "@auth0/nextjs-auth0/client";
 
-import Image from "next/image";
 import { useRouter } from "next/router";
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
 
@@ -35,13 +33,6 @@ const CreateMission = ({}) => {
   const [feedbackInput, setFeedbackInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
-
-  console.log("router.query.briefingInput");
-  console.log(router.query.briefingInput);
-  console.log("router.query");
-  console.log(router.query);
-  console.log("router.query.userId");
-  console.log(router.query.userId);
 
   if (!router.query.briefingInput || router.query.briefingInput.length == 0) {
     console.log("no briefing input. ");
@@ -69,18 +60,16 @@ const CreateMission = ({}) => {
           process.env.NEXT_PUBLIC_env === "production"
             ? "asyncTasks"
             : "localAsyncTasks"
-        }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/quickDraft/context/`
+        }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/quickDraft/context/`
       : null
   );
-  console.log("firebaseDraftData");
-  console.log(firebaseDraftData);
-  console.log("path");
+
   console.log(
     `/${
       process.env.NEXT_PUBLIC_env === "production"
         ? "asyncTasks"
         : "localAsyncTasks"
-    }/${process.env.NEXT_PUBLIC_serverUid}/${userId}/quickDraft/context/`
+    }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/quickDraft/context/`
   );
   const firebaseSaveData = useFirebaseListener(
     userId
@@ -89,13 +78,15 @@ const CreateMission = ({}) => {
             ? "asyncTasks"
             : "localAsyncTasks"
         }/${
-          process.env.NEXT_PUBLIC_serverUid
+          process.env.NEXT_PUBLIC_SERVER_UID
         }/${userId}/finalizeAndVisualizeReport/context/`
       : null
   );
 
   useEffect(() => {
     if (firebaseDraftData) {
+      console.log("firebaseDraftData");
+      console.log(firebaseDraftData);
       setDraft(firebaseDraftData.draft);
       setExpertiseOutput(firebaseDraftData.expertiseOutput);
     }
@@ -127,7 +118,6 @@ const CreateMission = ({}) => {
     };
     if (expertiseOutput) {
       draftData.expertiseOutput = expertiseOutput;
-      // specializedTraining,
     }
 
     const newTask = {
@@ -148,8 +138,6 @@ const CreateMission = ({}) => {
   const [feedbacks, setFeedbacks] = useState([]);
   async function handleQuickDraftClick() {
     console.log("handleQuickDraft userId");
-    // return console.log(userId);
-
     const draftData = { briefingInput: router.query.briefingInput };
     console.log("feedbackInput");
     console.log(feedbackInput);
@@ -182,7 +170,6 @@ const CreateMission = ({}) => {
 
   return (
     <div>
-      <Toaster position="bottom-center" />
       <Breadcrumb
         style={{ fontWeight: "200", fontFamily: "monospace" }}
         className="text-white"
@@ -223,23 +210,6 @@ const CreateMission = ({}) => {
               </CardBody>
             </Card>
           )}
-          {/* {previousDrafts &&
-            previousDrafts.map((previousDraft, i) => (
-              <Card
-                key={i}
-                style={{ backgroundColor: "#131313", color: "white" }}
-              >
-                <CardBody
-                  style={{ backgroundColor: "#131313", color: "white" }}
-                >
-                  <i className="bi bi-body-text"> Previous Draft </i>
-                  <div
-                    className="text-white"
-                    dangerouslySetInnerHTML={{ __html: previousDraft }}
-                  />
-                </CardBody>
-              </Card>
-            ))} */}
 
           {(draft && isSubmitting) ||
             hasSubmitted ||
@@ -265,8 +235,6 @@ const CreateMission = ({}) => {
                     />
                     <div
                       style={{
-                        // display: "flex",
-                        // flexDirection: "flex-end",
                         textAlign: "right",
                         paddingTop: "8px",
                       }}
@@ -275,7 +243,6 @@ const CreateMission = ({}) => {
                         color="primary"
                         style={{
                           border: "1px solid yellow",
-                          // marginRight: "16px",
                         }}
                         disabled={
                           !draft.endsWith(" ".repeat(3)) || !feedbackInput
@@ -316,7 +283,3 @@ const CreateMission = ({}) => {
 };
 
 export default CreateMission;
-
-// Dispatch Notifications
-// Describe the 5 steps needed to create a research report draft on the following topic. The 5th step should be writing draft report. The first step should be analyzing research objective: How can deep learning techniques be used to enhance idea generation processes and optimize monetization strategies in computer science? Return your answer as a JSON array of strings. Do not explain your answer. Use present tense -ing language. Maximum 5 words per step.
-// What are 5 humorous status updates for Agent Haida Gwaii Black Bear, an expert in Totem Poles, doing a mission with the following briefing: What are the effects of different blending and layering techniques with oil pastels on depth perception and emotional response in abstract artwork?

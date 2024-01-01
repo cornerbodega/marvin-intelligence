@@ -1,11 +1,7 @@
 import { Configuration, OpenAIApi } from "openai";
 
 export default async function handler(req, res) {
-  console.log("generate-loading-notifications called");
-  console.log("req.body");
-  console.log(req.body);
   const { briefingInput, number } = req.body;
-  // Load your OpenAI API key from environment variables for security
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
@@ -22,7 +18,6 @@ export default async function handler(req, res) {
 
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
-      // response_format: { type: "json_object" },
       messages: [
         {
           role: "system",
@@ -38,7 +33,6 @@ export default async function handler(req, res) {
 
     const loadingNotifications =
       response.data.choices[0].message.content.trim();
-    console.log("Generated loading notifications", loadingNotifications);
     res.status(200).json({ loadingNotifications });
   } catch (error) {
     console.error("Error in generateFunnyAgencyName:", error);

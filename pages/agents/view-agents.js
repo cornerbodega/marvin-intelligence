@@ -1,34 +1,14 @@
-import {
-  Card,
-  CardImg,
-  CardText,
-  CardBody,
-  CardTitle,
-  CardSubtitle,
-  CardGroup,
-  Button,
-  Row,
-  Breadcrumb,
-  BreadcrumbItem,
-  Col,
-  Toast,
-} from "reactstrap";
+import { Row, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import Link from "next/link";
 import useRouter from "next/router";
-import { useEffect, useRef, useState, useContext } from "react";
+import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
-// other imports
 import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 import IntelliCardGroup from "../../components/IntelliCardGroup";
-import IntelliCardGroupRow from "../../components/IntelliCardGroupRow";
+
 import { getSupabase } from "../../utils/supabase";
 const supabase = getSupabase();
-import RevealAnimations from "../../components/RevealAnimations";
-import IntelliFab from "../../components/IntelliFab";
-// rest of component
-import IntelliProvider from "../../components/IntelliProvider/IntelliProvider";
-import IntelliContext from "../../components/intelliContext/IntelliContext";
-import { useUser } from "@auth0/nextjs-auth0/client";
+
 import { slugify } from "../../utils/slugify";
 import Head from "next/head";
 const PAGE_COUNT = 6;
@@ -80,7 +60,6 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
   const [offset, setOffset] = useState(1);
   const [isInView, setIsInView] = useState(false);
   const [loadedAgents, setLoadedAgents] = useState(agents);
-  // const agentNames = agents.map((agent) => agent.agentName);
   const [parentReportTitle, setParentReportTitle] = useState("");
   const [parentReportId, setParentReportId] = useState("");
   const [parentReportSlug, setParentReportSlug] = useState("");
@@ -122,14 +101,7 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
       setIsInView((prev) => bottom <= innerHeight);
     }
   };
-  const handleFabClick = () => {
-    console.log("ViewAgents HandleClick Clicked!");
-    // goToPage("/missions/add-agent");sss
-    router.push({
-      pathname: "/agents/add-agent",
-      query: router.query,
-    });
-  };
+
   async function loadPagedResults() {
     console.log("Loading paged results");
 
@@ -180,30 +152,12 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
     }
   }
   const handleCardClick = (agent) => {
-    // console.log("handleCardClick");
-    // const agentName = event.target.dataset.datums.agentName;
-    const agentName = agent.agentName;
-    const agentId = agent.agentId;
-    console.log("ViewAgents HandleCardClick Clicked!");
-    // setSelectedAgent(agent);
-    // goToPage(`/missions/create-mission/agents/detail/${agentName}/${agentId}`);
-    // let createMissionPath = `agentId=${agent.agentId}&${router.query.}`;
     router.push({
       pathname: "/agents/detail/draft-report",
       query: { ...router.query, agentId: agent.agentId },
     });
-    // const parentReportId = router.query.parentReportId;
-
-    // console.log("parentReportId");
-    // console.log(parentReportId);
-    // if (parentReportId) {
-    //   createMissionPath += `&parentReportId=${router.query.parentReportId}`;
-    // }
-    // goToPage(createMissionPath);
   };
   function goToPage(name) {
-    console.log("go to page");
-    console.log(name);
     router.push(name);
   }
   useEffect(() => {
@@ -218,28 +172,20 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
           .select("*")
           .range(from, to)
           .order("createdAt", { ascending: false });
-        console.log("load more agents data");
 
-        console.log(data);
         return data;
       };
 
       if (isInView) {
-        console.log(`LOAD MORE AGENTS ${offset}`);
         loadMoreAgents().then((moreAgents) => {
-          console.log("moreAgents");
-          console.log(moreAgents);
           setLoadedAgents([...loadedAgents, ...moreAgents]);
           if (moreAgents.length < PAGE_COUNT) {
             setIsLast(true);
           }
-          // setLoadedAgents((prev) => [...prev, ...moreAgents]);
         });
       }
     }
   }, [isInView, isLast]);
-
-  // }
 
   return (
     <>
@@ -261,7 +207,6 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
           <i className={`bi bi-person-badge`}></i>
           &nbsp;
           <div
-            // href="/agents/view-agents"
             style={{
               fontWeight: "200",
               textDecoration: "none",
@@ -282,23 +227,8 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
             </Link>
           </BreadcrumbItem>
         )}
-
-        {/* <BreadcrumbItem className="text-white">
-          <i className={`bi-folder`}></i>+ Create Report
-        </BreadcrumbItem> */}
-        {/* <BreadcrumbItem className="text-white" active>
-          <i className={`bi bi-person-badge`}></i>
-          &nbsp;
-          
-          Select Agent
-          
-        </BreadcrumbItem> */}
       </Breadcrumb>
-      {/* <div style={{ marginBottom: "32px", textAlign: "right" }}>
-        <Button style={{ border: "1px solid white" }} onClick={handleFabClick}>
-          <i className="bi bi-person-badge"></i>+ Add Agent
-        </Button>
-      </div> */}
+
       <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
         <input
           type="text"
@@ -307,9 +237,6 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
             borderWidth: "0px",
             backgroundColor: "#444",
             color: "white",
-            // marginLeft: "12px",
-            // width: "auto", // Make the width auto to fit the content
-            // maxWidth: "100%", // Control the maximum width for larger screens
             height: "2em",
             flexGrow: 1, // Let it grow to take the available space
             textIndent: "10px",
@@ -319,7 +246,6 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
-      {/* <div>{JSON.stringify(loadedAgents)}</div> */}
       <div ref={containerRef}>
         <Row className="text-primary">
           <IntelliCardGroup
@@ -328,9 +254,6 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
             datums={loadedAgents}
             datumsType={"agents"}
           ></IntelliCardGroup>
-          {/* <IntelliFab onClick={handleFabClick} icon="+" fabType="agent" /> */}
-
-          {/* </Col> */}
         </Row>
       </div>
     </>

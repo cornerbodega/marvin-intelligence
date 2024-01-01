@@ -1,13 +1,12 @@
 import { Button, Row, Breadcrumb, BreadcrumbItem, Col } from "reactstrap";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import _, { debounce, set } from "lodash";
-// other imports
+import { debounce } from "lodash";
+
 import { v4 as uuidv4 } from "uuid"; // UUID library
 
 import { getSession } from "@auth0/nextjs-auth0";
-// import IntelliCardGroup from "../../../components/IntelliCardGroup";
-// import IntelliCardGroup from "../../../components/IntelliCardGroup";
+
 import { getSupabase } from "../../../utils/supabase";
 
 // rest of component
@@ -16,15 +15,12 @@ import IntelliCardGroup from "../../../components/IntelliCardGroup";
 import Link from "next/link";
 
 import Head from "next/head";
-// import useUserId from "../../../hooks/useUserId";
 import { saveToSupabase } from "../../../utils/saveToSupabase";
-import { useUser } from "@auth0/nextjs-auth0/client";
 const PAGE_COUNT = 6;
 const supabase = getSupabase();
 
 export async function getServerSideProps(context) {
   const session = await getSession(context.req, context.res);
-  // const user = ;
   const userId = session?.user.sub;
   if (userId) {
     let { data: agency, agencyError } = await supabase
@@ -34,8 +30,7 @@ export async function getServerSideProps(context) {
     if (agencyError) {
       console.log("agencyError");
     }
-    console.log("agency");
-    console.log(agency);
+
     if (!agency || agency.length === 0) {
       return {
         redirect: {
@@ -52,13 +47,9 @@ export async function getServerSideProps(context) {
       .eq("userId", userId)
       .filter("folderName", "neq", null)
       .filter("folderPicUrl", "neq", null)
-      // .filter("availability", "neq", "DELETED")
       .or(`availability.neq.DELETED,availability.is.null`)
       .limit(PAGE_COUNT)
       .order("folderId", { ascending: false });
-
-    console.log("folders");
-    console.log(folders);
 
     // Extract folderIds from the obtained folders data
     const folderIds = folders.map((folder) => folder.folderId);
@@ -74,8 +65,6 @@ export async function getServerSideProps(context) {
 
       if (!folderLikesError) {
         folderLikes = data;
-        // console.log("folderLikes");
-        // console.log(folderLikes);
       } else {
         console.error("Error fetching folder likes:", folderLikesError);
       }
@@ -101,39 +90,14 @@ export async function getServerSideProps(context) {
       .select(`folderId, reportFolders(count)`)
       .in("folderId", folderIds);
 
-    console.log("reportCountsData");
-    console.log(reportCountsData);
-    // console.log("reportCountsData[0].reportFolders[0]");
-    // console.log(reportCountsData[0].reportFolders[0]);
-
     if (reportCountsError) {
       console.error("Error fetching report counts:", reportCountsError);
     }
 
     const _reportCountsByFolderId = reportCountsData.reduce((acc, item) => {
-      // remove folder.status == "DELETED"
       acc[item.folderId] = item.reportFolders[0].count || null;
       return acc;
     }, {});
-
-    // My Tokens
-    let { data: tokensResponse, error: tokensError } = await supabase
-      .from("tokens")
-      .select("tokens")
-      .eq("userId", userId);
-    if (tokensError) {
-      console.log("tokensError");
-    }
-    console.log("tokensResponse");
-    console.log(tokensResponse);
-    let tokensRemaining = 0;
-    if (tokensResponse) {
-      if (tokensResponse[0]) {
-        tokensRemaining = tokensResponse[0].tokens;
-      }
-    }
-    console.log("tokensRemaining");
-    console.log(tokensRemaining);
 
     return {
       props: {
@@ -142,7 +106,6 @@ export async function getServerSideProps(context) {
         _agencyName: agency[0].agencyName,
         _folderLikesByFolderId,
         _reportCountsByFolderId,
-        tokensRemaining,
       },
     };
   } else {
@@ -153,7 +116,6 @@ export async function getServerSideProps(context) {
         _agencyName: null,
         _folderLikesByFolderId: null,
         _reportCountsByFolderId: null,
-        tokensRemaining: 25,
       },
     };
   }
@@ -164,7 +126,6 @@ const ViewReports = ({
   _agencyName,
   _folderLikesByFolderId,
   _reportCountsByFolderId,
-  tokensRemaining,
 }) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
@@ -174,11 +135,9 @@ const ViewReports = ({
   const [briefingInput, setBriefingInput] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [userId, setUserId] = useState(_userId);
-  // const userId = useUserId(_userId);
   const [agencyName, setAgencyName] = useState(_agencyName);
   console.log("loadedReports");
   console.log(loadedReports);
-  // function handleSelectedLength() {}
   async function loadPagedResults() {
     console.log("Loading paged results");
 
@@ -220,8 +179,6 @@ const ViewReports = ({
         return;
       }
 
-      console.log("filteredReports");
-      console.log(filteredReports);
       setLoadedReports(filteredReports);
     } catch (error) {
       console.error("An unexpected error occurred:", error);
@@ -239,26 +196,19 @@ const ViewReports = ({
   }, []);
 
   async function fetchOrCreateUserId(authUserId) {
-    console.log("fetchOrCreateUserId");
     let guestUserId = authUserId || localStorage.getItem("guestUserId");
     let guestAgencyName = agencyName || localStorage.getItem("guestAgencyName");
-    console.log("guestUserId");
-    console.log(guestUserId);
+
     // set;
     if (!guestAgencyName) {
       const agencyName = await fetchFunnyAgencyName(guestUserId);
       localStorage.setItem("guestAgencyName", agencyName);
       guestAgencyName = agencyName;
-
-      console.log("funny guest agencyName");
-      console.log(agencyName);
     }
     setAgencyName(guestAgencyName);
     if (!guestUserId) {
       guestUserId = uuidv4();
       localStorage.setItem("guestUserId", guestUserId);
-      // console.log(savedUser);
-      // return guestUserId;
     }
     setUserId(guestUserId);
 
@@ -273,8 +223,6 @@ const ViewReports = ({
       const response = await fetch("/api/agency/generate-guest-agency-name");
       if (response.ok) {
         const { agencyName } = await response.json();
-        console.log("fetchFunnyAgencyName agencyName");
-        console.log(agencyName);
         setAgencyName(`Guest ${agencyName}`);
         return agencyName;
       }
@@ -282,26 +230,9 @@ const ViewReports = ({
       console.error("Error fetching funny agency name:", error);
     }
   };
-  // const { user } = useUser();
-
-  // // const [userId, setUserId] = useState("");
-  // useEffect(() => {
-  //   const guestUserId = localStorage.getItem("guestUserId");
-  //   if (!userId) {
-  //     const newGuestUserId = guestUserId || uuidv4();
-  //     localStorage.setItem("guestUserId", newGuestUserId);
-  //     setUserId(newGuestUserId);
-  //   } else {
-  //     setUserId(user?.sub || guestUserId);
-  //   }
-  // }, [user, userId]);
 
   const [didClickQuickDraft, setDidClickQuickDraft] = useState(false);
   async function handleQuickDraftClick() {
-    console.log("view-folders handleQuickDraft userId");
-    console.log(userId);
-    // setDidClickQuickDraft(true);
-
     if (didClickQuickDraft) {
       return;
     }
@@ -331,10 +262,6 @@ const ViewReports = ({
       createdAt: new Date().toISOString(),
     };
 
-    // const newTaskRef = await saveToFirebase(
-    //   `/${process.env.NEXT_PUBLIC_env === "production" ? "asyncTasks" : "localAsyncTasks"}/${process.env.NEXT_PUBLIC_serverUid}/${user.sub}/writeDraftReport`,
-    //   newTask
-    // );
     try {
       const response = await fetch("/api/tasks/save-task", {
         method: "POST", // Specify the request method
@@ -345,11 +272,6 @@ const ViewReports = ({
       });
 
       if (response.ok) {
-        console.log("Task saved successfully");
-        // Process the response if needed
-        const data = await response.json();
-        console.log(data);
-        // goToPage("/reports/create-report/quick-draft");
         router.push({
           pathname: "/reports/create-report/quick-draft",
           query: { ...router.query, briefingInput, userId },
@@ -360,19 +282,8 @@ const ViewReports = ({
     } catch (error) {
       console.error("An error occurred while saving the task:", error);
     }
-    // }
-    // Go to quick draft page
-    // immediately start writing the report
-    // let the user provide feedback
-    // let the user save the report
-    // the user will go to the folder detail page
-    // the report will be there
-    // the agent, folder, reportFolder, and report will be saved to supabase with no art
-    // the agent will be created
-    // the images for the folder and report and agent will load dynamically
-    // at the bottom of the report is a continuum button
   }
-  // const reportNames = missions.map((report) => report.reportName);
+
   useEffect(() => {
     const handleDebouncedScroll = debounce(
       () => !isLast && handleScroll(),
@@ -383,11 +294,6 @@ const ViewReports = ({
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  // useEffect(() => {
-  //   if (!missions || missions.length === 0) {
-  //     goToPage("/reports/folders/view-folders");
-  //   }
-  // });
 
   const handleScroll = (container) => {
     if (containerRef.current && typeof window !== "undefined") {
@@ -397,35 +303,22 @@ const ViewReports = ({
       setIsInView((prev) => bottom <= innerHeight);
     }
   };
-  // const handleFabClick = () => {
-  //   console.log("ViewReports HandleClick Clicked!");
-  //   goToPage("/missions/create-mission/briefing");
-  // };
   const router = useRouter();
 
   const handleCardClick = (folder) => {
     console.log(folder);
-    // console.log("handleCardClick");
-    // const reportName = event.target.dataset.datums.reportName;
     const folderName = folder.folderName;
     const folderId = folder.folderId;
 
     console.log("ViewReports HandleCardClick Clicked!");
-    // setSelectedReport(report);
+
     const folderSlug = slugify(`${folderId}-${folderName}`);
 
     router.push({
       pathname: `/reports/folders/intel-report/${folderSlug}`,
       query: { userId },
     });
-
-    // goToPage(`/reports/folders/intel-report/${folderSlug}`);
   };
-  // function goToPage(name) {
-  //   console.log("go to page");
-  //   console.log(name);
-  //   router.push(name);
-  // }
 
   const [folderLikesByFolderId, setFolderLikesByFolderId] = useState(
     _folderLikesByFolderId
@@ -491,7 +384,6 @@ const ViewReports = ({
           {}
         );
 
-        // Update the reportCountsByFolderId state
         setReportCountsByFolderId((prev) => ({
           ...prev,
           ...newReportCountsByFolderId,
@@ -548,11 +440,6 @@ const ViewReports = ({
         window.getComputedStyle(textareaRef.current).lineHeight
       );
 
-      // Adjust for padding and ensure the cursor stays within bounds
-      // const totalWidth = Math.min(
-      //   textWidth + paddingLeft,
-      //   textareaRef.current.offsetWidth - paddingRight - 1
-      // );
       const textareaContentWidth =
         textareaRef.current.offsetWidth - paddingLeft - paddingRight;
 
@@ -586,30 +473,12 @@ const ViewReports = ({
         );
         textareaRef.current.parentElement.classList.remove("no-background");
       } else {
-        // textareaRef.current.parentElement.style.removeProperty("top");
-        // console.log("lines");
-        // console.log(lines);
-        // textareaRef.current.parentElement.style.setProperty(
-        //   "--cursor-pos-y",
-        //   `${cursorTop + 15}px`
-        // );
-        // if (lines > 2) {
-        //   textareaRef.current.parentElement.style.removeProperty(
-        //     "--cursor-pos-y"
-        //   );
         textareaRef.current.parentElement.style.setProperty(
           "caret-color",
           "limegreen"
         );
         textareaRef.current.parentElement.classList.add("no-background");
       }
-      // } else {
-      // textareaRef.current.parentElement.style.setProperty(
-      //   "--cursor-pos-y",
-      //   `${cursorTop + 42}px`
-      // );
-      // }
-      // }
     }
   }, [briefingInput, textareaRef]);
 
@@ -644,14 +513,13 @@ const ViewReports = ({
           <i className="bi bi-briefcase" />
           &nbsp;
           <Link
+            href="/agency/rename-agency"
             style={{ color: "white", textDecoration: "none" }}
-            href="/account/tokens/get-tokens"
           >
             {agencyName}
           </Link>
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white" active>
-          {/* <i className={`bi bi-body-text`}></i> */}
           Create Report
         </BreadcrumbItem>
       </Breadcrumb>
@@ -678,13 +546,12 @@ const ViewReports = ({
               borderRadius: "8px",
               border: "1px solid white",
               backgroundColor: "#000",
-              "--cursor-pos": "0px", // Initial value
+              "--cursor-pos": "0px",
             }}
           />
         </div>
         <Row>
           <Col>
-            {/* <div style={{ display: "flex", justifyContent: "flex-start" }}> */}
             <div>
               <div style={{ marginBottom: "10px" }}>
                 <Button
@@ -699,42 +566,15 @@ const ViewReports = ({
                     cursor: "pointer",
                     width: "108",
                   }}
-                  disabled={
-                    briefingInput.length === 0 ||
-                    didClickQuickDraft ||
-                    tokensRemaining < 1
-                  }
+                  disabled={briefingInput.length === 0 || didClickQuickDraft}
                   className="btn btn-primary "
                 >
-                  <i className="bi bi-body-text"></i> Quick Draft
+                  <i className="bi bi-body-text"></i> Create Report
                 </Button>
               </div>
-              <div style={{ marginBottom: "100px" }}>
-                {/* <IntelliReportLengthDropdown
-                  handleSelectedLength={handleSelectedLength}
-                /> */}
-              </div>
-              {/* <div
-                onClick={() => goToPage("/account/tokens/get-tokens")}
-                style={{
-                  marginBottom: "32px",
-                  marginTop: "22px",
-                  fontSize: "0.75em",
-                  color: "lightblue",
-                  cursor: "pointer",
-                  width: "200px",
-                }}
-              >
-                My Tokens: {tokensRemaining} <i className="bi bi-coin" />
-              </div> */}
             </div>
-            {/* <div style={{}}>
-            
-            </div> */}
           </Col>
         </Row>
-
-        {/* <div>Super</div> */}
       </div>
       {loadedReports.length > 0 && (
         <>
@@ -747,9 +587,6 @@ const ViewReports = ({
                 backgroundColor: "#000",
                 color: "white",
                 border: "1px solid grey",
-                // marginLeft: "12px",
-                // width: "auto", // Make the width auto to fit the content
-                // maxWidth: "100%", // Control the maximum width for larger screens
                 height: "2em",
                 flexGrow: 1, // Let it grow to take the available space
                 textIndent: "10px",
@@ -759,7 +596,6 @@ const ViewReports = ({
               onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
-          {/* <div>{JSON.stringify(_folderLikesByFolderId)}</div> */}
           <div ref={containerRef}>
             <Row className="text-primary">
               <IntelliCardGroup
