@@ -1285,7 +1285,7 @@ const ViewReports = ({
                 display: "flex",
                 justifyContent: "center",
 
-                width: "auto",
+                // width: "auto",
                 objectFit: "cover",
                 marginBottom: "16px",
                 width: "200px",
@@ -1294,7 +1294,11 @@ const ViewReports = ({
             >
               <img
                 src={agent.profilePicUrl}
-                style={{ borderRadius: "20%", cursor: "pointer" }}
+                style={{
+                  borderRadius: "20%",
+                  width: "200px",
+                  cursor: "pointer",
+                }}
                 alt="agent"
               />
             </div>
