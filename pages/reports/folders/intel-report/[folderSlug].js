@@ -1285,10 +1285,10 @@ const ViewReports = ({
                 display: "flex",
                 justifyContent: "center",
 
-                // width: "auto",
+                width: "auto",
                 objectFit: "cover",
                 marginBottom: "16px",
-                width: "200px",
+                // width: "200px",
                 textAlign: "center",
               }}
             >
