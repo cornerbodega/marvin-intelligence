@@ -139,12 +139,15 @@ const ViewReports = ({
   console.log("loadedReports");
   console.log(loadedReports);
   async function loadPagedResults() {
-    console.log("Loading paged results");
-
+    let generalUserId = userId;
+    if (!generalUserId) {
+      generalUserId = await fetchOrCreateUserId();
+    }
+    console.log(`Loading paged results ${generalUserId}`);
     const { data, error } = await supabase
       .from("folders")
       .select("*")
-      .eq("userId", userId)
+      .eq("userId", generalUserId)
       .filter("folderName", "neq", null)
       .filter("folderPicUrl", "neq", null)
       .limit(PAGE_COUNT)
@@ -191,6 +194,7 @@ const ViewReports = ({
 
     if (userId && loadedReports.length === 0 && !triedToLoadReports) {
       loadPagedResults();
+      console.log("tried to loadPagedResults");
     }
     setTriedToLoadReports(true);
   }, []);
