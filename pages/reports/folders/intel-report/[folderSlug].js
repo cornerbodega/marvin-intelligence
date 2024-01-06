@@ -316,12 +316,12 @@ const ViewReports = ({
   useEffect(() => {
     if (firebaseDraftData) {
       if (firebaseDraftData.status == "complete") {
-        if (hasStartedContinuum) {
-          fetchUpdatedReports();
-          setHasStartedContinuum(false);
-          setIsStreaming(false);
-          setContinuumCompleted(true);
-        }
+        // if (hasStartedContinuum) {
+        fetchUpdatedReports();
+        setHasStartedContinuum(false);
+        setIsStreaming(false);
+        setContinuumCompleted(true);
+        // }
       }
     }
   }, [firebaseDraftData]);
