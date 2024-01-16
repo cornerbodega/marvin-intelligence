@@ -1,7 +1,7 @@
 import { Button, Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-
+import getEnv from "../../../../utils/getEnv";
 import { getSession } from "@auth0/nextjs-auth0";
 
 import { getSupabase } from "../../../../utils/supabase";
@@ -224,6 +224,28 @@ const ViewReports = ({
   const [continuumCompleted, setContinuumCompleted] = useState(false);
   const [hasStartedContinuum, setHasStartedContinuum] = useState(false);
   const [loadedAgentId, setLoadedAgentId] = useState(agentId);
+  const firebaseContinuumStatus = useFirebaseListener(
+    `/${getEnv()}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
+      userId || "default"
+    }/continuum/status`
+  );
+  const firebaseVisualizeAndSaveStatus = useFirebaseListener(
+    `/${getEnv()}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
+      userId || "default"
+    }/finalizeAndVisualizeReport/status`
+  );
+  useEffect(() => {
+    console.log("firebaseVisualizeAndSaveStatus");
+    console.log(firebaseVisualizeAndSaveStatus);
+    if (
+      userId &&
+      (firebaseVisualizeAndSaveStatus === "complete" ||
+        firebaseContinuumStatus === "complete")
+    ) {
+      console.log("Continuum Completed. Calling updateReports");
+      fetchUpdatedReports(); // this one makes links happen for existing reports
+    }
+  }, [userId, firebaseVisualizeAndSaveStatus, firebaseContinuumStatus]);
 
   const firebaseSaveData = useFirebaseListener(
     user
@@ -238,18 +260,16 @@ const ViewReports = ({
   );
 
   const [agent, setAgent] = useState({});
+  const folderPath = `/${
+    process.env.NEXT_PUBLIC_env === "production"
+      ? "asyncTasks"
+      : "localAsyncTasks"
+  }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/regenerateFolder/context/`;
+  // console.log("folderPath");
+  // console.log(folderPath);
 
-  const firebaseFolderData = useFirebaseListener(
-    user
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${
-          process.env.NEXT_PUBLIC_SERVER_UID
-        }/${userId}/regenerateFolder/context`
-      : null
-  );
+  const firebaseFolderData = useFirebaseListener(user ? folderPath : null);
+
   const firebaseDraftData = useFirebaseListener(
     user
       ? `/${
@@ -268,7 +288,7 @@ const ViewReports = ({
       .select(
         `
           folders (folderName, folderDescription, folderPicUrl),
-          reports (reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, availability, createdAt)
+          reports (reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, availability, createdAt, agentId)
       `
       )
       .eq("folderId", folderId);
@@ -305,6 +325,13 @@ const ViewReports = ({
     // Update the state with the newly fetched data
     setLoadedReports(updatedMissions);
     updateReports(updatedMissions); // this one sets links on initial load
+    // if (updatedMissionsResponse[0].folders.folderPicUrl) {
+    //   setFolderPicUrl(updatedMissionsResponse[0].folders.folderPicUrl);
+    //   setFolderDescription(
+    //     updatedMissionsResponse[0].folders.folderDescription
+    //   );
+    //   setFolderName(updatedMissionsResponse[0].folders.folderName);
+    // }
   }
   function goToAgentProfile({ agentId }) {
     Router.push({
@@ -333,8 +360,8 @@ const ViewReports = ({
 
       if (
         firebaseFolderData.folderId &&
-        firebaseFolderData.folderId == folderId &&
-        firebaseFolderData.folderPicUrl
+        firebaseFolderData.folderPicUrl &&
+        folderPicUrl.length == 0
       ) {
         console.log("FOUND PHOTO FOR FOLDER");
         setFolderName(firebaseFolderData.folderName);
@@ -345,6 +372,8 @@ const ViewReports = ({
   }, [firebaseFolderData, folderId]); // Added folderId as a dependency
 
   useEffect(() => {
+    console.log("2firebaseSaveData");
+    console.log(firebaseSaveData);
     if (firebaseSaveData) {
       console.log("firebase save data");
 
@@ -364,6 +393,7 @@ const ViewReports = ({
   useEffect(() => {
     // get agent from supabase by agentId
     // set agent name
+
     updateAgent(loadedAgentId);
   }, [loadedAgentId]);
   async function updateAgent(loadedAgentId) {
@@ -508,6 +538,7 @@ const ViewReports = ({
 
     console.log("Setting Loaded Reports");
     setLoadedReports(updatedReports); // Simply setting the whole updatedReports array
+    // update folder
   }
 
   async function getLinksForContinuum(reportId) {
@@ -609,9 +640,9 @@ const ViewReports = ({
       );
 
       for (const parentReportId of parentReportIds) {
-        console.log("parentReportId");
+        // console.log("parentReportId");
         const childReports = parentChildIdMap[parentReportId];
-        console.log(parentReportId);
+        // console.log(parentReportId);
         if (!childReports) {
           if (!seenReportIds.includes(parentReportId)) {
             seenReportIds.push(parentReportId);
@@ -648,7 +679,7 @@ const ViewReports = ({
       // };
       function buildTree(data) {
         const recurse = (key) => {
-          console.log("Processing key:", key);
+          // console.log("Processing key:", key);
 
           const childrenData = data[key];
           if (!childrenData) {
@@ -669,7 +700,7 @@ const ViewReports = ({
         };
 
         const rootKey = String(Math.min(...Object.keys(data).map(Number)));
-        console.log("Root key:", rootKey);
+        // console.log("Root key:", rootKey);
         return recurse(rootKey);
       }
 
@@ -930,7 +961,6 @@ const ViewReports = ({
   return (
     <>
       {/* Notifications Area */}
-
       <IntelliNotificationsArea />
       <div style={{ maxWidth: "90%" }}>
         {folderPicUrl.length > 0 && (
@@ -1288,6 +1318,7 @@ const ViewReports = ({
                 width: "auto",
                 objectFit: "cover",
                 marginBottom: "16px",
+
                 textAlign: "center",
               }}
             >
@@ -1295,8 +1326,9 @@ const ViewReports = ({
                 src={agent.profilePicUrl}
                 style={{
                   borderRadius: "20%",
-                  width: "200px",
                   cursor: "pointer",
+                  width: "300px",
+                  height: "auto",
                 }}
                 alt="agent"
               />
