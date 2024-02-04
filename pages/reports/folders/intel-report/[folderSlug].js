@@ -361,7 +361,7 @@ const ViewReports = ({
       if (
         firebaseFolderData.folderId &&
         firebaseFolderData.folderPicUrl &&
-        folderPicUrl.length == 0
+        firebaseFolderData.folderId == folderId
       ) {
         console.log("FOUND PHOTO FOR FOLDER");
         setFolderName(firebaseFolderData.folderName);

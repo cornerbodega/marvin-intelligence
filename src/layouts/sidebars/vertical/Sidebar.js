@@ -72,11 +72,11 @@ const navigation = [
   //   href: "/",
   //   icon: "bi bi-speedometer2",
   // },
-  {
-    title: "Support",
-    href: "/support",
-    icon: "bi bi-patch-question-fill",
-  },
+  // {
+  //   title: "Lolltron",
+  //   href: "/lolltron",
+  //   icon: "bi bi-patch-question-fill",
+  // },
 ];
 
 const Sidebar = ({ showMobilemenu }) => {

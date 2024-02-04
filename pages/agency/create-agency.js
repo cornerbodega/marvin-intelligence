@@ -90,7 +90,7 @@ function CreateAgency() {
               </div>
               <FormGroup>
                 <Row>
-                  <Label for="expertise1" md={4}>
+                  <Label for="agencyName" md={4}>
                     Agency Name
                   </Label>
                   <Col md={8}>
