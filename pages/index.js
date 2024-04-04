@@ -27,8 +27,8 @@ export default function Home() {
       >
         <ambientLight />
         <pointLight position={[10, 10, 10]} />
-        <CameraController gateOpened={gateOpened} />{" "}
-        {/* Use the CameraController here */}
+        <CameraController gateOpened={gateOpened} />
+        {/* <OrbitControls /> */}
         <TrafficGateScene setGateOpened={setGateOpened} />
       </Canvas>
     </div>

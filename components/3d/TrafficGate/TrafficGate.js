@@ -40,7 +40,7 @@ export default function TrafficGate({ setGateOpened }) {
         <meshStandardMaterial color="darkgrey" />
       </mesh>
       {/* Snow on top of the roof */}
-      <mesh position={[-1.5, 1.4, 0]}>
+      <mesh position={[-1.5, 1.42, 0]}>
         <boxGeometry args={[2.1, 0.05, 1.5]} />
         <meshStandardMaterial color="white" />
       </mesh>

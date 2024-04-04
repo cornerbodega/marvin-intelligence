@@ -3490,6 +3490,11 @@
   dependencies:
     "is-arrayish" "^0.3.1"
 
+"simplex-noise@^4.0.1":
+  "integrity" "sha512-zl/+bdSqW7HJOQ0oDbxrNYaF4F5ik0i7M6YOYmEoIJNtg16NpvWaTTM1Y7oV/7T0jFljawLgYPS81Uu2rsfo1A=="
+  "resolved" "https://registry.npmjs.org/simplex-noise/-/simplex-noise-4.0.1.tgz"
+  "version" "4.0.1"
+
 "sirv@^1.0.7":
   "integrity" "sha512-JuLThK3TnZG1TAKDwNIqNq6QA2afLOCcm+iE8D1Kj3GA40pSPsxQjjJl0J8X3tsR7T+CP1GavpzLwYkgVLWrZQ=="
   "resolved" "https://registry.npmjs.org/sirv/-/sirv-1.0.19.tgz"
@@ -3702,6 +3707,11 @@
   "integrity" "sha1-f17oI66AUgfACvLfSoTsP8+lcLQ="
   "resolved" "https://registry.npmjs.org/text-table/-/text-table-0.2.0.tgz"
   "version" "0.2.0"
+
+"three-csg-ts@^3.1.14":
+  "integrity" "sha512-miDfFA/bxXU5sgnePj28Nq4wcdmGkdM6dbv+lqK/vb0KbeYEDzcA9aTwMOyS1a3Fd/TDkcJ7MxHRevIGj8hMSA=="
+  "resolved" "https://registry.npmjs.org/three-csg-ts/-/three-csg-ts-3.1.14.tgz"
+  "version" "3.1.14"
 
 "three-mesh-bvh@^0.7.0":
   "integrity" "sha512-3W6KjzmupjfE89GuHPT31kxKWZ4YGZPEZJNysJpiOZfQRsBQQgmK7v/VJPpjG6syhAvTnY+5Fr77EvIkTLpGSw=="

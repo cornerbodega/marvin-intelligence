@@ -1,4 +1,5 @@
 import DamWater from "./DamWater";
+import MountainRange from "./MountainRange";
 import Road from "./Road";
 import TrafficGate from "./TrafficGate";
 
@@ -9,6 +10,7 @@ export default function TrafficGateScene({ setGateOpened }) {
       <TrafficGate setGateOpened={setGateOpened} />
       <Road />
       <DamWater />
+      <MountainRange />
     </>
   );
 }

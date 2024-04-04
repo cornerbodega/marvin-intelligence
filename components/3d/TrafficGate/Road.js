@@ -31,21 +31,33 @@ export default function Road() {
       const prevPosition = positions[index - 1];
       const midPointZ = (position + prevPosition) / 2;
 
-      return (
-        <React.Fragment key={`line-${xOffset}-${index}`}>
+      if (midPointZ > -50) {
+        return (
+          <React.Fragment key={`line-${xOffset}-${index}`}>
+            <mesh
+              position={[xOffset, 0.35, midPointZ]}
+              geometry={lineGeometry}
+              material={silverMaterial}
+            />
+            {/* Snow on the line */}
+            <mesh
+              position={[xOffset, 0.4, midPointZ]} // Slightly higher to sit on top of the line
+              geometry={snowLineGeometry}
+              material={snowMaterial}
+            />
+          </React.Fragment>
+        );
+      } else {
+        // If Z coordinate is less than or equal to -50, render only the line without snow
+        return (
           <mesh
+            key={`line-${xOffset}-${index}`}
             position={[xOffset, 0.35, midPointZ]}
             geometry={lineGeometry}
             material={silverMaterial}
           />
-          {/* Snow on the line */}
-          <mesh
-            position={[xOffset, 0.4, midPointZ]} // Slightly higher to sit on top of the line
-            geometry={snowLineGeometry}
-            material={snowMaterial}
-          />
-        </React.Fragment>
-      );
+        );
+      }
     });
   };
 
@@ -68,17 +80,35 @@ export default function Road() {
             geometry={boxGeometry}
             material={silverMaterial}
           />
-          {/* Snow on top of the fence pole */}
-          <mesh
-            position={[-3, 0.7, position]} // Positioned to sit on top of the pole
-            geometry={snowPoleGeometry}
-            material={snowMaterial}
-          />
-          <mesh
-            position={[3, 0.7, position]} // Positioned to sit on top of the pole
-            geometry={snowPoleGeometry}
-            material={snowMaterial}
-          />
+          {fencePolePositions.map((position, index) => (
+            <React.Fragment key={`pole-${index}`}>
+              <mesh
+                position={[-3, 0.2, position]}
+                geometry={boxGeometry}
+                material={silverMaterial}
+              />
+              <mesh
+                position={[3, 0.2, position]}
+                geometry={boxGeometry}
+                material={silverMaterial}
+              />
+              {/* Conditionally render snow on top of the pole */}
+              {position > -50 && (
+                <>
+                  <mesh
+                    position={[-3, 0.7, position]} // Positioned to sit on top of the pole
+                    geometry={snowPoleGeometry}
+                    material={snowMaterial}
+                  />
+                  <mesh
+                    position={[3, 0.7, position]} // Positioned to sit on top of the pole
+                    geometry={snowPoleGeometry}
+                    material={snowMaterial}
+                  />
+                </>
+              )}
+            </React.Fragment>
+          ))}
         </React.Fragment>
       ))}
       {createFenceLines(fencePolePositions, -3)}
