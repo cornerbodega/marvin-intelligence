@@ -39,6 +39,12 @@ export default function TrafficGate({ setGateOpened }) {
         <boxGeometry args={[2.1, 0.4, 1.5]} />
         <meshStandardMaterial color="darkgrey" />
       </mesh>
+      {/* Snow on top of the roof */}
+      <mesh position={[-1.5, 1.4, 0]}>
+        <boxGeometry args={[2.1, 0.05, 1.5]} />
+        <meshStandardMaterial color="white" />
+      </mesh>
+
       {/* Window of the booth */}
       <mesh position={[-1.5, 0.65, 0.51]}>
         <planeGeometry args={[0.8, 0.4]} />
@@ -53,6 +59,11 @@ export default function TrafficGate({ setGateOpened }) {
       <mesh ref={armBaseRef} position={[-0.36, 0.4, 0]}>
         <boxGeometry args={[0.2, 0.4, 0.2]} />
         <meshStandardMaterial color="grey" />
+      </mesh>
+      {/* Arm Base Snow */}
+      <mesh ref={armBaseRef} position={[-0.36, 0.6, 0]}>
+        <boxGeometry args={[0.2, 0.04, 0.2]} />
+        <meshStandardMaterial color="white" />
       </mesh>
       {/* Pivot group for the gate pole with applied rotation */}
       <group

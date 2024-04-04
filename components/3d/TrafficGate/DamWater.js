@@ -7,7 +7,7 @@ export default function DamWater() {
   const cubes = useMemo(() => {
     // Generate positions for the water fall cubes
     const positions = [];
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < 1000; i++) {
       positions.push({
         x: Math.random() * 100 - 50, // Spread across the width of the dam
         y: Math.random() * 100 - 50, // Spread vertically
@@ -24,7 +24,7 @@ export default function DamWater() {
       cube.y -= cube.speed;
       if (cube.y < -2.5) {
         // Reset the cube to the top once it falls beyond a certain point
-        cubes[index].y = 5;
+        cubes[index].y = 50;
       }
       // Update the position of each cube in the waterfall
       waterFallRef.current.children[index].position.set(cube.x, cube.y, cube.z);

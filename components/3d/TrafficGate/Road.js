@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { BoxGeometry, MeshStandardMaterial, PlaneGeometry, Mesh } from "three";
-console.log(`BoxGeometry: ${BoxGeometry}`);
+
 export default function Road() {
   const fencePolePositions = useMemo(
     () => Array.from({ length: 30 }, (_, index) => -150 + index * 10),
@@ -8,10 +8,16 @@ export default function Road() {
   );
 
   const boxGeometry = useMemo(() => new BoxGeometry(0.1, 1, 0.1), []);
+  const snowPoleGeometry = useMemo(() => new BoxGeometry(0.12, 0.07, 0.12), []); // Slightly larger to cover the pole top
   const lineGeometry = useMemo(() => new BoxGeometry(0.05, 0.1, 10), []);
+  const snowLineGeometry = useMemo(() => new BoxGeometry(0.07, 0.05, 10), []); // Slightly larger and flatter for snow on lines
   const planeGeometry = useMemo(() => new PlaneGeometry(5, 300), []);
   const silverMaterial = useMemo(
     () => new MeshStandardMaterial({ color: "silver" }),
+    []
+  );
+  const snowMaterial = useMemo(
+    () => new MeshStandardMaterial({ color: "white" }),
     []
   );
   const darkGrayMaterial = useMemo(
@@ -24,15 +30,21 @@ export default function Road() {
       if (index === 0) return null;
       const prevPosition = positions[index - 1];
       const midPointZ = (position + prevPosition) / 2;
-      const length = position - prevPosition;
 
       return (
-        <mesh
-          key={index}
-          position={[xOffset, 0.35, midPointZ]}
-          geometry={lineGeometry}
-          material={silverMaterial}
-        />
+        <React.Fragment key={`line-${xOffset}-${index}`}>
+          <mesh
+            position={[xOffset, 0.35, midPointZ]}
+            geometry={lineGeometry}
+            material={silverMaterial}
+          />
+          {/* Snow on the line */}
+          <mesh
+            position={[xOffset, 0.4, midPointZ]} // Slightly higher to sit on top of the line
+            geometry={snowLineGeometry}
+            material={snowMaterial}
+          />
+        </React.Fragment>
       );
     });
   };
@@ -55,6 +67,17 @@ export default function Road() {
             position={[3, 0.2, position]}
             geometry={boxGeometry}
             material={silverMaterial}
+          />
+          {/* Snow on top of the fence pole */}
+          <mesh
+            position={[-3, 0.7, position]} // Positioned to sit on top of the pole
+            geometry={snowPoleGeometry}
+            material={snowMaterial}
+          />
+          <mesh
+            position={[3, 0.7, position]} // Positioned to sit on top of the pole
+            geometry={snowPoleGeometry}
+            material={snowMaterial}
           />
         </React.Fragment>
       ))}
