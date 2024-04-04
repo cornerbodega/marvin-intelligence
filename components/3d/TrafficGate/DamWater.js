@@ -18,18 +18,18 @@ export default function DamWater() {
     return positions;
   }, []);
 
-  useFrame(() => {
-    // Animate each cube to fall and reset its position to create a loop
-    cubes.forEach((cube, index) => {
-      cube.y -= cube.speed;
-      if (cube.y < -2.5) {
-        // Reset the cube to the top once it falls beyond a certain point
-        cubes[index].y = 50;
-      }
-      // Update the position of each cube in the waterfall
-      waterFallRef.current.children[index].position.set(cube.x, cube.y, cube.z);
-    });
-  });
+  //   useFrame(() => {
+  //     // Animate each cube to fall and reset its position to create a loop
+  //     cubes.forEach((cube, index) => {
+  //       cube.y -= cube.speed;
+  //       if (cube.y < -2.5) {
+  //         // Reset the cube to the top once it falls beyond a certain point
+  //         cubes[index].y = 50;
+  //       }
+  //       // Update the position of each cube in the waterfall
+  //       waterFallRef.current.children[index].position.set(cube.x, cube.y, cube.z);
+  //     });
+  //   });
 
   return (
     <group>
@@ -44,7 +44,7 @@ export default function DamWater() {
         <meshStandardMaterial color="lightblue" />
       </mesh>
       {/* Animated falling water on the right using cubes */}
-      <group ref={waterFallRef}>
+      {/* <group ref={waterFallRef}>
         {cubes.map((cube, index) => (
           <mesh
             key={index}
@@ -53,7 +53,7 @@ export default function DamWater() {
             material={new MeshStandardMaterial({ color: "white" })}
           />
         ))}
-      </group>
+      </group> */}
     </group>
   );
 }
