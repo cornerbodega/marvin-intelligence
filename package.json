@@ -14,6 +14,7 @@
     "@firebase/database": "^1.0.1",
     "@google-cloud/text-to-speech": "^5.0.1",
     "@next/bundle-analyzer": "^14.0.3",
+    "@react-three/drei": "^9.105.1",
     "@react-three/fiber": "^8.16.1",
     "@supabase/supabase-js": "^2.32.0",
     "bootstrap": "^5.1.3",

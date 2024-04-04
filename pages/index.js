@@ -1,29 +1,35 @@
 import React, { useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import AgencyBuilding from "../components/3d/AgencyBuilding";
-
+import TrafficGateScene from "../components/3d/TrafficGate/TrafficGateScene";
+import { OrbitControls } from "@react-three/drei";
+import CameraController from "../components/3d/CameraController";
 // Cube component
 
 // Home component
+// Home component
 export default function Home() {
-  // Assuming the top nav height and side nav width
-  const topNavHeight = 60; // Adjust as needed
-  const sideNavWidth = 50; // Adjust as needed
+  // State to track if the gate is open
+  const [gateOpened, setGateOpened] = useState(false);
 
   return (
     <div
       style={{
-        height: `calc(100vh - ${topNavHeight}px)`,
-        width: `calc(100vw - ${sideNavWidth}px)`,
-        position: "absolute", // This makes it fill the exact remaining space
-        top: `${topNavHeight}px`, // Start below the top nav
-        left: `${sideNavWidth}px`, // Start to the right of the side nav
+        height: `calc(100vh - 60px)`, // Assuming a fixed size for simplicity
+        width: `calc(100vw - 50px)`,
+        position: "absolute",
+        top: "60px",
+        left: "50px",
       }}
     >
-      <Canvas style={{ height: "100%", width: "100%" }}>
+      <Canvas
+        camera={{ position: [0, 1.2, 5], fov: 75 }}
+        style={{ height: "100%", width: "100%" }}
+      >
         <ambientLight />
         <pointLight position={[10, 10, 10]} />
-        <AgencyBuilding />
+        <CameraController gateOpened={gateOpened} />{" "}
+        {/* Use the CameraController here */}
+        <TrafficGateScene setGateOpened={setGateOpened} />
       </Canvas>
     </div>
   );
