@@ -18,42 +18,85 @@ export default function DamWater() {
     return positions;
   }, []);
 
-  //   useFrame(() => {
-  //     // Animate each cube to fall and reset its position to create a loop
-  //     cubes.forEach((cube, index) => {
-  //       cube.y -= cube.speed;
-  //       if (cube.y < -2.5) {
-  //         // Reset the cube to the top once it falls beyond a certain point
-  //         cubes[index].y = 50;
-  //       }
-  //       // Update the position of each cube in the waterfall
-  //       waterFallRef.current.children[index].position.set(cube.x, cube.y, cube.z);
-  //     });
-  //   });
+  function WaterMaterial(props) {
+    const ref = useRef();
+    useFrame(() => {
+      if (ref.current) {
+        // Adjusting the time increment here as needed to control the speed of the water flow animation
+        ref.current.uniforms.time.value += 0.01; // This value can be tweaked to speed up or slow down the flow
+      }
+    });
+
+    return (
+      <shaderMaterial
+        ref={ref}
+        attach="material"
+        args={[waterShader]}
+        transparent={true}
+        {...props}
+      />
+    );
+  }
+  const waterShader = {
+    vertexShader: `
+      uniform float time;
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        vec3 pos = position;
+        // Adjusting the wave to move left to right by subtracting time from the x-position
+        pos.y += sin(pos.x * 0.1 - time) * 0.25; // Adjust sin multiplier for wave height
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform float time;
+      varying vec2 vUv;
+      void main() {
+        // Adjusting for a smoother and subtler color transition, making it consistent with the direction change
+        float wave = sin(vUv.x * 5.0 - time * 2.5) * 0.05; // Adjust these for smoother color transition
+        gl_FragColor = vec4(0.0, 0.4, 0.7, 1.0) + vec4(0.0, wave, wave, 0.0);
+      }
+    `,
+    uniforms: {
+      time: { value: 0 },
+    },
+  };
+
+  function WaterMaterial(props) {
+    const ref = useRef();
+    useFrame(() => {
+      if (ref.current) {
+        // Adjusting the time increment here as needed to control the speed of the water flow animation
+        ref.current.uniforms.time.value += 0.01; // This value can be tweaked to speed up or slow down the flow
+      }
+    });
+
+    return (
+      <shaderMaterial
+        ref={ref}
+        attach="material"
+        args={[waterShader]}
+        transparent={true}
+        {...props}
+      />
+    );
+  }
 
   return (
     <group>
       {/* Static water body on the left */}
-      <mesh position={[-40, -0.5, -1]}>
+      <mesh position={[-40, -1, -1]}>
         <boxGeometry args={[80, 0.5, 100]} />
-        <meshStandardMaterial color="lightblue" />
+        {/* <WaterMaterial /> */}
+        <meshStandardMaterial color="#2962AB" />
       </mesh>
       {/* Static water body on the right */}
+
       <mesh position={[40, -12.5, -1]}>
         <boxGeometry args={[80, 0.5, 100]} />
-        <meshStandardMaterial color="lightblue" />
+        <WaterMaterial />
       </mesh>
-      {/* Animated falling water on the right using cubes */}
-      {/* <group ref={waterFallRef}>
-        {cubes.map((cube, index) => (
-          <mesh
-            key={index}
-            position={[cube.x, cube.y, cube.z]}
-            geometry={new BoxGeometry(0.1, 0.1, 0.1)}
-            material={new MeshStandardMaterial({ color: "white" })}
-          />
-        ))}
-      </group> */}
     </group>
   );
 }
