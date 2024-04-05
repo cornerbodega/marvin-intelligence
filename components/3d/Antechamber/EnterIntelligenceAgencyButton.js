@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { Text, Box } from "@react-three/drei";
 import { useRouter } from "next/router"; // Import useRouter from next/router if you're using Next.js
 
@@ -27,7 +27,12 @@ export default function EnterIntelligenceAgencyButton() {
         rotation={[Math.PI / 8, 0, 0]} // Rotation of the box
         onClick={handleClick} // Attach the click event handler
       >
-        <meshBasicMaterial attach="material" color="royalblue" />
+        <meshStandardMaterial
+          attach="material"
+          color="royalblue"
+          emissive="blue" // Makes the material "glow" by itself
+          emissiveIntensity={0.5} // Adjust the intensity of the glow
+        />
       </Box>
       {/* Text for the button */}
       <Text

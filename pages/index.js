@@ -7,6 +7,8 @@ import CameraControl from "../components/3d/CameraControl";
 // Cube component
 import EnterIntelligenceAgencyButton from "../components/3d/Antechamber/EnterIntelligenceAgencyButton";
 import StreetLight from "../components/3d/TrafficGate/StreetLight";
+import { Bloom, EffectComposer } from "@react-three/postprocessing";
+
 // Home component
 // Home component
 export default function Home() {
@@ -27,14 +29,35 @@ export default function Home() {
         camera={{ position: [0, 1.2, 5], fov: 75 }}
         style={{ height: "100%", width: "100%" }}
       >
+        <EffectComposer>
+          <Bloom
+            luminanceThreshold={0.3}
+            luminanceSmoothing={0.9}
+            height={300}
+          />
+        </EffectComposer>
         <ambientLight />
         <CameraControl />
-        <pointLight position={[0, 0, -70]} />
+        <ambientLight position={[0, 0, -60]} intensity={0.75} />
         {/* add ambient light */}
-        <ambientLight intensity={0.5} />
+        {/* <ambientLight intensity={0.5} /> */}
         {/* add directional light */}
         {/* <pointLight position={[0, 0, -90]} /> */}
-        <pointLight position={[0.6, 2.19, 0]} />
+        {/* directional light pointing down here */}
+        {/* <directionalLight position={[0.6, 10, 0]} intensity={0.5} /> */}
+        <directionalLight
+          position={[0.6, 2.19, 0]}
+          intensity={0.25}
+          color={"yellow"}
+        />
+        {/* <spotlight position={[0.6, 2.19, 0]} /> */}
+        {/* spotlight pointing down here */}
+        <spotLight
+          position={[0.6, 2.19, 0]}
+          intensity={5.25}
+          color={"orange"}
+        />
+
         {/* <CameraController gateOpened={gateOpened} /> */}
         {/* <OrbitControls /> */}
         <TrafficGateScene setGateOpened={setGateOpened} />
