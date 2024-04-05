@@ -19,8 +19,8 @@ export default function TrafficGate({ setGateOpened }) {
 
     if (cameraDistance < isOpeningDistance) {
       // Open the gate
-      if (gateGroupRef.current.rotation.z < Math.PI / 2) {
-        gateGroupRef.current.rotation.z += 0.02;
+      if (gateGroupRef.current.rotation.z < Math.PI / 2 - 0.1) {
+        gateGroupRef.current.rotation.z += 0.2;
       } else {
         setGateOpened(true);
       }
