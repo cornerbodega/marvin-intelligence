@@ -10,7 +10,7 @@ export default function EnterIntelligenceAgencyButton() {
   // Animation logic for floating effect
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
-    buttonMesh.current.position.y = Math.sin(t) * 0.5;
+    buttonMesh.current.position.y = (Math.sin(t) * 0.5 + 0.45) * 0.5;
   });
 
   // Function to handle the click event
@@ -26,6 +26,8 @@ export default function EnterIntelligenceAgencyButton() {
         position={[0, 3, -81]} // Position of the box
         rotation={[Math.PI / 8, 0, 0]} // Rotation of the box
         onClick={handleClick} // Attach the click event handler
+        onPointerOver={() => (document.body.style.cursor = "pointer")} // Change cursor to pointer on hover
+        onPointerOut={() => (document.body.style.cursor = "auto")} // Change cursor back to default on mouse leave
       >
         <meshStandardMaterial
           attach="material"
@@ -34,6 +36,8 @@ export default function EnterIntelligenceAgencyButton() {
           emissiveIntensity={0.5} // Adjust the intensity of the glow
         />
       </Box>
+
+      <spotLight position={[0, 0.5, -80]} intensity={4} />
       {/* Text for the button */}
       <Text
         position={[0, 3, -80]}

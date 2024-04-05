@@ -42,7 +42,7 @@ export default function Home() {
         {/* add ambient light */}
         {/* <ambientLight intensity={0.5} /> */}
         {/* add directional light */}
-        {/* <pointLight position={[0, 0, -90]} /> */}
+
         {/* directional light pointing down here */}
         {/* <directionalLight position={[0.6, 10, 0]} intensity={0.5} /> */}
         <directionalLight
