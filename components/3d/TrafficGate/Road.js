@@ -11,7 +11,7 @@ export default function Road() {
   const snowPoleGeometry = useMemo(() => new BoxGeometry(0.12, 0.07, 0.12), []); // Slightly larger to cover the pole top
   const lineGeometry = useMemo(() => new BoxGeometry(0.05, 0.1, 10), []);
   const snowLineGeometry = useMemo(() => new BoxGeometry(0.07, 0.05, 10), []); // Slightly larger and flatter for snow on lines
-  const planeGeometry = useMemo(() => new PlaneGeometry(5, 300), []);
+  const planeGeometry = useMemo(() => new PlaneGeometry(5, 350), []);
   const silverMaterial = useMemo(
     () => new MeshStandardMaterial({ color: "silver" }),
     []

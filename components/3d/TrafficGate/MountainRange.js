@@ -9,14 +9,32 @@ import { useFrame, useThree } from "@react-three/fiber";
 
 export default function MountainRange() {
   const { camera } = useThree();
-  const [doorPosition, setDoorPosition] = useState({ x: 0, y: -10, z: -50 });
-  const doorOpenThreshold = -30;
+  const [doorPosition, setDoorPosition] = useState({ x: 0, y: -10, z: -48 });
+  const doorOpenThreshold = -20;
   const doorOpenSpeed = 0.1;
-  const doorUpperLimit = 10;
-
+  const doorUpperLimit = 2;
+  const doorRef = useRef();
   // This will hold refs for all mountains to control their visibility individually
   const mountainsRef = useRef([]);
+  useFrame(() => {
+    // Update the door's visibility based on its position
+    if (doorRef.current) {
+      doorRef.current.visible = doorPosition.y < Math.abs(doorUpperLimit - 2);
+    }
+    // Calculate the distance from the camera to the door
+    const doorDistance = camera.position.distanceTo(
+      new Vector3(doorPosition.x, doorPosition.y, doorPosition.z)
+    );
+    const closeDoorThreshold = -1 * doorOpenThreshold; // Adjust based on when you want the door to close
 
+    if (doorDistance > closeDoorThreshold && doorPosition.y > -10) {
+      // Close the door if we are far from it
+      setDoorPosition((prevState) => ({
+        ...prevState,
+        y: Math.max(prevState.y - doorOpenSpeed, -10), // Adjust -10 to wherever the door's closed position is
+      }));
+    }
+  });
   useFrame(() => {
     if (
       camera.position.z < doorOpenThreshold &&
@@ -35,15 +53,15 @@ export default function MountainRange() {
         const doorDistance = camera.position.distanceTo(
           new Vector3(doorPosition.x, doorPosition.y, doorPosition.z)
         );
-        const hideThreshold = 20;
+        const hideThreshold = 18;
         mountain.visible = doorDistance > hideThreshold;
       }
     });
   });
 
-  const mountainHeights = [60, 50, 70, 55, 65, 75, 50, 60, 70, 55];
+  const mountainHeights = [60, 50, 70, 55, 65, 75, 50, 60, 70, 55, 65, 75];
   const mountains = mountainHeights.map((height, i) => {
-    const positionX = i * 20 - 80;
+    const positionX = i * 20 - 100;
     const positionZ = -50;
     // Adjust condition for placing the door one mountain to the left of the middle
     const isDoorMountain = i === Math.floor(mountainHeights.length / 2 - 1);
@@ -60,7 +78,7 @@ export default function MountainRange() {
       );
       const doorMaterial = new MeshStandardMaterial({ color: "grey" });
       return (
-        <group key={i}>
+        <group key={i} ref={doorRef}>
           <mesh
             ref={(el) => (mountainsRef.current[i] = el)}
             position={[positionX, height / 2 - 20, positionZ - 20]}

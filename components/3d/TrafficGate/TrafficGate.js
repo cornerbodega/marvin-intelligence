@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 
 export default function TrafficGate({ setGateOpened }) {
   const gateGroupRef = useRef();
@@ -7,21 +7,29 @@ export default function TrafficGate({ setGateOpened }) {
   const armBaseRef = useRef();
   const enterButtonRef = useRef();
   const [clicked, setClick] = useState(false);
+  const { camera } = useThree(); // Access the camera
 
-  // Rotate the gate group to simulate opening and closing on click
   useFrame(() => {
-    const targetZRotation = Math.PI / 2; // Rotation indicating gate is fully open
-    if (clicked) {
-      if (gateGroupRef.current.rotation.z < targetZRotation) {
+    // Assuming the Z-axis is the forward direction and the gate opens when the camera gets close
+    const cameraDistance = Math.abs(
+      camera.position.z - gateGroupRef.current.position.z
+    );
+    const isOpeningDistance = 5; // Distance at which the gate starts opening
+    const isClosingDistance = 10; // Distance at which the gate starts closing
+
+    if (cameraDistance < isOpeningDistance) {
+      // Open the gate
+      if (gateGroupRef.current.rotation.z < Math.PI / 2) {
         gateGroupRef.current.rotation.z += 0.02;
       } else {
-        setGateOpened(true); // Call the callback once the gate is fully open
+        setGateOpened(true);
       }
-    } else {
+    } else if (cameraDistance > isClosingDistance) {
+      // Close the gate
       if (gateGroupRef.current.rotation.z > 0) {
         gateGroupRef.current.rotation.z -= 0.02;
       } else {
-        setGateOpened(false); // Optionally reset when the gate closes
+        setGateOpened(false);
       }
     }
   });
@@ -61,7 +69,7 @@ export default function TrafficGate({ setGateOpened }) {
         <meshStandardMaterial color="grey" />
       </mesh>
       {/* Arm Base Snow */}
-      <mesh ref={armBaseRef} position={[-0.36, 0.6, 0]}>
+      <mesh ref={armBaseRef} position={[-0.36, 0.63, 0]}>
         <boxGeometry args={[0.2, 0.04, 0.2]} />
         <meshStandardMaterial color="white" />
       </mesh>
