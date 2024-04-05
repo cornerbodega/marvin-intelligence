@@ -36,7 +36,7 @@ export default function Home() {
             height={300}
           />
         </EffectComposer>
-        <ambientLight />
+        {/* <ambientLight /> */}
         <CameraControl />
         <ambientLight position={[0, 0, -60]} intensity={0.75} />
         {/* add ambient light */}
