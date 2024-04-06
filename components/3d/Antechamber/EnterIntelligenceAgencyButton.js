@@ -15,7 +15,7 @@ export default function EnterIntelligenceAgencyButton() {
 
   // Function to handle the click event
   const handleClick = () => {
-    router.push("/reports/folders/view-folders"); // Route the user to the specified path
+    router.push("/intelnet/folders/view-intelnet"); // Route the user to the specified path
   };
 
   return (
