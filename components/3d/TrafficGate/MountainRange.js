@@ -9,7 +9,8 @@ import { useFrame, useThree } from "@react-three/fiber";
 
 export default function MountainRange() {
   const { camera } = useThree();
-  const [doorPosition, setDoorPosition] = useState({ x: 0, y: -10, z: -48 });
+  const [doorPosition, setDoorPosition] = useState({ x: 0, y: -10, z: -47 });
+  const [showMoon, setShowMoon] = useState(true);
   const doorOpenThreshold = -20;
   const doorOpenSpeed = 0.1;
   const doorUpperLimit = 2;
@@ -31,7 +32,7 @@ export default function MountainRange() {
       // Close the door if we are far from it
       setDoorPosition((prevState) => ({
         ...prevState,
-        y: Math.max(prevState.y - doorOpenSpeed, -10), // Adjust -10 to wherever the door's closed position is
+        y: Math.max(prevState.y - doorOpenSpeed * 4, -10), // Adjust -10 to wherever the door's closed position is
       }));
     }
   });
@@ -55,13 +56,21 @@ export default function MountainRange() {
         );
         const hideThreshold = 18;
         mountain.visible = doorDistance > hideThreshold;
+        const shouldHideMoon = doorDistance > hideThreshold + 10;
+        if (!shouldHideMoon) {
+          setShowMoon(false);
+        } else {
+          setShowMoon(true);
+        }
       }
     });
   });
 
-  const mountainHeights = [60, 50, 70, 55, 65, 75, 50, 60, 70, 55, 65, 75];
+  const mountainHeights = [
+    54, 60, 50, 70, 55, 65, 75, 50, 60, 70, 55, 65, 75, 43,
+  ];
   const mountains = mountainHeights.map((height, i) => {
-    const positionX = i * 20 - 100;
+    const positionX = i * 20 - 120;
     const positionZ = -50;
     // Adjust condition for placing the door one mountain to the left of the middle
     const isDoorMountain = i === Math.floor(mountainHeights.length / 2 - 1);
@@ -118,5 +127,15 @@ export default function MountainRange() {
     );
   });
 
-  return <group>{mountains}</group>;
+  return (
+    <>
+      {showMoon && (
+        <mesh position={[20, 40, -200]}>
+          <sphereGeometry args={[30, 32, 32]} />
+          <meshBasicMaterial color="white" />
+        </mesh>
+      )}
+      <group>{mountains}</group>
+    </>
+  );
 }

@@ -1,16 +1,25 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { BoxGeometry, MeshStandardMaterial, PlaneGeometry, Mesh } from "three";
 
 export default function Road() {
+  const [snowPoleHeight, setSnowPoleHeight] = useState(0.15); // Snow height for poles
+  const [snowLineHeight, setSnowLineHeight] = useState(0.15); // Snow height for lines
+
   const fencePolePositions = useMemo(
     () => Array.from({ length: 30 }, (_, index) => -150 + index * 10),
     []
   );
 
   const boxGeometry = useMemo(() => new BoxGeometry(0.1, 1, 0.1), []);
-  const snowPoleGeometry = useMemo(() => new BoxGeometry(0.12, 0.07, 0.12), []); // Slightly larger to cover the pole top
+  const snowPoleGeometry = useMemo(
+    () => new BoxGeometry(0.12, snowPoleHeight, 0.12),
+    [snowPoleHeight]
+  ); // Use snowPoleHeight here
   const lineGeometry = useMemo(() => new BoxGeometry(0.05, 0.1, 10), []);
-  const snowLineGeometry = useMemo(() => new BoxGeometry(0.07, 0.05, 10), []); // Slightly larger and flatter for snow on lines
+  const snowLineGeometry = useMemo(
+    () => new BoxGeometry(0.07, snowLineHeight, 10),
+    [snowLineHeight]
+  ); // Use snowLineHeight here
   const planeGeometry = useMemo(() => new PlaneGeometry(5, 350), []);
   const silverMaterial = useMemo(
     () => new MeshStandardMaterial({ color: "silver" }),
@@ -31,33 +40,23 @@ export default function Road() {
       const prevPosition = positions[index - 1];
       const midPointZ = (position + prevPosition) / 2;
 
-      if (midPointZ > -50) {
-        return (
-          <React.Fragment key={`line-${xOffset}-${index}`}>
-            <mesh
-              position={[xOffset, 0.35, midPointZ]}
-              geometry={lineGeometry}
-              material={silverMaterial}
-            />
-            {/* Snow on the line */}
-            <mesh
-              position={[xOffset, 0.4, midPointZ]} // Slightly higher to sit on top of the line
-              geometry={snowLineGeometry}
-              material={snowMaterial}
-            />
-          </React.Fragment>
-        );
-      } else {
-        // If Z coordinate is less than or equal to -50, render only the line without snow
-        return (
+      return (
+        <React.Fragment key={`line-${xOffset}-${index}`}>
           <mesh
-            key={`line-${xOffset}-${index}`}
             position={[xOffset, 0.35, midPointZ]}
             geometry={lineGeometry}
             material={silverMaterial}
           />
-        );
-      }
+          {/* Conditionally render snow on the line */}
+          {midPointZ > -50 && (
+            <mesh
+              position={[xOffset, 0.4 + snowLineHeight / 2, midPointZ]} // Adjusted for snow height
+              geometry={snowLineGeometry}
+              material={snowMaterial}
+            />
+          )}
+        </React.Fragment>
+      );
     });
   };
 
@@ -80,35 +79,21 @@ export default function Road() {
             geometry={boxGeometry}
             material={silverMaterial}
           />
-          {fencePolePositions.map((position, index) => (
-            <React.Fragment key={`pole-${index}`}>
+          {/* Conditionally render snow on top of the pole */}
+          {position > -50 && (
+            <>
               <mesh
-                position={[-3, 0.2, position]}
-                geometry={boxGeometry}
-                material={silverMaterial}
+                position={[-3, 0.7 + snowPoleHeight / 2, position]} // Adjusted for snow height
+                geometry={snowPoleGeometry}
+                material={snowMaterial}
               />
               <mesh
-                position={[3, 0.2, position]}
-                geometry={boxGeometry}
-                material={silverMaterial}
+                position={[3, 0.7 + snowPoleHeight / 2, position]} // Adjusted for snow height
+                geometry={snowPoleGeometry}
+                material={snowMaterial}
               />
-              {/* Conditionally render snow on top of the pole */}
-              {position > -50 && (
-                <>
-                  <mesh
-                    position={[-3, 0.7, position]} // Positioned to sit on top of the pole
-                    geometry={snowPoleGeometry}
-                    material={snowMaterial}
-                  />
-                  <mesh
-                    position={[3, 0.7, position]} // Positioned to sit on top of the pole
-                    geometry={snowPoleGeometry}
-                    material={snowMaterial}
-                  />
-                </>
-              )}
-            </React.Fragment>
-          ))}
+            </>
+          )}
         </React.Fragment>
       ))}
       {createFenceLines(fencePolePositions, -3)}

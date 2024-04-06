@@ -71,7 +71,11 @@ export default function Home() {
           intensity={5.25}
           color={"orange"}
         />
-
+        <directionalLight
+          position={[0.6, 2.19, -200]}
+          intensity={1.25}
+          color={"white"}
+        />
         {/* <CameraController gateOpened={gateOpened} /> */}
         {/* <OrbitControls /> */}
         <TrafficGateScene setGateOpened={setGateOpened} />

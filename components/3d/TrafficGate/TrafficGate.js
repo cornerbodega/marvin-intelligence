@@ -5,11 +5,27 @@ export default function TrafficGate({ setGateOpened }) {
   const gateGroupRef = useRef();
   const boothRef = useRef();
   const armBaseRef = useRef();
-  const enterButtonRef = useRef();
+  const snowOnArmBaseRef = useRef(); // Ref for the snow on the arm base
+  const [snowKnockedOff, setSnowKnockedOff] = useState(false); // State to track if snow is knocked off
+  const [snowFallProgress, setSnowFallProgress] = useState(0); // Progress of the snow falling
   const [clicked, setClick] = useState(false);
   const { camera } = useThree(); // Access the camera
+  // Snow height variable
+  const [snowHeight, setSnowHeight] = useState(0.2); // Initialize with default snow height
 
   useFrame(() => {
+    if (!snowKnockedOff && gateGroupRef.current.rotation.z >= Math.PI / 4) {
+      setSnowKnockedOff(true);
+    }
+
+    // Animate the snow falling off the arm base
+    if (snowKnockedOff && snowFallProgress < 1) {
+      const fallSpeed = 0.02; // Control the speed of the fall
+      snowOnArmBaseRef.current.position.y -= fallSpeed;
+      snowOnArmBaseRef.current.position.x -= fallSpeed;
+      snowOnArmBaseRef.current.rotation.z += fallSpeed / 2; // Simulate rotation during the fall
+      setSnowFallProgress(snowFallProgress + fallSpeed + 0.08);
+    }
     // Assuming the Z-axis is the forward direction and the gate opens when the camera gets close
     const cameraDistance = Math.abs(
       camera.position.z - gateGroupRef.current.position.z
@@ -47,9 +63,9 @@ export default function TrafficGate({ setGateOpened }) {
         <boxGeometry args={[2.1, 0.4, 1.5]} />
         <meshStandardMaterial color="darkgrey" />
       </mesh>
-      {/* Snow on top of the roof */}
-      <mesh position={[-1.5, 1.42, 0]}>
-        <boxGeometry args={[2.1, 0.05, 1.5]} />
+      {/* Snow on top of the roof, using snowHeight */}
+      <mesh position={[-1.5, 1.2 + 0.2 + snowHeight / 2, 0]}>
+        <boxGeometry args={[2.1, snowHeight, 1.5]} />
         <meshStandardMaterial color="white" />
       </mesh>
 
@@ -68,11 +84,16 @@ export default function TrafficGate({ setGateOpened }) {
         <boxGeometry args={[0.2, 0.4, 0.2]} />
         <meshStandardMaterial color="grey" />
       </mesh>
-      {/* Arm Base Snow */}
-      <mesh ref={armBaseRef} position={[-0.36, 0.63, 0]}>
-        <boxGeometry args={[0.2, 0.04, 0.2]} />
+      {/* Snow on the arm base */}
+      <mesh
+        ref={snowOnArmBaseRef}
+        position={[-0.36, 0.4 + 0.4 / 2 + snowHeight / 2, 0]}
+        rotation={[0, 0, snowKnockedOff ? Math.PI / 4 : 0]} // Rotate when knocked off
+      >
+        <boxGeometry args={[0.2, snowHeight, 0.2]} />
         <meshStandardMaterial color="white" />
       </mesh>
+
       {/* Pivot group for the gate pole with applied rotation */}
       <group
         ref={gateGroupRef}
