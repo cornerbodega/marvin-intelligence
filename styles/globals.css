@@ -1,3 +1,26 @@
+html, body, #_next {
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* This prevents scrollbars from affecting the viewport size */
+}
+
+/* Add this to ensure your canvas fills its container */
+.canvas-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Ensure the full-screen class fills the entire viewport */
+.fullScreen {
+  width: 100vw;
+  height: 100vh;
+  padding: 0 !important;
+  margin: 0 !important;
+  /* These are just for troubleshooting, not typically recommended */
+  position: fixed;
+  top: 0;
+  left: 0;
+}
 
 .textareaWrapper {
   position: relative;

@@ -8,25 +8,35 @@ import CameraControl from "../components/3d/CameraControl";
 import EnterIntelligenceAgencyButton from "../components/3d/Antechamber/EnterIntelligenceAgencyButton";
 import StreetLight from "../components/3d/TrafficGate/StreetLight";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
+import MessageOverlay from "../components/3d/MessageOverlay";
 
 // Home component
 // Home component
 export default function Home() {
   // State to track if the gate is open
   const [gateOpened, setGateOpened] = useState(false);
+  const messages = {
+    "-10": "Entering the restricted area.",
+    0: "Approaching the gate.",
+    14: "Welcome to Intelligence",
+  };
+
+  // In your main scene component
+  <Canvas>
+    <MessageOverlay messages={messages} />
+    {/* Other components */}
+  </Canvas>;
 
   return (
     <div
       style={{
-        height: `calc(100vh - 60px)`, // Assuming a fixed size for simplicity
-        width: `calc(100vw - 50px)`,
+        height: `calc(100vh)`, // Assuming a fixed size for simplicity
+        width: `calc(100vw)`,
         position: "absolute",
-        top: "60px",
-        left: "50px",
       }}
     >
       <Canvas
-        camera={{ position: [0, 1.2, 5], fov: 75 }}
+        camera={{ position: [0, 1.2, 15], fov: 75 }}
         style={{ height: "100%", width: "100%" }}
       >
         <EffectComposer>
@@ -63,6 +73,7 @@ export default function Home() {
         <TrafficGateScene setGateOpened={setGateOpened} />
         <EnterIntelligenceAgencyButton />
         <StreetLight />
+        <MessageOverlay messages={messages} />
       </Canvas>
     </div>
   );

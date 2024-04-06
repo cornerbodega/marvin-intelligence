@@ -7,28 +7,37 @@ export default function CameraControl() {
   useEffect(() => {
     let lastTouchY = 0;
 
-    const handleScroll = (event) => {
+    const handleWheelScroll = (event) => {
       event.preventDefault();
-      const scrollDelta = event.deltaY
-        ? event.deltaY * 0.01
-        : (lastTouchY - event.touches[0].clientY) * 0.1;
-      lastTouchY = event.touches?.[0]?.clientY || lastTouchY;
 
-      // Calculate the new position
+      const scrollDelta = event.deltaY ? event.deltaY * 0.01 : 0;
       let newPosZ = camera.position.z + scrollDelta;
 
-      // Define the limits for the camera position
+      handleCameraPosition(newPosZ);
+    };
+
+    const handleTouchScroll = (event) => {
+      event.preventDefault();
+
+      const touchY = event.touches[0]?.clientY || lastTouchY;
+      const scrollDelta = (lastTouchY - touchY) * 0.1;
+      lastTouchY = touchY;
+
+      let newPosZ = camera.position.z + scrollDelta;
+
+      handleCameraPosition(newPosZ);
+    };
+
+    const handleCameraPosition = (newPosZ) => {
       const minPosZ = -70;
       const maxPosZ = 15;
 
-      // Check if the new position is beyond the limits
       if (newPosZ < minPosZ) {
         newPosZ = minPosZ;
       } else if (newPosZ > maxPosZ) {
         newPosZ = maxPosZ;
       }
 
-      // Update the camera position
       camera.position.z = newPosZ;
     };
 
@@ -37,15 +46,15 @@ export default function CameraControl() {
     };
 
     // Attach the event listeners for both wheel and touch events
-    window.addEventListener("wheel", handleScroll, { passive: false });
+    window.addEventListener("wheel", handleWheelScroll, { passive: false });
     window.addEventListener("touchstart", handleTouchStart, { passive: false });
-    window.addEventListener("touchmove", handleScroll, { passive: false });
+    window.addEventListener("touchmove", handleTouchScroll, { passive: false });
 
     // Clean up by removing the event listeners when component unmounts
     return () => {
-      window.removeEventListener("wheel", handleScroll);
+      window.removeEventListener("wheel", handleWheelScroll);
       window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleScroll);
+      window.removeEventListener("touchmove", handleTouchScroll);
     };
   }, [camera]); // Dependency array includes camera to ensure it's captured in the effect scope
 
