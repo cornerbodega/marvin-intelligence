@@ -61,20 +61,22 @@ export default function MessageOverlay({ messages }) {
         material-toneMapped={false}
         material-depthTest={false}
       >
-        {currentMessage || "Welcome!"}
+        {currentMessage}
       </Text>
       {/* Down Arrow indicating to scroll */}
-      <Text
-        position={[0, -0.15, 0.01]}
-        fontSize={0.1}
-        color="black"
-        anchorX="center"
-        anchorY="middle"
-        material-toneMapped={false}
-        material-depthTest={false}
-      >
-        (scroll to proceed)
-      </Text>
+      {currentMessage != "" && (
+        <Text
+          position={[0, -0.15, 0.01]}
+          fontSize={0.08}
+          color="black"
+          anchorX="center"
+          anchorY="middle"
+          material-toneMapped={false}
+          material-depthTest={false}
+        >
+          (scroll to proceed)
+        </Text>
+      )}
     </group>
   );
 }

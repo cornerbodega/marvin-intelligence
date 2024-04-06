@@ -16,7 +16,7 @@ export default function Home() {
   // State to track if the gate is open
   const [gateOpened, setGateOpened] = useState(false);
   const messages = {
-    "-10": "Entering the restricted area.",
+    "-10": "",
     0: "Approaching the gate.",
     14: "Welcome to Intelligence",
   };

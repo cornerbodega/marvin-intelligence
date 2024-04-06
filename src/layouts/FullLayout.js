@@ -9,6 +9,12 @@ const FullLayout = ({ children }) => {
   const router = useRouter(); // Use useRouter to get the current path
   const isRootPath = router.pathname === "/"; // Check if it's the root path
 
+  const showMobilemenu = () => {
+    if (!isRootPath) {
+      setOpen(!open);
+    }
+  };
+
   return (
     <main>
       <Row
