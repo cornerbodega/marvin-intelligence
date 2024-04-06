@@ -43,39 +43,42 @@ export default function MessageOverlay({ messages }) {
   return (
     <group ref={overlayRef}>
       {/* Overlay Plane */}
-      <Plane args={[2, 0.5]} position={[0, 0, 0]}>
-        <meshBasicMaterial
-          color="lightgray"
-          opacity={0.8}
-          depthTest={false}
-          transparent
-        />
-      </Plane>
-      {/* Text Message */}
-      <Text
-        position={[0, 0, 0.01]}
-        fontSize={0.1}
-        color="black"
-        anchorX="center"
-        anchorY="middle"
-        material-toneMapped={false}
-        material-depthTest={false}
-      >
-        {currentMessage}
-      </Text>
-      {/* Down Arrow indicating to scroll */}
       {currentMessage != "" && (
-        <Text
-          position={[0, -0.15, 0.01]}
-          fontSize={0.08}
-          color="black"
-          anchorX="center"
-          anchorY="middle"
-          material-toneMapped={false}
-          material-depthTest={false}
-        >
-          (scroll to proceed)
-        </Text>
+        <>
+          <Plane args={[2, 0.5]} position={[0, 0, 0]}>
+            <meshBasicMaterial
+              color="lightgray"
+              opacity={0.8}
+              depthTest={false}
+              transparent
+            />
+          </Plane>
+          {/* Text Message */}
+          <Text
+            position={[0, 0, 0.01]}
+            fontSize={0.1}
+            color="black"
+            anchorX="center"
+            anchorY="middle"
+            material-toneMapped={false}
+            material-depthTest={false}
+          >
+            {currentMessage}
+          </Text>
+          {/* Down Arrow indicating to scroll */}
+
+          <Text
+            position={[0, -0.15, 0.01]}
+            fontSize={0.08}
+            color="black"
+            anchorX="center"
+            anchorY="middle"
+            material-toneMapped={false}
+            material-depthTest={false}
+          >
+            (scroll to proceed)
+          </Text>
+        </>
       )}
     </group>
   );

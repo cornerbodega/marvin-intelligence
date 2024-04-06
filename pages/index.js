@@ -16,11 +16,15 @@ export default function Home() {
   // State to track if the gate is open
   const [gateOpened, setGateOpened] = useState(false);
   const messages = {
-    "-10": "",
-    0: "Approaching the gate.",
+    "-80": "",
+    "-20": "AI-ify your learning",
+    "-5": "Agents will write linked reports",
+    "-1": "Approve to save the report",
+    0: "You provide feedback",
+    5: "Your agents will write reports",
+    10: "Think of what you'd like to know",
     14: "Welcome to Intelligence",
   };
-
   // In your main scene component
   <Canvas>
     <MessageOverlay messages={messages} />
