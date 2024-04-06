@@ -45,18 +45,18 @@ export default function MessageOverlay({ messages }) {
       {/* Overlay Plane */}
       {currentMessage != "" && (
         <>
-          <Plane args={[2, 0.5]} position={[0, 0, 0]}>
+          <Plane args={[2, 0.5]} position={[0, 0.5, 0]}>
             <meshBasicMaterial
               color="lightgray"
-              opacity={0.8}
+              opacity={1}
               depthTest={false}
               transparent
             />
           </Plane>
           {/* shadow pane */}
-          <Plane args={[2, 0.5]} position={[0, 0, -0.05]}>
+          <Plane args={[2.1, 0.6]} position={[0, 0.5, -0.01]}>
             <meshBasicMaterial
-              color="grey"
+              color="black"
               opacity={0.8}
               depthTest={false}
               transparent
@@ -64,7 +64,7 @@ export default function MessageOverlay({ messages }) {
           </Plane>
           {/* Text Message */}
           <Text
-            position={[0, 0.1, 0.01]}
+            position={[0, 0.6, 0.01]}
             fontSize={0.1}
             color="black"
             anchorX="center"
@@ -77,7 +77,7 @@ export default function MessageOverlay({ messages }) {
           {/* Down Arrow indicating to scroll */}
 
           <Text
-            position={[0, -0.1, 0.01]}
+            position={[0, 0.4, 0.01]}
             fontSize={0.08}
             color="black"
             anchorX="center"
