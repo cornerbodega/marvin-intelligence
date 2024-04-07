@@ -1,9 +1,10 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Text, Box } from "@react-three/drei";
 import { useRouter } from "next/router"; // Import useRouter from next/router if you're using Next.js
 
 export default function EnterIntelligenceAgencyButton() {
+  const [buttonText, setButtonText] = useState("Enter Intelligence Agency");
   const buttonMesh = useRef();
   const router = useRouter(); // Initialize useRouter for navigation
 
@@ -15,6 +16,7 @@ export default function EnterIntelligenceAgencyButton() {
 
   // Function to handle the click event
   const handleClick = () => {
+    setButtonText("Entering..."); // Update the text displayed on the button
     router.push("/intelnet/folders/view-intelnet"); // Route the user to the specified path
   };
 
@@ -38,7 +40,7 @@ export default function EnterIntelligenceAgencyButton() {
       </Box>
 
       <spotLight position={[0, 0.5, -80]} intensity={4} />
-      {/* Text for the button */}
+      {/* Dynamic text for the button */}
       <Text
         position={[0, 3, -80]}
         rotation={[Math.PI / 8, 0, 0]}
@@ -47,7 +49,7 @@ export default function EnterIntelligenceAgencyButton() {
         anchorX="center"
         anchorY="middle"
       >
-        Enter Intelligence Agency
+        {buttonText}
       </Text>
     </group>
   );

@@ -1,8 +1,8 @@
-html, body, #_next {
+/* html, body, #_next {
   margin: 0;
   padding: 0;
-  overflow: hidden; /* This prevents scrollbars from affecting the viewport size */
-}
+  overflow: hidden; 
+} */
 
 /* Add this to ensure your canvas fills its container */
 .canvas-container {

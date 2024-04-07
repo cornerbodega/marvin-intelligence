@@ -114,7 +114,7 @@ export default function MountainRange() {
       <mesh
         key={i}
         ref={(el) => (mountainsRef.current[i] = el)}
-        position={[positionX, height / 2 - 20, positionZ - 20]}
+        position={[positionX, height / 2 - 24, positionZ - 20]}
         geometry={new ConeGeometry(20, height, 4)}
         material={new MeshStandardMaterial({ color: "green" })}
       >
