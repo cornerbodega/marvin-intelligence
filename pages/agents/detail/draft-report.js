@@ -120,7 +120,15 @@ const CreateMission = ({
   const [writeDraftTaskId, setWriteDraftTaskId] = useState();
   const [isSaving, setIsSaving] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
-
+  const firebaseSaveData = useFirebaseListener(
+    userId
+      ? `/${
+          process.env.NEXT_PUBLIC_env === "production"
+            ? "asyncTasks"
+            : "localAsyncTasks"
+        }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/regenerateFolder/`
+      : null
+  );
   const firebaseDraftData = useFirebaseListener(
     user
       ? `/${
@@ -138,11 +146,26 @@ const CreateMission = ({
             : "localAsyncTasks"
         }/${process.env.NEXT_PUBLIC_SERVER_UID}/${
           user.sub
-        }/saveLinkedReport/context/folderId`
+        }/finalizeAndVisualizeReport/context/folderId`
       : null
   );
   const [hasSavedReport, setHasSavedReport] = useState(false);
-
+  // useEffect(() => {
+  //   if (firebaseSaveData) {
+  //     if (firebaseSaveData.status === "complete") {
+  //       if (hasSavedReport) {
+  //         if (firebaseSaveData.folderId) {
+  //           router.push({
+  //             pathname: `/reports/folders/intel-report/${firebaseSaveData.folderId}`,
+  //             query: { userId },
+  //           });
+  //         } else {
+  //           // setShowLoadingImage(true);
+  //         }
+  //       }
+  //     }
+  //   }
+  // }, [firebaseSaveData]);
   useEffect(() => {
     if (firebaseFolderIdData && hasSavedReport) {
       router.push({
@@ -219,6 +242,14 @@ const CreateMission = ({
         createdAt: new Date().toISOString(),
       };
       await saveTask(clearSaveReportTask);
+      const clearFinalizeAndVisualizeReport = {
+        type: "finalizeAndVisualizeReport",
+        status: "cleared",
+        userId: user.sub,
+        context: {},
+        createdAt: new Date().toISOString(),
+      };
+      await saveTask(clearFinalizeAndVisualizeReport);
 
       const newTask = {
         type: "quickDraft",
@@ -254,7 +285,7 @@ const CreateMission = ({
     try {
       const draftData = {
         briefingInput: router.query.briefingInput,
-        existingAgentId: agent.agentId,
+        agentId: agent.agentId,
         draft,
       };
       if (router.query.parentReportId) {
@@ -266,9 +297,12 @@ const CreateMission = ({
       if (router.query.elementId) {
         draftData.elementId = router.query.elementId;
       }
-
+      let reportType = "finalizeAndVisualizeReport";
+      if (draftData.parentReportId) {
+        reportType = "saveLinkedReport";
+      }
       const saveReportTask = {
-        type: "saveLinkedReport",
+        type: reportType,
         status: "queued",
         userId: user.sub,
         context: {
@@ -700,57 +734,62 @@ const CreateMission = ({
               </div>
             </div>
           )}
-          {draft && !isSubmitting && draft.endsWith(" ".repeat(3)) && (
-            <>
-              <Form onSubmit={(e) => handleQuickDraft(e)}>
-                <FormGroup>
-                  <div style={{ marginTop: "40px" }}></div>
-                  <Label htmlFor="exampleText" className="text-white">
-                    Feedback
-                  </Label>
-                  <Input
-                    style={{ backgroundColor: "#131313" }}
-                    id="exampleText"
-                    placeholder="What do you think?"
-                    name="text"
-                    rows="5"
-                    type="textarea"
-                    value={feedbackInput}
-                    onChange={(e) => setFeedbackInput(e.target.value)}
-                  />
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "flex-end",
-                      paddingTop: "8px",
-                    }}
-                  >
-                    <Button
-                      color="primary"
+          {draft &&
+            !isSubmitting &&
+            hasSubmitted &&
+            draft.endsWith(" ".repeat(3)) && (
+              <>
+                <Form onSubmit={(e) => handleQuickDraft(e)}>
+                  <FormGroup>
+                    <div style={{ marginTop: "40px" }}></div>
+                    <Label htmlFor="exampleText" className="text-white">
+                      Feedback
+                    </Label>
+                    <Input
+                      style={{ backgroundColor: "#131313" }}
+                      id="exampleText"
+                      placeholder="What do you think?"
+                      name="text"
+                      rows="5"
+                      type="textarea"
+                      value={feedbackInput}
+                      onChange={(e) => setFeedbackInput(e.target.value)}
+                    />
+                    <div
                       style={{
-                        border: "1px solid yellow",
-                        marginRight: "16px",
+                        display: "flex",
+                        flexDirection: "flex-end",
+                        paddingTop: "8px",
                       }}
-                      disabled={isSubmitting}
                     >
-                      <i className="bi bi-arrow-clockwise"></i>
-                      &nbsp;Refine
-                    </Button>
-                  </div>
-                </FormGroup>
-              </Form>
+                      <Button
+                        color="primary"
+                        style={{
+                          border: "1px solid yellow",
+                          marginRight: "16px",
+                        }}
+                        disabled={isSubmitting}
+                      >
+                        <i className="bi bi-arrow-clockwise"></i>
+                        &nbsp;Refine
+                      </Button>
+                    </div>
+                  </FormGroup>
+                </Form>
 
-              <Button
-                color="primary"
-                style={{ border: "3px solid green", marginTop: "40px" }}
-                disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
-                onClick={(e) => handleAcceptReport(e)}
-              >
-                <i className="bi bi-floppy"></i> Save Report
-              </Button>
-              {isSaving && isSubmitting && "Savinng Report..."}
-            </>
-          )}
+                <Button
+                  color="primary"
+                  style={{ border: "3px solid green", marginTop: "40px" }}
+                  disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
+                  onClick={(e) => handleAcceptReport(e)}
+                >
+                  <i className="bi bi-floppy"></i> Save Report
+                </Button>
+              </>
+            )}
+          <div style={{ marginTop: "10px" }}>
+            {hasSubmitted && isSubmitting && "Saving Report..."}
+          </div>
         </Col>
       </Row>
     </div>
