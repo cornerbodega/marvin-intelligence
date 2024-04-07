@@ -25,6 +25,11 @@ export default function MessageOverlay({ messages }) {
 
   // Use useEffect to initialize the message
   useEffect(() => {
+    overlayRef.current.renderOrder = 1000; // Set a high render order value
+    // Apply this to all relevant children, as the renderOrder needs to be set individually
+    overlayRef.current.children.forEach((child) => {
+      child.renderOrder = 1000;
+    });
     updateMessage();
   }, []); // Empty array ensures this runs once on mount
 

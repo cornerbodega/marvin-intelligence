@@ -20,7 +20,7 @@ const IntelliCardGroup = ({
         return acc;
       }, [])
     : [];
-  const PAGE_COUNT = 6;
+  const PAGE_COUNT = 9;
   return (
     <>
       {rowsInThrees.map((cols, index) => {

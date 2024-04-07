@@ -16,7 +16,7 @@ import Link from "next/link";
 
 import Head from "next/head";
 import { saveToSupabase } from "../../../utils/saveToSupabase";
-const PAGE_COUNT = 6;
+const PAGE_COUNT = 9;
 const supabase = getSupabase();
 
 export const getServerSideProps = withPageAuthRequired({

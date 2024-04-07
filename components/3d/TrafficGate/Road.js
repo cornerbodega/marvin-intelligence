@@ -20,7 +20,9 @@ export default function Road() {
     () => new BoxGeometry(0.07, snowLineHeight, 10),
     [snowLineHeight]
   ); // Use snowLineHeight here
-  const planeGeometry = useMemo(() => new PlaneGeometry(5, 350), []);
+  // const planeGeometry = useMemo(() => new PlaneGeometry(5, 350), []);
+  const whitePlaneGeometry = useMemo(() => new PlaneGeometry(5, 110), []);
+  const darkGrayPlaneGeometry = useMemo(() => new PlaneGeometry(5, 250), []);
   const silverMaterial = useMemo(
     () => new MeshStandardMaterial({ color: "silver" }),
     []
@@ -33,7 +35,10 @@ export default function Road() {
     () => new MeshStandardMaterial({ color: "darkgray" }),
     []
   );
-
+  const whiteMaterial = useMemo(
+    () => new MeshStandardMaterial({ color: "white" }),
+    []
+  );
   const createFenceLines = (positions, xOffset) => {
     return positions.map((position, index) => {
       if (index === 0) return null;
@@ -62,11 +67,28 @@ export default function Road() {
 
   return (
     <group>
-      <mesh
+      <group>
+        {/* Dark gray road segment */}
+        <mesh
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, 0, -75]} // Positioned to start at z = -50, considering its height
+          geometry={darkGrayPlaneGeometry}
+          material={darkGrayMaterial}
+        />
+        {/* White road segment */}
+        <mesh
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, 0.01, 0]} // Slightly raised to avoid z-fighting
+          geometry={whitePlaneGeometry}
+          material={whiteMaterial}
+        />
+        {/* Fence poles and lines */}
+      </group>
+      {/* <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         geometry={planeGeometry}
         material={darkGrayMaterial}
-      />
+      /> */}
       {fencePolePositions.map((position, index) => (
         <React.Fragment key={`pole-${index}`}>
           <mesh

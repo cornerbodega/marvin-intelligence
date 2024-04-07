@@ -27,6 +27,8 @@ export default function StreetLight() {
         <boxGeometry args={[0.3, 0.1, 0.1]} />
         <meshStandardMaterial color="orange" />
       </mesh>
+      {/* add a point light */}
+      <pointLight position={[0.6, 2.1, 0]} intensity={0.5} color={"orange"} />
     </group>
   );
 }

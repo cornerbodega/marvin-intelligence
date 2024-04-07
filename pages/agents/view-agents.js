@@ -11,7 +11,7 @@ const supabase = getSupabase();
 
 import { slugify } from "../../utils/slugify";
 import Head from "next/head";
-const PAGE_COUNT = 6;
+const PAGE_COUNT = 9;
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     const session = await getSession(context.req, context.res);

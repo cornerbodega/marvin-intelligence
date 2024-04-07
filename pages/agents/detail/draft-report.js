@@ -119,6 +119,7 @@ const CreateMission = ({
 
   const [writeDraftTaskId, setWriteDraftTaskId] = useState();
   const [isSaving, setIsSaving] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const firebaseDraftData = useFirebaseListener(
     user
@@ -185,6 +186,7 @@ const CreateMission = ({
     if (e) {
       e.preventDefault();
     }
+    setHasSubmitted(true);
     setIsSubmitting(true);
     setFeedbackInput("");
     const draftData = {
@@ -620,7 +622,7 @@ const CreateMission = ({
 
                     {agentMissionHistory && (
                       <>
-                        <div>
+                        <div style={{ marginTop: "12px" }}>
                           <h4>Report History</h4>
                         </div>
                         <ul>
@@ -680,7 +682,7 @@ const CreateMission = ({
             </div>
           </Form>
           <div style={{ marginTop: "50px" }} ref={draftRef}></div>
-          {draft && (
+          {draft && hasSubmitted && (
             <Card style={{ background: "black", color: "white" }}>
               <CardBody className="report">
                 <i className="bi bi-body-text"> New Draft </i>
@@ -737,6 +739,7 @@ const CreateMission = ({
                   </div>
                 </FormGroup>
               </Form>
+
               <Button
                 color="primary"
                 style={{ border: "3px solid green", marginTop: "40px" }}

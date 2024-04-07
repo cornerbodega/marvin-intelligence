@@ -6,7 +6,7 @@ import { getSession } from "@auth0/nextjs-auth0";
 import { getSupabase } from "../../../utils/supabase";
 import { slugify } from "../../../utils/slugify";
 import IntelliCardGroup from "../../../components/IntelliCardGroup";
-const PAGE_COUNT = 6;
+const PAGE_COUNT = 9;
 const supabase = getSupabase();
 export async function getServerSideProps(context) {
   const session = await getSession(context.req, context.res);

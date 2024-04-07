@@ -5,14 +5,15 @@ import { useRouter } from "next/router";
 
 const navigation = [
   {
+    title: "My Agency",
+    href: "/reports/folders/view-folders",
+    icon: "bi bi-body-text",
+  },
+
+  {
     title: "Intel-Net",
     href: "/intelnet/folders/view-intelnet",
     icon: "bi bi-globe2",
-  },
-  {
-    title: "Reports",
-    href: "/reports/folders/view-folders",
-    icon: "bi bi-body-text",
   },
 
   {
