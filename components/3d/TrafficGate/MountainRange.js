@@ -141,15 +141,20 @@ export default function MountainRange() {
       const doorMaterial = new MeshStandardMaterial({ color: "grey" });
 
       return (
-        <group key={`group-${i}`} ref={(el) => (mountainsRef.current[i] = el)}>
-          {baseMesh}
-          {overlayMesh}
+        <>
+          <group
+            key={`group-${i}`}
+            ref={(el) => (mountainsRef.current[i] = el)}
+          >
+            {baseMesh}
+            {overlayMesh}
+          </group>
           <mesh
             position={[positionX, doorPosition.y + 10, doorPosition.z - 9]}
             geometry={doorGeometry}
             material={doorMaterial}
           />
-        </group>
+        </>
       );
     }
 
