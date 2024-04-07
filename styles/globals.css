@@ -1,8 +1,4 @@
-/* html, body, #_next {
-  margin: 0;
-  padding: 0;
-  overflow: hidden; 
-} */
+
 
 /* Add this to ensure your canvas fills its container */
 .canvas-container {
@@ -16,10 +12,7 @@
   height: 100vh;
   padding: 0 !important;
   margin: 0 !important;
-  /* These are just for troubleshooting, not typically recommended */
-  position: fixed;
-  top: 0;
-  left: 0;
+
 }
 
 .textareaWrapper {
