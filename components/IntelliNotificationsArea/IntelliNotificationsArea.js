@@ -3,6 +3,7 @@ import getEnv from "../../utils/getEnv";
 import { useFirebaseListener } from "../../utils/useFirebaseListener";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import IntelliLoadingBar from "../IntelliLoadingBar/IntelliLoadingBar";
 
 export default function IntelliNotificationsArea() {
   let { user } = useUser();
@@ -119,7 +120,7 @@ export default function IntelliNotificationsArea() {
       const percentage = ((completedSubtasks / totalSubtasks) * 100).toFixed(2);
 
       setNotificationString(
-        `${completedSubtasks + 1}/${totalSubtasks} (${percentage}%) ${
+        `${completedSubtasks + 1}/${totalSubtasks} ${
           notifications[currentSubtaskIndex]
         } ${
           (completedSubtasks === 1 &&
@@ -138,20 +139,6 @@ export default function IntelliNotificationsArea() {
     firebaseContinuumSubtasks,
     notifications,
   ]);
-  const [animate, setAnimate] = useState(false);
-
-  // useEffect(() => {
-  //   setAnimate(true);
-  //   const timeout = setTimeout(() => setAnimate(false), 3000); // Adjust for fade duration
-  //   return () => clearTimeout(timeout);
-  // }, [notificationString]);
-  // useEffect(() => {
-  //   const dotInterval = setInterval(() => {
-  //     setLibraryImage((dots) => (dots.length < 3 ? dots + "." : ""));
-  //   }, 500); // Adjust timing as needed
-
-  //   return () => clearInterval(dotInterval);
-  // }, []);
 
   const isInProgress =
     firebaseVisualizeAndSaveStatus === "in-progress" ||
@@ -196,6 +183,7 @@ export default function IntelliNotificationsArea() {
           {`${notificationString}`}
         </div>
       )}
+      <IntelliLoadingBar speedFactor={1} />
     </>
   );
 }

@@ -265,8 +265,6 @@ const ViewReports = ({
       ? "asyncTasks"
       : "localAsyncTasks"
   }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/regenerateFolder/context/`;
-  // console.log("folderPath");
-  // console.log(folderPath);
 
   const firebaseFolderData = useFirebaseListener(user ? folderPath : null);
 
@@ -325,13 +323,6 @@ const ViewReports = ({
     // Update the state with the newly fetched data
     setLoadedReports(updatedMissions);
     updateReports(updatedMissions); // this one sets links on initial load
-    // if (updatedMissionsResponse[0].folders.folderPicUrl) {
-    //   setFolderPicUrl(updatedMissionsResponse[0].folders.folderPicUrl);
-    //   setFolderDescription(
-    //     updatedMissionsResponse[0].folders.folderDescription
-    //   );
-    //   setFolderName(updatedMissionsResponse[0].folders.folderName);
-    // }
   }
   function goToAgentProfile({ agentId }) {
     Router.push({
@@ -343,12 +334,10 @@ const ViewReports = ({
   useEffect(() => {
     if (firebaseDraftData) {
       if (firebaseDraftData.status == "complete") {
-        // if (hasStartedContinuum) {
         fetchUpdatedReports();
         setHasStartedContinuum(false);
         setIsStreaming(false);
         setContinuumCompleted(true);
-        // }
       }
     }
   }, [firebaseDraftData]);
@@ -640,9 +629,7 @@ const ViewReports = ({
       );
 
       for (const parentReportId of parentReportIds) {
-        // console.log("parentReportId");
         const childReports = parentChildIdMap[parentReportId];
-        // console.log(parentReportId);
         if (!childReports) {
           if (!seenReportIds.includes(parentReportId)) {
             seenReportIds.push(parentReportId);

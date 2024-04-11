@@ -1,3 +1,24 @@
+/* IntelliNotificationsArea.module.css */
+.loadingBarContainer {
+  width: 100%;
+  background-color: #ddd;
+  border-radius: 2px;
+  margin-top: 5px;
+}
+
+.loadingBar {
+  height: 20px;
+  background-color: #4CAF50;
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.5s ease-in-out;
+}
+
+@keyframes loadingAnimation {
+  0% { width: 0%; }
+  50% { width: 90%; }
+  100% { width: 0%; }
+}
 
 
 /* Add this to ensure your canvas fills its container */

@@ -23,6 +23,8 @@ import { useState, useEffect } from "react";
 
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
 
+import IntelliLoadingBar from "../../../components/IntelliLoadingBar/IntelliLoadingBar";
+
 const CreateMission = ({}) => {
   const router = useRouter();
 
@@ -183,11 +185,15 @@ const CreateMission = ({}) => {
             <CardBody style={{ backgroundColor: "#131313", color: "white" }}>
               <i className="bi bi-body-text"> Draft {i + 1} </i>
               <div
+                style={{ marginTop: "20px" }}
                 className="text-white"
                 dangerouslySetInnerHTML={{ __html: feedback.draft }}
               />
-              <i className="bi bi-pencil"> Feedback </i>
+              <div style={{ marginTop: "40px" }}>
+                <i className="bi bi-pencil"> Feedback </i>
+              </div>
               <div
+                style={{ marginTop: "20px" }}
                 className="text-white"
                 dangerouslySetInnerHTML={{
                   __html: feedback.feedback,
@@ -199,11 +205,17 @@ const CreateMission = ({}) => {
 
       {!showLoadingImage && (
         <div>
+          {draft && !draft.endsWith(" ".repeat(3)) && (
+            <>
+              <IntelliLoadingBar speedFactor={3} />
+            </>
+          )}
           {draft && (
             <Card style={{ backgroundColor: "#131313", color: "white" }}>
               <CardBody style={{ backgroundColor: "#131313", color: "white" }}>
                 <i className="bi bi-body-text"> Current Draft </i>
                 <div
+                  style={{ marginTop: "20px" }}
                   className="text-white"
                   dangerouslySetInnerHTML={{ __html: draft }}
                 />
@@ -235,7 +247,7 @@ const CreateMission = ({}) => {
                     />
                     <div
                       style={{
-                        textAlign: "right",
+                        textAlign: "left",
                         paddingTop: "8px",
                       }}
                     >
@@ -250,7 +262,7 @@ const CreateMission = ({}) => {
                         onClick={(e) => handleQuickDraftClick(e)}
                       >
                         <i className="bi bi-arrow-clockwise"></i>
-                        &nbsp;Send
+                        &nbsp;Retry
                       </Button>
                     </div>
                   </FormGroup>
