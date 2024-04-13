@@ -13,6 +13,7 @@ import Head from "next/head";
 import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
 import IntelliCopyUrl from "../../../../components/IntelliCopyUrl/IntelliCopyUrl";
 import Image from "next/image";
+import { useRouter } from "next/router";
 export async function getServerSideProps(context) {
   console.log("context.params.folderSlug");
   console.log(context.params.folderSlug);
@@ -44,6 +45,7 @@ export async function getServerSideProps(context) {
             agent:agentId (
                 agentId,
                 agentName,
+                profilePicUrl,
                 expertise1,
                 expertise2,
                 expertise3,
@@ -156,9 +158,40 @@ const ViewReports = ({
   const { user } = useUser();
   const userId = user ? user.sub : null;
   const [loadedReports, setLoadedReports] = useState(_loadedReports);
-
+  const router = useRouter();
   const [isStreaming, setIsStreaming] = useState(false);
+  const [loadedAgentId, setLoadedAgentId] = useState(agentId);
+  const [agent, setAgent] = useState({});
 
+  useEffect(() => {
+    // get agent from supabase by agentId
+    // set agent name
+
+    updateAgent(loadedAgentId);
+  }, [loadedAgentId]);
+  async function updateAgent(loadedAgentId) {
+    let { data: agents, error: agentsError } = await supabase
+      .from("agents")
+      .select("*")
+      .eq("agentId", loadedAgentId);
+
+    if (agentsError) {
+      console.log("agentError", agentError);
+      return;
+    }
+    console.log("agent");
+    console.log(agents);
+    if (agents && agents.length > 0) {
+      setAgent(agents[0]);
+    }
+  }
+
+  function goToAgentProfile({ agentId }) {
+    router.push({
+      pathname: "/agents/detail/draft-report",
+      query: { ...router.query, agentId: agentId },
+    });
+  }
   const [folderName, setFolderName] = useState(_folderName);
   const [folderDescription, setFolderDescription] =
     useState(_folderDescription);
@@ -177,8 +210,6 @@ const ViewReports = ({
         }/${userId}/finalizeAndVisualizeReport/context/`
       : null
   );
-
-  const [agent] = useState({});
 
   const firebaseFolderData = useFirebaseListener(
     user
@@ -204,6 +235,10 @@ const ViewReports = ({
   const [likes, setLikes] = useState(
     _folderLikes.map((like) => like.likeValue).reduce((a, b) => a + b, 0)
   );
+
+  useEffect(() => {
+    fetchUpdatedReports();
+  }, []);
 
   async function fetchUpdatedReports() {
     console.log("FETCH UPDATED REPORTS");
@@ -268,7 +303,10 @@ const ViewReports = ({
   useEffect(() => {
     if (firebaseSaveData) {
       console.log("firebase save data");
-
+      console.log(
+        `${firebaseSaveData.reportPicUrl} ${folderId} ${firebaseSaveData.folderId}`
+      );
+      console.log("update reports");
       if (
         firebaseSaveData.folderId &&
         firebaseSaveData.folderId == folderId &&
@@ -798,6 +836,48 @@ const ViewReports = ({
               </div>
             );
           })}
+        {agent.profilePicUrl && !isStreaming && (
+          <div
+            style={{ textAlign: "center", marginTop: "116px" }}
+            onClick={() => goToAgentProfile({ agentId: agent.agentId })}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+
+                width: "auto",
+                objectFit: "cover",
+                marginBottom: "16px",
+
+                textAlign: "center",
+              }}
+            >
+              <img
+                src={agent.profilePicUrl}
+                style={{
+                  borderRadius: "20%",
+                  cursor: "pointer",
+                  width: "300px",
+                  height: "auto",
+                }}
+                alt="agent"
+              />
+            </div>
+
+            <a
+              style={{
+                fontWeight: 800,
+                color: "#E7007C",
+                fontWeight: "200",
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+            >
+              Agent {agent.agentName}
+            </a>
+          </div>
+        )}
       </div>
     </>
   );

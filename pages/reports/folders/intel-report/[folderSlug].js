@@ -332,6 +332,10 @@ const ViewReports = ({
   }
 
   useEffect(() => {
+    fetchUpdatedReports();
+  }, []);
+
+  useEffect(() => {
     if (firebaseDraftData) {
       if (firebaseDraftData.status == "complete") {
         fetchUpdatedReports();

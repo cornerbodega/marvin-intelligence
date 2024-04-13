@@ -80,6 +80,7 @@ export default function Home() {
         {/* <OrbitControls /> */}
         <TrafficGateScene setGateOpened={setGateOpened} />
         <EnterIntelligenceAgencyButton />
+
         <StreetLight />
         <MessageOverlay messages={messages} />
       </Canvas>

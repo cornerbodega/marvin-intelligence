@@ -10,7 +10,8 @@ export default function CameraControl() {
     const handleWheelScroll = (event) => {
       event.preventDefault();
 
-      const scrollDelta = event.deltaY ? event.deltaY * 0.01 : 0;
+      // Reverse the scroll direction here by negating the deltaY
+      const scrollDelta = event.deltaY ? -event.deltaY * 0.01 : 0;
       let newPosZ = camera.position.z + scrollDelta;
 
       handleCameraPosition(newPosZ);
@@ -20,7 +21,8 @@ export default function CameraControl() {
       event.preventDefault();
 
       const touchY = event.touches[0]?.clientY || lastTouchY;
-      const scrollDelta = (lastTouchY - touchY) * 0.1;
+      // Reverse the scroll direction here as well
+      const scrollDelta = (touchY - lastTouchY) * 0.1;
       lastTouchY = touchY;
 
       let newPosZ = camera.position.z + scrollDelta;

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Text, Box } from "@react-three/drei";
 import { useRouter } from "next/router"; // Import useRouter from next/router if you're using Next.js
 
@@ -7,11 +7,15 @@ export default function EnterIntelligenceAgencyButton() {
   const [buttonText, setButtonText] = useState("Enter Intelligence Agency");
   const buttonMesh = useRef();
   const router = useRouter(); // Initialize useRouter for navigation
-
+  const { camera } = useThree();
   // Animation logic for floating effect
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
     buttonMesh.current.position.y = (Math.sin(t) * 0.5 + 0.45) * 0.5;
+
+    if (camera.position.z < -60) {
+      handleClick();
+    }
   });
 
   // Function to handle the click event
