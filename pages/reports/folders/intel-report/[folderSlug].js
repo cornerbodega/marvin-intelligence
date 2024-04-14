@@ -324,6 +324,7 @@ const ViewReports = ({
     setLoadedReports(updatedMissions);
     updateReports(updatedMissions); // this one sets links on initial load
   }
+
   function goToAgentProfile({ agentId }) {
     Router.push({
       pathname: "/agents/detail/draft-report",
@@ -727,7 +728,7 @@ const ViewReports = ({
                 <a
                   style={{
                     fontSize: "1rem",
-                    color: "#E7007C",
+                    color: "#00e5ff",
                     fontWeight: calculateFontWeight(level),
                     textDecoration: "none",
                     cursor: "pointer",
@@ -1082,7 +1083,7 @@ const ViewReports = ({
                 <li key={parentChildIdMap.id}>
                   <a
                     style={{
-                      color: "#E7007C",
+                      color: "#00e5ff",
                       textDecoration: "none",
                       cursor: "pointer",
                       fontSize: "1.2em",
@@ -1327,7 +1328,7 @@ const ViewReports = ({
             <a
               style={{
                 fontWeight: 800,
-                color: "#E7007C",
+                color: "#00e5ff",
                 fontWeight: "200",
                 textDecoration: "none",
                 cursor: "pointer",

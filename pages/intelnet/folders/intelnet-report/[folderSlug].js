@@ -36,6 +36,7 @@ export async function getServerSideProps(context) {
             folderPicUrl
         ),
         reports:reports (
+            createdAt,
             reportTitle,
             reportPicUrl,
             reportPicDescription,
@@ -248,10 +249,12 @@ const ViewReports = ({
       .select(
         `
               folders (folderName, folderDescription, folderPicUrl),
-              reports (reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, reportPicDescription)
+              reports (reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, reportPicDescription, createdAt)
           `
       )
-      .eq("folderId", folderId);
+      .eq("folderId", folderId)
+      .order("createdAt", { ascending: true });
+
     console.log("updatedMissionsResponse");
     console.log(updatedMissionsResponse);
     if (updatedError) {
@@ -323,14 +326,14 @@ const ViewReports = ({
     if (!loadedReports) return;
     let reports = newestReports;
     if (!reports) reports = loadedReports;
-    const updatedReports = await Promise.all(
+    let updatedReports = await Promise.all(
       reports.map(async (report) => {
         const clonedReport = { ...report };
         await getLinks(clonedReport);
         return clonedReport;
       })
     );
-
+    console.log(`updatedReports ${JSON.stringify(updatedReports[0])}`);
     console.log("Setting Loaded Reports");
     setLoadedReports(updatedReports);
   }
@@ -733,7 +736,7 @@ const ViewReports = ({
             <li style={{ marginBottom: "8px" }} key={parentChildIdMap.id}>
               <a
                 style={{
-                  color: "#E7007C",
+                  color: "#00e5ff",
                   textDecoration: "none",
                   cursor: "pointer",
                   fontWeight: 800,
@@ -868,7 +871,7 @@ const ViewReports = ({
             <a
               style={{
                 fontWeight: 800,
-                color: "#E7007C",
+                color: "#00e5ff",
                 fontWeight: "200",
                 textDecoration: "none",
                 cursor: "pointer",

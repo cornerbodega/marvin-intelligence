@@ -76,7 +76,7 @@ const Sidebar = ({ showMobilemenu }) => {
                 }
                 style={
                   location.includes(navi.href.split("/")[1])
-                    ? { textDecoration: "underline", color: "#E7007C" }
+                    ? { textDecoration: "underline", color: "#00e5ff" }
                     : { color: "white" }
                 }
               >

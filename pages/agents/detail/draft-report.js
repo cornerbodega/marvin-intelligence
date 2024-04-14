@@ -672,7 +672,7 @@ const CreateMission = ({
                                   style={{
                                     textDecoration: "none",
                                     fontWeight: 300,
-                                    color: "#E7007C",
+                                    color: "#00e5ff",
                                     cursor: "pointer",
                                   }}
                                   href={`/reports/folders/intel-report/${mission.reportFolders[0].folderId}`}
@@ -697,7 +697,7 @@ const CreateMission = ({
                             style={{
                               textDecoration: "none",
                               fontWeight: 300,
-                              color: "#E7007C",
+                              color: "#00e5ff",
                               cursor: "pointer",
                             }}
                             href={`/reports/folders/intel-report/${parentReportId}`}

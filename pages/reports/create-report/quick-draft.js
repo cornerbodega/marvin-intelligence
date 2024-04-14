@@ -270,7 +270,7 @@ const CreateMission = ({}) => {
                 <div style={{ textAlign: "center" }}>
                   <Button
                     color="primary"
-                    style={{ border: "3px solid green" }}
+                    style={{ border: "3px solid green", fontSize: "2em" }}
                     disabled={
                       isSubmitting ||
                       hasSubmitted ||
