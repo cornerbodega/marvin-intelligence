@@ -1,4 +1,4 @@
-import { Row, Breadcrumb, BreadcrumbItem } from "reactstrap";
+import { Row, Breadcrumb, BreadcrumbItem, Button } from "reactstrap";
 import useRouter from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
@@ -298,12 +298,25 @@ const ViewReports = ({
 
   return (
     <>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button
+          color="primary"
+          style={{
+            border: "3px solid green",
+            fontSize: "1em",
+            marginBottom: "20px",
+            // align to the right using flexbox
+          }}
+          onClick={(e) => goToPage("/reports/folders/view-folders")}
+        >
+          <i className="bi bi-body-text"></i> Create Report
+        </Button>
+      </div>
       <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white" active>
           <i className={`bi bi-globe`}></i>&nbsp;Intel-Net
         </BreadcrumbItem>
       </Breadcrumb>
-
       <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
         <input
           type="text"
