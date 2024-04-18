@@ -11,7 +11,6 @@ import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import MessageOverlay from "../components/3d/MessageOverlay";
 
 // Home component
-// Home component
 export default function Home() {
   // State to track if the gate is open
   const [gateOpened, setGateOpened] = useState(false);
@@ -26,10 +25,22 @@ export default function Home() {
     14: "Welcome to Intelligence",
   };
   // In your main scene component
-  <Canvas>
-    <MessageOverlay messages={messages} />
-    {/* Other components */}
-  </Canvas>;
+  // <Canvas>
+  {
+    /* <MessageOverlay messages={messages} /> */
+  }
+  {
+    /* <SimpleText /> */
+  }
+  {
+    /*  */
+  }
+  {
+    /* Other components */
+  }
+  {
+    /* </Canvas>; */
+  }
 
   return (
     <div

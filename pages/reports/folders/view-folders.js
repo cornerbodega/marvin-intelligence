@@ -531,7 +531,9 @@ const ViewReports = ({
           Create Report
         </BreadcrumbItem>
       </Breadcrumb>
-      Ask a question to create a report
+      <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+        Ask a question to create a report
+      </div>
       <div id="quickDraftBriefingInput">
         <div className="textareaWrapper">
           <textarea
