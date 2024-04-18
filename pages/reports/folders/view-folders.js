@@ -344,6 +344,9 @@ const ViewReports = ({
           .select("*")
           .range(from, to)
           .or(`availability.neq.DELETED,availability.is.null`)
+          // and name and image exist
+          .filter("folderName", "neq", null)
+          .filter("folderPicUrl", "neq", null)
           .eq("userId", userId)
           .order("createdAt", { ascending: false });
 
@@ -513,7 +516,6 @@ const ViewReports = ({
       <Head>
         <title>Reports | {agencyName}</title>
       </Head>
-
       <Breadcrumb style={{ fontFamily: "monospace" }}>
         <BreadcrumbItem className="text-white">
           <i className="bi bi-briefcase" />
@@ -529,6 +531,7 @@ const ViewReports = ({
           Create Report
         </BreadcrumbItem>
       </Breadcrumb>
+      Ask a question to create a report
       <div id="quickDraftBriefingInput">
         <div className="textareaWrapper">
           <textarea

@@ -549,7 +549,7 @@ const ViewReports = ({
     console.log("likeBalance");
     console.log(likeBalance);
     // Determine the likeValue based on the like balance
-    const likeValue = likeBalance >= 0 ? -1 : 1;
+    const likeValue = likeBalance >= 1 ? -1 : 1;
 
     // Prepare the record for the database operation
     const likeRecord = { folderId, userId, likeValue };
@@ -697,14 +697,13 @@ const ViewReports = ({
                 style={{
                   marginRight: "20px",
                   color: "gold",
+                  color: `${likes > 0 ? "gold" : "white"}`,
+                  cursor: "pointer",
                 }}
               >
+                Like &nbsp;
                 <i
                   onClick={handleLike}
-                  style={{
-                    color: `${likes > 0 ? "gold" : "white"}`,
-                    cursor: "pointer",
-                  }}
                   className={`bi bi-star${
                     likes === 0 ? "bi bi-star" : "bi bi-star-fill"
                   }`}
@@ -712,10 +711,12 @@ const ViewReports = ({
                 {likes == 0 ? "" : ` ${likes}`}
               </span>
               <span style={{ marginRight: "20px" }}>
+                Print &nbsp;
                 <IntelliPrint loadedReports={loadedReports} />
               </span>
 
               <span style={{ marginRight: "20px" }}>
+                Share &nbsp;
                 <IntelliCopyUrl />
               </span>
             </Col>
@@ -736,7 +737,7 @@ const ViewReports = ({
             <li style={{ marginBottom: "8px" }} key={parentChildIdMap.id}>
               <a
                 style={{
-                  color: "#00e5ff",
+                  color: "#00fff2",
                   textDecoration: "none",
                   cursor: "pointer",
                   fontWeight: 800,
@@ -871,7 +872,7 @@ const ViewReports = ({
             <a
               style={{
                 fontWeight: 800,
-                color: "#00e5ff",
+                color: "#00fff2",
                 fontWeight: "200",
                 textDecoration: "none",
                 cursor: "pointer",

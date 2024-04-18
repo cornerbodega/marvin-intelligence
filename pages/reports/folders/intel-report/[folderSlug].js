@@ -534,13 +534,13 @@ const ViewReports = ({
     setLoadedReports(updatedReports); // Simply setting the whole updatedReports array
     // update folder
   }
-
   async function getLinksForContinuum(reportId) {
     console.log("getLinksForContinuum");
     let { data: links, error: linksError } = await supabase
       .from("links")
-      .select("*")
-      .eq("parentReportId", reportId);
+      .select("*, reports:parentReportId(availability)")
+      .eq("childReportId", reportId)
+      .not("reports.availability", "eq", "DELETED");
 
     if (linksError) {
       console.log("linksError", linksError);
@@ -554,8 +554,9 @@ const ViewReports = ({
   async function getLinks(report) {
     let { data: links, error: linksError } = await supabase
       .from("links")
-      .select("*")
-      .eq("parentReportId", report.reportId);
+      .select("*, reports:parentReportId(availability)")
+      .eq("childReportId", report.reportId)
+      .not("reports.availability", "eq", "DELETED");
 
     if (linksError) {
       console.log("linksError", linksError);
@@ -728,7 +729,7 @@ const ViewReports = ({
                 <a
                   style={{
                     fontSize: "1rem",
-                    color: "#00e5ff",
+                    color: "#00fff2",
                     fontWeight: calculateFontWeight(level),
                     textDecoration: "none",
                     cursor: "pointer",
@@ -1013,13 +1014,12 @@ const ViewReports = ({
                     style={{
                       whiteSpace: "nowrap",
                       marginRight: "20px",
-                      color: "gold",
+                      color: `${likes > 0 ? "gold" : "white"}`,
                     }}
                   >
+                    Like &nbsp;
                     <i
-                      style={{
-                        color: `${likes > 0 ? "gold" : "white"}`,
-                      }}
+                      style={{}}
                       onClick={handleLike}
                       className={`bi bi-star${
                         likes === 0 ? "bi bi-star" : "bi bi-star-fill"
@@ -1027,19 +1027,22 @@ const ViewReports = ({
                     />
                     {likes < 2 ? "" : likes}
                   </span>
-                  <span style={{ marginRight: "20px" }}>
+                  <span
+                    style={{
+                      marginRight: "20px",
+                      color: `${availability === "GLOBAL" ? "gold" : "white"}`,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Intel-Net &nbsp;
                     <i
                       onClick={handleGlobeClick}
                       className="bi bi-globe"
-                      style={{
-                        color: `${
-                          availability === "GLOBAL" ? "gold" : "white"
-                        }`,
-                        cursor: "pointer",
-                      }}
+                      style={{}}
                     />
                   </span>
                   <span>
+                    Print &nbsp;
                     <IntelliPrint loadedReports={loadedReports} />
                   </span>
                 </Col>
@@ -1057,6 +1060,7 @@ const ViewReports = ({
                       cursor: "pointer",
                     }}
                   >
+                    Regenerate Image &nbsp;
                     <i
                       onClick={() => handleRefreshFolderImageClick()}
                       className="bi bi-arrow-clockwise"
@@ -1083,7 +1087,7 @@ const ViewReports = ({
                 <li key={parentChildIdMap.id}>
                   <a
                     style={{
-                      color: "#00e5ff",
+                      color: "#00fff2",
                       textDecoration: "none",
                       cursor: "pointer",
                       fontSize: "1.2em",
@@ -1193,10 +1197,11 @@ const ViewReports = ({
                           disabled={isLoadingAudio}
                           style={{
                             fontSize: "1.25em",
-
+                            color: (isPlaying || isLoadingAudio) && "gold",
                             marginTop: "10px",
                           }}
                         >
+                          Listen &nbsp;
                           {isLoadingAudio ? (
                             <i className="bi bi-hourglass-split" />
                           ) : isPlaying ? (
@@ -1225,6 +1230,7 @@ const ViewReports = ({
                             color: "white",
                           }}
                         >
+                          Regenerate Image &nbsp;
                           <i
                             onClick={() => handleRefreshReportImageClick(index)}
                             className="bi bi-arrow-clockwise"
@@ -1241,10 +1247,11 @@ const ViewReports = ({
                   className="report text-primary reportFont"
                   dangerouslySetInnerHTML={{ __html }}
                 />
-                <div style={{ display: "flex", flexDirection: "flex-start" }}>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  Learn More &nbsp;
                   <Button
                     className="btn btn-primary"
-                    style={{ marginRight: "16px", textAlign: "left" }}
+                    style={{ marginRight: "16px" }}
                     onClick={() => {
                       handleContinuumClick(report);
                     }}
@@ -1252,7 +1259,6 @@ const ViewReports = ({
                   >
                     <i className="bi bi-link"></i> Continuum
                   </Button>
-
                   {/* Report Delete Button */}
                   <div style={{ marginLeft: "auto", textAlign: "right" }}>
                     <Button disabled={isStreaming}>
@@ -1328,7 +1334,7 @@ const ViewReports = ({
             <a
               style={{
                 fontWeight: 800,
-                color: "#00e5ff",
+                color: "#00fff2",
                 fontWeight: "200",
                 textDecoration: "none",
                 cursor: "pointer",

@@ -26,9 +26,7 @@ const IntelliCopyUrl = () => {
         <i className="bi bi-send" />
       </span>
       {copied && (
-        <span className="copied-message">
-          <i className="bi bi-link" /> Copied to Clipboard
-        </span>
+        <span className="copied-message">Link Copied to Clipboard</span>
       )}
     </span>
   );

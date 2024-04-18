@@ -5,15 +5,14 @@ import { useRouter } from "next/router";
 
 const navigation = [
   {
-    title: "My Agency",
-    href: "/reports/folders/view-folders",
-    icon: "bi bi-body-text",
-  },
-
-  {
     title: "Intel-Net",
     href: "/intelnet/folders/view-intelnet",
     icon: "bi bi-globe2",
+  },
+  {
+    title: "My Reports",
+    href: "/reports/folders/view-folders",
+    icon: "bi bi-body-text",
   },
 
   {
@@ -63,7 +62,11 @@ const Sidebar = ({ showMobilemenu }) => {
         <Nav
           vertical
           className="sidebarNav"
-          style={{ zIndex: "100", fontStyle: "italic" }}
+          style={{
+            zIndex: "100",
+            fontStyle: "italic",
+            fontFamily: "monospace",
+          }}
         >
           {navigation.map((navi, index) => (
             <NavItem key={index} className="sidenav-bg">
@@ -76,7 +79,7 @@ const Sidebar = ({ showMobilemenu }) => {
                 }
                 style={
                   location.includes(navi.href.split("/")[1])
-                    ? { textDecoration: "underline", color: "#00e5ff" }
+                    ? { textDecoration: "underline", color: "#00fff2" }
                     : { color: "white" }
                 }
               >

@@ -228,7 +228,8 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
           </BreadcrumbItem>
         )}
       </Breadcrumb>
-
+      Agents write reports. They have different expertise and skills, and
+      remember their past missions.
       <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
         <input
           type="text"

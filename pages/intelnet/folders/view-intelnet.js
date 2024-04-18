@@ -317,6 +317,8 @@ const ViewReports = ({
           <i className={`bi bi-globe`}></i>&nbsp;Intel-Net
         </BreadcrumbItem>
       </Breadcrumb>
+      Intel-Net contains the latest declassified intelligence reports from
+      around the world.
       <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
         <input
           type="text"

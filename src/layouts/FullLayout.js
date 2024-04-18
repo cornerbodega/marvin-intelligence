@@ -25,6 +25,20 @@ const FullLayout = ({ children }) => {
           marginLeft: isRootPath ? "0px" : "10px",
         }}
       >
+        <div
+          style={{
+            textAlign: "right",
+            paddingRight: "20px",
+            paddingTop: "10px",
+            paddingBottom: "10px",
+            fontSize: "0.75em",
+          }}
+        >
+          <i className="bi bi-info-circle" />{" "}
+          <a href="mailto:merhone@gmail.com" style={{ textDecoration: "none" }}>
+            Feedback & Support
+          </a>
+        </div>
         {/* Conditionally render Sidebar if not on root path */}
         {!isRootPath && (
           <Col
@@ -37,7 +51,6 @@ const FullLayout = ({ children }) => {
             <Sidebar showMobilemenu={showMobilemenu} />
           </Col>
         )}
-
         {/* Main Content Area */}
         <Col onClick={(open && showMobilemenu) || (() => {})}>
           {/* Header - conditionally render if not on root path */}
