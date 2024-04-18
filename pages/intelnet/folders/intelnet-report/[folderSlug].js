@@ -693,7 +693,7 @@ const ViewReports = ({
         <div style={{ marginTop: "-30px", marginBottom: "20px" }}>
           <Row>
             <Col style={{ whiteSpace: "nowrap" }}>
-              <span
+              {/* <span
                 style={{
                   marginRight: "20px",
                   color: "gold",
@@ -709,15 +709,15 @@ const ViewReports = ({
                   }`}
                 />
                 {likes == 0 ? "" : ` ${likes}`}
-              </span>
-              <span style={{ marginRight: "20px" }}>
-                Print &nbsp;
-                <IntelliPrint loadedReports={loadedReports} />
-              </span>
+              </span> */}
 
               <span style={{ marginRight: "20px" }}>
                 Share &nbsp;
                 <IntelliCopyUrl />
+              </span>
+              <span style={{ marginRight: "20px" }}>
+                Print &nbsp;
+                <IntelliPrint loadedReports={loadedReports} />
               </span>
             </Col>
           </Row>

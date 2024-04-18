@@ -1010,7 +1010,7 @@ const ViewReports = ({
             <div style={{ marginTop: "-10px", marginBottom: "20px" }}>
               <Row>
                 <Col style={{ whiteSpace: "nowrap" }}>
-                  <span
+                  {/* <span
                     style={{
                       whiteSpace: "nowrap",
                       marginRight: "20px",
@@ -1026,7 +1026,7 @@ const ViewReports = ({
                       }`}
                     />
                     {likes < 2 ? "" : likes}
-                  </span>
+                  </span> */}
                   <span
                     style={{
                       marginRight: "20px",

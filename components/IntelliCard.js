@@ -112,7 +112,7 @@ const IntelliCard = ({
                 fontWeight: "800",
                 color: "white",
                 fontSize: "1em",
-                minHeight: "70px",
+                maxHeight: "80px",
                 display: "-webkit-box",
                 WebkitBoxOrient: "vertical",
                 WebkitLineClamp: 2,
@@ -146,7 +146,7 @@ const IntelliCard = ({
               )}
             </CardSubtitle>
           )}
-          <div
+          {/* <div
             style={{
               display: "flex",
               flexDirection: "column",
@@ -167,7 +167,7 @@ const IntelliCard = ({
                 <i className="bi bi-star-fill" />
               </div>
             )}
-          </div>
+          </div> */}
         </CardBody>
       </Card>
     </>
