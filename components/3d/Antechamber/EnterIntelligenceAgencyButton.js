@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Text, Box } from "@react-three/drei";
 import { useRouter } from "next/router"; // Import useRouter from next/router if you're using Next.js
+import sendEvent from "../../../utils/sendEvent";
 
 export default function EnterIntelligenceAgencyButton() {
   const [buttonText, setButtonText] = useState("Enter Intelligence Agency");
@@ -20,13 +21,12 @@ export default function EnterIntelligenceAgencyButton() {
 
   // Function to handle the click event
   const handleClick = () => {
-    if (window.gtag) {
-      window.gtag("event", "click", {
-        event_category: "Button",
-        event_label: "Enter Agency Button",
-        value: 1,
-      });
-    }
+    sendEvent({
+      action: "click",
+      category: "enter_intelligence_agency",
+      label: "Enter Intelligence Agency",
+    });
+
     setButtonText("Entering..."); // Update the text displayed on the button
     router.push("/intelnet/folders/view-intelnet"); // Route the user to the specified path
   };
