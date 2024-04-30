@@ -20,6 +20,13 @@ export default function EnterIntelligenceAgencyButton() {
 
   // Function to handle the click event
   const handleClick = () => {
+    if (window.gtag) {
+      window.gtag("event", "click", {
+        event_category: "Button",
+        event_label: "Enter Agency Button",
+        value: 1,
+      });
+    }
     setButtonText("Entering..."); // Update the text displayed on the button
     router.push("/intelnet/folders/view-intelnet"); // Route the user to the specified path
   };
