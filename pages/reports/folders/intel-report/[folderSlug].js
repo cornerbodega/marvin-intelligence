@@ -555,7 +555,7 @@ const ViewReports = ({
     let { data: links, error: linksError } = await supabase
       .from("links")
       .select("*, reports:parentReportId(availability)")
-      .eq("childReportId", report.reportId)
+      .eq("parentReportId", report.reportId)
       .not("reports.availability", "eq", "DELETED");
 
     if (linksError) {
@@ -587,6 +587,9 @@ const ViewReports = ({
           console.log("updatedHTML");
           console.log(updatedHTML);
           element.innerHTML = updatedHTML;
+        } else {
+          console.log(`Element with id ${link.elementId} not found`);
+          console.log(`report.reportContent ${report.reportContent}`);
         }
       });
 
@@ -1264,6 +1267,7 @@ const ViewReports = ({
                   >
                     <i className="bi bi-link"></i> Continuum
                   </Button>
+                  {isStreaming && "Continuum in Progress"}
                   {/* Report Delete Button */}
                   <div style={{ marginLeft: "auto", textAlign: "right" }}>
                     <Button disabled={isStreaming}>
