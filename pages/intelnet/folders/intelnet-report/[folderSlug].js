@@ -814,9 +814,10 @@ const ViewReports = ({
                       onClick={() => handleReadReportClick(index)}
                       disabled={isLoadingAudio}
                       style={{
-                        fontSize: "1.25em",
-
+                        fontSize: "1.20em",
+                        fontWeight: "200",
                         marginTop: "10px",
+                        marginBottom: "10px",
                       }}
                     >
                       {isLoadingAudio ? (
@@ -824,10 +825,13 @@ const ViewReports = ({
                       ) : isPlaying ? (
                         <i className="bi bi-pause-btn" />
                       ) : (
-                        <i
-                          style={{ cursor: "pointer" }}
-                          className="bi bi-speaker"
-                        />
+                        <>
+                          Play{" "}
+                          <i
+                            style={{ cursor: "pointer" }}
+                            className="bi bi-speaker"
+                          />
+                        </>
                       )}
                     </div>
                   </Col>
