@@ -144,6 +144,8 @@ const ViewReports = ({
   const [agencyName, setAgencyName] = useState(_agencyName);
   console.log("loadedReports");
   console.log(loadedReports);
+  console.log("userId");
+  console.log(userId);
   async function loadPagedResults() {
     console.log("Loading paged results");
 
