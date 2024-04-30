@@ -23,6 +23,7 @@ function AppContent({ Component, pageProps }) {
       </Head>
 
       <Script
+        id="google-tag-manager" // Added the id attribute here
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
