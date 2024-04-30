@@ -124,9 +124,18 @@ const IntelliCard = ({
               className="reportFont"
             >
               {icon && <i className={icon}></i>} {displayDatums.title}{" "}
-              {reportCount && (
-                <span style={{ whiteSpace: "nowrap" }}>
-                  [{reportCount} <i className="bi bi-link" />]
+              {reportCount > 1 && (
+                <span
+                  style={{
+                    fontWeight: "200px",
+                    fontSize: "0.75em",
+                    textAlign: "right",
+                    color: "#00fff2",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <i className="bi bi-link" />
+                  <span>{reportCount}</span>
                 </span>
               )}
             </div>

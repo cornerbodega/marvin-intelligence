@@ -575,6 +575,7 @@ const ViewReports = ({
                     borderWidth: "4px",
                     alignContent: "right",
                     marginTop: "0px",
+                    marginBottom: "16px",
                     marginRight: "8px",
                     cursor: "pointer",
                     width: "108",

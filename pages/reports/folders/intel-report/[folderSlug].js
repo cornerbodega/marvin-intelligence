@@ -1193,24 +1193,29 @@ const ViewReports = ({
                     <Row>
                       <Col>
                         <div
-                          onClick={() => handleReadReportClick(index)}
                           disabled={isLoadingAudio}
                           style={{
-                            fontSize: "1.25em",
-                            color: (isPlaying || isLoadingAudio) && "gold",
+                            fontSize: "1.20em",
+                            fontWeight: "200",
                             marginTop: "10px",
+                            marginBottom: "10px",
                           }}
                         >
-                          Listen &nbsp;
                           {isLoadingAudio ? (
                             <i className="bi bi-hourglass-split" />
                           ) : isPlaying ? (
-                            <i className="bi bi-pause-btn" />
-                          ) : (
                             <i
                               style={{ cursor: "pointer" }}
-                              className="bi bi-speaker"
+                              className="bi bi-pause-btn"
+                              onClick={() => handleReadReportClick(index)}
                             />
+                          ) : (
+                            <div
+                              style={{ cursor: "pointer" }}
+                              onClick={() => handleReadReportClick(index)}
+                            >
+                              Play <i className="bi bi-speaker" />
+                            </div>
                           )}
                         </div>
                       </Col>
