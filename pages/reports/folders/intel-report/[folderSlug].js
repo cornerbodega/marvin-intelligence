@@ -1125,6 +1125,7 @@ const ViewReports = ({
                     style={{
                       color: "white",
                       cursor: "pointer",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     Regen Image &nbsp;
@@ -1293,6 +1294,7 @@ const ViewReports = ({
                         <span
                           style={{
                             color: "white",
+                            whiteSpace: "nowrap",
                           }}
                           onClick={() =>
                             handleEditReportClick(
