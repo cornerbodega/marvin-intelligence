@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         {
           role: "system",
           content:
-            "You are a creative assistant. Your task is to generate unique and funny loading messages. You return the loading messages as an unnamed JSON array of strings",
+            "You are a creative assistant. Your task is to generate unique and funny loading messages. You return the loading messages as an unnamed JSON array of strings. Do not include the data type your response.",
         },
         {
           role: "user",

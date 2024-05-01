@@ -1321,12 +1321,10 @@ const ViewReports = ({
                           style={{
                             color: "white",
                           }}
+                          onClick={() => handleRefreshReportImageClick(index)}
                         >
                           Regen Image &nbsp;
-                          <i
-                            onClick={() => handleRefreshReportImageClick(index)}
-                            className="bi bi-arrow-clockwise"
-                          />
+                          <i className="bi bi-arrow-clockwise" />
                         </span>
                       </Col>
                     </Row>

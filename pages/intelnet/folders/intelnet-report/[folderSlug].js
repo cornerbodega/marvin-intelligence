@@ -36,6 +36,7 @@ export async function getServerSideProps(context) {
             folderPicUrl
         ),
         reports:reports (
+            availability,
             createdAt,
             reportTitle,
             reportPicUrl,
@@ -122,6 +123,10 @@ export async function getServerSideProps(context) {
   let _folderPicUrl = "";
 
   missionsResponse.forEach((mission) => {
+    console.log(`mission.reports.availability ${mission.reports.availability}`);
+    if (mission.reports.availability == "DELETED") {
+      return;
+    }
     _loadedReports.push(mission.reports);
 
     _folderName = mission.folders.folderName;
@@ -249,7 +254,7 @@ const ViewReports = ({
       .select(
         `
               folders (folderName, folderDescription, folderPicUrl),
-              reports (reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, reportPicDescription, createdAt)
+              reports (availability, reportTitle, reportPicUrl, reportPicDescription, reportId, reportContent, reportPicDescription, createdAt)
           `
       )
       .eq("folderId", folderId)
@@ -264,6 +269,9 @@ const ViewReports = ({
 
     const updatedMissions = [];
     updatedMissionsResponse.forEach((mission) => {
+      if (mission.reports.availability == "DELETED") {
+        return;
+      }
       updatedMissions.push({ ...mission.reports });
     });
 
