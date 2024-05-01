@@ -1272,7 +1272,10 @@ const ViewReports = ({
                             />
                           ) : (
                             <div
-                              style={{ cursor: "pointer" }}
+                              style={{
+                                cursor: "pointer",
+                                whiteSpace: "nowrap",
+                              }}
                               onClick={() => handleReadReportClick(index)}
                             >
                               Play <i className="bi bi-speaker" />
