@@ -685,15 +685,20 @@ const ViewReports = ({
               }}
               className="image-container"
             >
-              <a
+              {/* <a
                 href={folderPicUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 alt={folderPicDescription}
                 title={folderPicDescription}
-              >
-                <Image src={`${folderPicUrl}`} fill={true} />
-              </a>
+              > */}
+              <Image
+                alt={folderPicDescription}
+                title={folderPicDescription}
+                src={`${folderPicUrl}`}
+                fill={true}
+              />
+              {/* </a> */}
             </div>
           )}
         </div>
@@ -800,19 +805,13 @@ const ViewReports = ({
                 <div style={{ height: "700px" }} className="image-container">
                   {!report.reportPicUrl && <LibraryImage />}
                   {report.reportPicUrl && (
-                    <a
-                      href={report.reportPicUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        src={report.reportPicUrl}
-                        alt={report.reportPicDescription}
-                        title={report.reportPicDescription}
-                        className="report-image"
-                        style={{ borderRadius: "10px" }}
-                      />
-                    </a>
+                    <img
+                      src={report.reportPicUrl}
+                      alt={report.reportPicDescription}
+                      title={report.reportPicDescription}
+                      className="report-image"
+                      style={{ borderRadius: "10px" }}
+                    />
                   )}
                 </div>
                 {/* Speech */}

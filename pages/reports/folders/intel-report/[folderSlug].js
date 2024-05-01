@@ -1064,7 +1064,12 @@ const ViewReports = ({
                   alt={folderPicDescription}
                   title={folderPicDescription}
                 > */}
-                <img className="report-image" src={`${folderPicUrl}`} />
+                <img
+                  alt={folderPicDescription}
+                  title={folderPicDescription}
+                  className="report-image"
+                  src={`${folderPicUrl}`}
+                />
                 {/* </a> */}
               </div>
             </div>
@@ -1236,13 +1241,6 @@ const ViewReports = ({
                     <div className="image-container">
                       {!report.reportPicUrl && <LibraryImage />}
                       {report.reportPicUrl && (
-                        // <a
-                        //   href={report.reportPicUrl}
-                        //   target="_blank"
-                        //   rel="noopener noreferrer"
-                        //   alt={report.reportPicDescription}
-                        //   title={report.reportPicDescription}
-                        // >
                         <img
                           src={report.reportPicUrl}
                           alt={report.reportPicDescription}
@@ -1450,13 +1448,13 @@ const ViewReports = ({
             >
               <img
                 src={agent.profilePicUrl}
+                alt={agent.agentName}
                 style={{
                   borderRadius: "20%",
                   cursor: "pointer",
                   width: "300px",
                   height: "auto",
                 }}
-                alt="agent"
               />
             </div>
 
