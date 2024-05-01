@@ -21,6 +21,7 @@ import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
 import Head from "next/head";
 
 import IntelliNotificationsArea from "../../../../components/IntelliNotificationsArea/IntelliNotificationsArea";
+import IntelliEditor from "../../../../components/IntelliEditor";
 
 export async function getServerSideProps(context) {
   const folderId = context.params.folderSlug.split("-")[0];
@@ -197,7 +198,6 @@ const ViewReports = ({
   _availability,
 }) => {
   const { user } = useUser();
-
   const [userId, setUserId] = useState(user?.sub);
   const router = useRouter();
   const userIdFromRouter = router.query.userId;
@@ -223,7 +223,21 @@ const ViewReports = ({
   const [folderPicUrl, setFolderPicUrl] = useState(_folderPicUrl || "");
   const [continuumCompleted, setContinuumCompleted] = useState(false);
   const [hasStartedContinuum, setHasStartedContinuum] = useState(false);
+  const [editorReportId, setEditorReportId] = useState(null);
+  const editorRef = useRef(null);
+  const [editorContent, setEditorContent] = useState("");
+
+  function handleContentChange(newContent) {
+    setEditorContent(newContent);
+  }
+
   const [loadedAgentId, setLoadedAgentId] = useState(agentId);
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [editorReportId]);
+
   const firebaseContinuumStatus = useFirebaseListener(
     `/${getEnv()}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
       userId || "default"
@@ -234,6 +248,7 @@ const ViewReports = ({
       userId || "default"
     }/finalizeAndVisualizeReport/status`
   );
+
   useEffect(() => {
     console.log("firebaseVisualizeAndSaveStatus");
     console.log(firebaseVisualizeAndSaveStatus);
@@ -594,7 +609,7 @@ const ViewReports = ({
       });
 
       report.reportContent = container.innerHTML; // Update the reportContent directly
-      console.log(report.reportContent);
+      // console.log(report.reportContent);
     }
   }
 
@@ -838,6 +853,50 @@ const ViewReports = ({
     console.log("handleFolderDeleteNo");
     setShowFolderDeleteQuestion(false);
   }
+  function handleEditReportClick(reportId) {
+    console.log(`Editing report ${reportId}`);
+    setEditorReportId(reportId);
+    if (editorReportId === reportId) {
+      setEditorReportId(null);
+    }
+  }
+
+  async function handleEditReportSaveClick(
+    reportId,
+    newContent,
+    reportContent
+  ) {
+    console.log("Preparing to save report:", reportId, newContent); // This will show you what's being passed
+
+    try {
+      const response = await fetch("/api/reports/edit-report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reportId, newContent, reportContent }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result.message);
+        // close the editor
+        setEditorReportId(null);
+        // reload reports
+        fetchUpdatedReports();
+        // Log the success message
+        // alert("Report saved successfully!");
+      } else {
+        console.log(`Failed to save report ${reportId}. response:`, response);
+        console.error("Failed to save the report");
+        alert("Error 542: error saving report.");
+      }
+    } catch (error) {
+      console.error("Error sending data:", error);
+      alert("Error 543: error processing your request to save report.");
+    }
+  }
+
   function handleReportDeleteClick() {
     console.log("handleReportDeleteClick");
     setShowReportDeleteQuestion(!showReportDeleteQuestion);
@@ -1063,7 +1122,7 @@ const ViewReports = ({
                       cursor: "pointer",
                     }}
                   >
-                    Regenerate Image &nbsp;
+                    Regen Image &nbsp;
                     <i
                       onClick={() => handleRefreshFolderImageClick()}
                       className="bi bi-arrow-clockwise"
@@ -1237,8 +1296,33 @@ const ViewReports = ({
                           style={{
                             color: "white",
                           }}
+                          onClick={() =>
+                            handleEditReportClick(
+                              reportId,
+                              report.reportContent
+                            )
+                          }
                         >
-                          Regenerate Image &nbsp;
+                          Edit Report &nbsp;
+                          <i className="bi bi-pencil" />
+                        </span>
+                      </Col>
+                      <Col
+                        style={{
+                          width: "100%",
+                          // background: "red",
+                          textAlign: "right",
+                          marginRight: "20px",
+                          marginTop: "10px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: "white",
+                          }}
+                        >
+                          Regen Image &nbsp;
                           <i
                             onClick={() => handleRefreshReportImageClick(index)}
                             className="bi bi-arrow-clockwise"
@@ -1248,65 +1332,103 @@ const ViewReports = ({
                     </Row>
                   </>
                 )}
-                <div
-                  id={`reportRoot${index}`}
-                  onMouseUp={(e) => handleTextHighlight(e, report)}
-                  onTouchEnd={(e) => handleTextHighlight(e, report)}
-                  className="report text-primary reportFont"
-                  dangerouslySetInnerHTML={{ __html }}
-                />
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  Learn More &nbsp;
-                  <Button
-                    className="btn btn-primary"
-                    style={{ marginRight: "16px" }}
-                    onClick={() => {
-                      handleContinuumClick(report);
-                    }}
-                    disabled={isStreaming}
-                  >
-                    <i className="bi bi-link"></i> Continuum
-                  </Button>
-                  {isStreaming && "Continuum in Progress"}
-                  {/* Report Delete Button */}
-                  <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                    <Button disabled={isStreaming}>
-                      <i
-                        style={{
-                          color: `${
-                            showReportDeleteQuestion ? "white" : "grey"
-                          }`,
-                          cursor: "pointer",
-                        }}
-                        className="bi bi-trash"
-                        disabled={isStreaming}
-                        onClick={handleReportDeleteClick}
+                {/* Begin Editor */}
+                {/* Editor Report Id
+                {editorReportId}
+                Report Id
+                {reportId} */}
+                <>
+                  {report.reportId == editorReportId && (
+                    <div ref={editorRef} style={{ marginBottom: "30px" }}>
+                      <IntelliEditor
+                        reportContent={report.reportContent}
+                        index={index}
+                        onContentChange={handleContentChange}
                       />
-                    </Button>
-                    &nbsp;
-                    {showReportDeleteQuestion}
-                    {showReportDeleteQuestion && (
-                      <>
-                        Delete Report?{" "}
-                        <span
-                          style={{ color: "white", cursor: "pointer" }}
-                          onClick={() => {
-                            handleReportDeleteYes(reportId);
-                          }}
-                        >
-                          Yes
-                        </span>{" "}
-                        /{" "}
-                        <span
-                          style={{ color: "white", cursor: "pointer" }}
-                          onClick={handleReportDeleteNo}
-                        >
-                          No
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
+                      <Button
+                        color="primary"
+                        style={{
+                          border: "3px solid green",
+                          marginTop: "40px",
+                        }}
+                        // disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
+                        onClick={(e) =>
+                          handleEditReportSaveClick(
+                            report.reportId,
+                            editorContent,
+                            report.reportContent
+                          )
+                        }
+                      >
+                        <i className="bi bi-floppy"></i> Save Report
+                      </Button>
+                    </div>
+                  )}
+                </>
+                {/* End Editor */}
+                {/* Begin Report */}
+                {reportId != editorReportId && (
+                  <>
+                    <div
+                      id={`reportRoot${index}`}
+                      onMouseUp={(e) => handleTextHighlight(e, report)}
+                      onTouchEnd={(e) => handleTextHighlight(e, report)}
+                      className="report text-primary reportFont"
+                      dangerouslySetInnerHTML={{ __html }}
+                    />
+
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <Button
+                        className="btn btn-primary"
+                        style={{ marginRight: "16px" }}
+                        onClick={() => {
+                          handleContinuumClick(report);
+                        }}
+                        disabled={isStreaming}
+                      >
+                        <i className="bi bi-link"></i> Continuum
+                      </Button>
+                      {isStreaming && "Continuum in Progress"}
+                      <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                        <Button disabled={isStreaming}>
+                          <i
+                            style={{
+                              color: `${
+                                showReportDeleteQuestion ? "white" : "grey"
+                              }`,
+                              cursor: "pointer",
+                            }}
+                            className="bi bi-trash"
+                            disabled={isStreaming}
+                            onClick={handleReportDeleteClick}
+                          />
+                        </Button>
+                        &nbsp;
+                        {showReportDeleteQuestion}
+                        {showReportDeleteQuestion && (
+                          <>
+                            Delete Report?{" "}
+                            <span
+                              style={{ color: "white", cursor: "pointer" }}
+                              onClick={() => {
+                                handleReportDeleteYes(reportId);
+                              }}
+                            >
+                              Yes
+                            </span>{" "}
+                            /{" "}
+                            <span
+                              style={{ color: "white", cursor: "pointer" }}
+                              onClick={handleReportDeleteNo}
+                            >
+                              No
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             );
           })}
