@@ -716,7 +716,7 @@ const CreateMission = ({
             </div>
           </Form>
           <div style={{ marginTop: "50px" }} ref={draftRef}></div>
-          {draft && hasSubmitted && (
+          {draft && (
             <Card style={{ background: "black", color: "white" }}>
               <CardBody className="report">
                 <i className="bi bi-body-text"> New Draft </i>
@@ -728,65 +728,65 @@ const CreateMission = ({
             </Card>
           )}
           {draft && !draft.endsWith(" ".repeat(3)) && (
-            <div className="scroll-downs">
-              <div className="mousey">
-                <div className="scroller"></div>
+            <>
+              Loading...
+              <div className="scroll-downs">
+                <div className="mousey">
+                  <div className="scroller"></div>
+                </div>
               </div>
-            </div>
+            </>
           )}
-          {draft &&
-            !isSubmitting &&
-            hasSubmitted &&
-            draft.endsWith(" ".repeat(3)) && (
-              <>
-                <Form onSubmit={(e) => handleQuickDraft(e)}>
-                  <FormGroup>
-                    <div style={{ marginTop: "40px" }}></div>
-                    <Label htmlFor="exampleText" className="text-white">
-                      Feedback
-                    </Label>
-                    <Input
-                      style={{ backgroundColor: "#131313" }}
-                      id="exampleText"
-                      placeholder="What do you think?"
-                      name="text"
-                      rows="5"
-                      type="textarea"
-                      value={feedbackInput}
-                      onChange={(e) => setFeedbackInput(e.target.value)}
-                    />
-                    <div
+          {draft && !isSubmitting && draft.endsWith(" ".repeat(3)) && (
+            <>
+              <Form onSubmit={(e) => handleQuickDraft(e)}>
+                <FormGroup>
+                  <div style={{ marginTop: "40px" }}></div>
+                  <Label htmlFor="exampleText" className="text-white">
+                    Feedback
+                  </Label>
+                  <Input
+                    style={{ backgroundColor: "#131313", color: "white" }}
+                    id="exampleText"
+                    placeholder="What do you think?"
+                    name="text"
+                    rows="5"
+                    type="textarea"
+                    value={feedbackInput}
+                    onChange={(e) => setFeedbackInput(e.target.value)}
+                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "flex-end",
+                      paddingTop: "8px",
+                    }}
+                  >
+                    <Button
+                      color="primary"
                       style={{
-                        display: "flex",
-                        flexDirection: "flex-end",
-                        paddingTop: "8px",
+                        border: "1px solid yellow",
+                        marginRight: "16px",
                       }}
+                      disabled={isSubmitting}
                     >
-                      <Button
-                        color="primary"
-                        style={{
-                          border: "1px solid yellow",
-                          marginRight: "16px",
-                        }}
-                        disabled={isSubmitting}
-                      >
-                        <i className="bi bi-arrow-clockwise"></i>
-                        &nbsp;Refine
-                      </Button>
-                    </div>
-                  </FormGroup>
-                </Form>
+                      <i className="bi bi-arrow-clockwise"></i>
+                      &nbsp;Refine
+                    </Button>
+                  </div>
+                </FormGroup>
+              </Form>
 
-                <Button
-                  color="primary"
-                  style={{ border: "3px solid green", marginTop: "40px" }}
-                  disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
-                  onClick={(e) => handleAcceptReport(e)}
-                >
-                  <i className="bi bi-floppy"></i> Save Report
-                </Button>
-              </>
-            )}
+              <Button
+                color="primary"
+                style={{ border: "3px solid green", marginTop: "40px" }}
+                disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
+                onClick={(e) => handleAcceptReport(e)}
+              >
+                <i className="bi bi-floppy"></i> Save Report
+              </Button>
+            </>
+          )}
           <div style={{ marginTop: "10px" }}>
             {hasSubmitted && isSubmitting && "Saving Report..."}
           </div>

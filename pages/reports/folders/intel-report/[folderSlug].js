@@ -214,6 +214,7 @@ const ViewReports = ({
     endIndex: undefined,
   });
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [folderName, setFolderName] = useState(_folderName);
   const [folderDescription, setFolderDescription] =
     useState(_folderDescription);
@@ -496,6 +497,15 @@ const ViewReports = ({
       parentReportTitle: report.reportTitle,
     });
   };
+
+  const imageStyle = {
+    borderTop: "2px solid #31A0D1",
+    borderLeft: "2px solid #31A0D1",
+    borderRight: "2px solid #31A0D1",
+  };
+
+  imageStyle.borderTopLeftRadius = "16px";
+  imageStyle.borderTopRightRadius = "16px";
 
   const handleFabClick = () => {
     console.log("handleFabClick");
@@ -867,7 +877,7 @@ const ViewReports = ({
     reportContent
   ) {
     console.log("Preparing to save report:", reportId, newContent); // This will show you what's being passed
-
+    setIsSubmitting(true);
     try {
       const response = await fetch("/api/reports/edit-report", {
         method: "POST",
@@ -882,6 +892,7 @@ const ViewReports = ({
         console.log(result.message);
         // close the editor
         setEditorReportId(null);
+        setIsSubmitting(false);
         // reload reports
         fetchUpdatedReports();
         // Log the success message
@@ -1065,6 +1076,10 @@ const ViewReports = ({
                   title={folderPicDescription}
                 > */}
                 <img
+                  style={{
+                    borderTopRightRadius: "20px",
+                    borderTopLeftRadius: "20px",
+                  }}
                   alt={folderPicDescription}
                   title={folderPicDescription}
                   className="report-image"
@@ -1097,7 +1112,10 @@ const ViewReports = ({
                   <span
                     style={{
                       marginRight: "20px",
-                      color: `${availability === "GLOBAL" ? "gold" : "white"}`,
+                      fontFamily: "monospace",
+                      color: `${
+                        availability === "GLOBAL" ? "#3FFF8D" : "white"
+                      }`,
                       cursor: "pointer",
                     }}
                   >
@@ -1108,7 +1126,7 @@ const ViewReports = ({
                       style={{}}
                     />
                   </span>
-                  <span>
+                  <span style={{ fontFamily: "monospace" }}>
                     Print &nbsp;
                     <IntelliPrint loadedReports={loadedReports} />
                   </span>
@@ -1126,6 +1144,7 @@ const ViewReports = ({
                       color: "white",
                       cursor: "pointer",
                       whiteSpace: "nowrap",
+                      fontFamily: "monospace",
                     }}
                   >
                     Regen Image &nbsp;
@@ -1246,7 +1265,6 @@ const ViewReports = ({
                           src={report.reportPicUrl}
                           alt={report.reportPicDescription}
                           className="report-image"
-                          style={{ borderRadius: "10px" }}
                         />
                       )}
                     </div>
@@ -1275,6 +1293,7 @@ const ViewReports = ({
                               style={{
                                 cursor: "pointer",
                                 whiteSpace: "nowrap",
+                                fontFamily: "monospace",
                               }}
                               onClick={() => handleReadReportClick(index)}
                             >
@@ -1298,6 +1317,7 @@ const ViewReports = ({
                           style={{
                             color: "white",
                             whiteSpace: "nowrap",
+                            fontFamily: "monospace",
                           }}
                           onClick={() =>
                             handleEditReportClick(
@@ -1318,6 +1338,7 @@ const ViewReports = ({
                           marginRight: "20px",
                           marginTop: "10px",
                           cursor: "pointer",
+                          fontFamily: "monospace",
                         }}
                       >
                         <span
@@ -1352,7 +1373,7 @@ const ViewReports = ({
                           border: "3px solid green",
                           marginTop: "40px",
                         }}
-                        // disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
+                        disabled={isSubmitting}
                         onClick={(e) =>
                           handleEditReportSaveClick(
                             report.reportId,
@@ -1374,11 +1395,17 @@ const ViewReports = ({
                       id={`reportRoot${index}`}
                       onMouseUp={(e) => handleTextHighlight(e, report)}
                       onTouchEnd={(e) => handleTextHighlight(e, report)}
-                      className="report text-primary reportFont"
+                      className="report reportFont"
                       dangerouslySetInnerHTML={{ __html }}
                     />
 
-                    <div style={{ display: "flex", alignItems: "center" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginTop: "20px",
+                      }}
+                    >
                       <Button
                         className="btn btn-primary"
                         style={{ marginRight: "16px" }}

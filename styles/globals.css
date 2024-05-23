@@ -253,16 +253,24 @@ body {
   animation: fadeInUp 1s forwards;
   animation-delay: calc(var(--i) * 300ms);
   transition: box-shadow 0.5s ease-in-out;
-  border-radius: 8px;
+  
   overflow: hidden;
   perspective: 1000px; 
 }
 
 .report-image {
-  width: 100%;
-  max-height: 299px;
-  object-fit: cover;
-  transition: transform 0.5s ease-in-out, filter 0.3s ease-in-out; 
+    width: 100%;
+    max-height: 299px;
+    object-fit: cover;
+    transition: transform 0.25s ease-in-out, filter 0.13s ease-in-out; 
+    
+    /* border-top: "2px solid #31A0D1";
+    border-left: "2px solid #31A0D1";
+    border-right: "2px solid #31A0D1";
+    
+    border-top-left-radius: "16px";
+    
+    border-top-right-radius:"16px"; */
 }
 
 /* Removed hover effect on the entire .report section */
@@ -474,6 +482,7 @@ a:hover {
 body {
     font-family: 'Open Sans', sans-serif;
     font-size: larger;
+    color:white;
 }
 @font-face {
     font-family: 'ComputerModern';
@@ -483,6 +492,8 @@ body {
   
 .reportFont {
    font-family: 'ComputerModern', serif;
+   font-weight: 0;
+   color: white;
  }
 
 .linkFont {

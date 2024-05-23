@@ -697,6 +697,10 @@ const ViewReports = ({
                 title={folderPicDescription}
                 src={`${folderPicUrl}`}
                 fill={true}
+                style={{
+                  borderTopRightRadius: "10px",
+                  borderTopLeftRadius: "10px",
+                }}
               />
               {/* </a> */}
             </div>
@@ -724,11 +728,11 @@ const ViewReports = ({
                 {likes == 0 ? "" : ` ${likes}`}
               </span> */}
 
-              <span style={{ marginRight: "20px" }}>
+              <span style={{ fontFamily: "monospace", marginRight: "20px" }}>
                 Share &nbsp;
                 <IntelliCopyUrl />
               </span>
-              <span style={{ marginRight: "20px" }}>
+              <span style={{ fontFamily: "monospace", marginRight: "20px" }}>
                 Print &nbsp;
                 <IntelliPrint loadedReports={loadedReports} />
               </span>
@@ -810,7 +814,7 @@ const ViewReports = ({
                       alt={report.reportPicDescription}
                       title={report.reportPicDescription}
                       className="report-image"
-                      style={{ borderRadius: "10px" }}
+                      style={{ borderRadius: "0px" }}
                     />
                   )}
                 </div>
@@ -836,7 +840,11 @@ const ViewReports = ({
                         />
                       ) : (
                         <div
-                          style={{ cursor: "pointer", whiteSpace: "nowrap" }}
+                          style={{
+                            cursor: "pointer",
+                            whiteSpace: "nowrap",
+                            fontFamily: "monospace",
+                          }}
                           onClick={() => handleReadReportClick(index)}
                         >
                           Play <i className="bi bi-speaker" />
@@ -873,7 +881,7 @@ const ViewReports = ({
               <img
                 src={agent.profilePicUrl}
                 style={{
-                  borderRadius: "20%",
+                  // borderRadius: "20%",
                   cursor: "pointer",
                   width: "300px",
                   height: "auto",

@@ -347,7 +347,7 @@ const ViewReports = ({
             datums={loadedReports}
             folderLikesByFolderId={folderLikesByFolderId}
             reportCountsByFolderId={reportCountsByFolderId}
-            datumsType={"folders"}
+            datumsType={"intelnet"}
           ></IntelliCardGroup>
         </Row>
       </div>

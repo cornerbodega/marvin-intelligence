@@ -9,10 +9,18 @@ const IntelliCard = ({
   folderLikesByFolderId,
   reportCountsByFolderId,
 }) => {
+  const reportsColor = "#31A0D1";
+  const intelnetColor = "#3FFF8D";
+  let borderBottomColor = reportsColor;
   const imageStyle = {
-    borderTop: "2px solid #31A0D1",
-    borderLeft: "2px solid #31A0D1",
-    borderRight: "2px solid #31A0D1",
+    borderTop: `2px solid ${reportsColor}`,
+    borderLeft: `2px solid ${reportsColor}`,
+    borderRight: `2px solid ${reportsColor}`,
+  };
+  const cardBottomBorder = {
+    borderBottom: `2px solid ${reportsColor}`,
+    borderLeft: `2px solid ${reportsColor}`,
+    borderRight: `2px solid ${reportsColor}`,
   };
   // if (index === 0) {
   imageStyle.borderTopLeftRadius = "16px";
@@ -34,13 +42,24 @@ const IntelliCard = ({
     displayDatums.title = datums.reportTitle;
     icon = "bi bi-body-text";
   }
-  if (datumsType === "folders") {
+  if (datumsType === "folders" || datumsType === "intelnet") {
     displayDatums.picUrl = datums.folderPicUrl;
     displayDatums.title = datums.folderName;
     icon = "bi bi-folder";
-    if (folderLikesByFolderId) {
-      likes = folderLikesByFolderId[datums.folderId];
+    if (datumsType === "intelnet") {
+      imageStyle.borderTop = `2px solid ${intelnetColor}`;
+      imageStyle.borderLeft = `2px solid ${intelnetColor}`;
+      imageStyle.borderRight = `2px solid ${intelnetColor}`;
+      cardBottomBorder.borderBottom = `2px solid ${intelnetColor}`;
+      cardBottomBorder.borderLeft = `2px solid ${intelnetColor}`;
+      cardBottomBorder.borderRight = `2px solid ${intelnetColor}`;
+      borderBottomColor = intelnetColor;
+      // borderLeft: `2px solid ${reportsColor}`,
+      // borderRight: `2px solid ${reportsColor}`,
     }
+    // if (folderLikesByFolderId) {
+    //   likes = folderLikesByFolderId[datums.folderId];
+    // }
     if (reportCountsByFolderId) {
       reportCount = reportCountsByFolderId[datums.folderId];
     }
@@ -86,16 +105,14 @@ const IntelliCard = ({
             justifyContent: "space-between",
             marginBottom: "30px",
             padding: "10px 20px 10px 20px",
-            borderBottom: "2px solid #31A0D1",
-            borderLeft: "2px solid #31A0D1",
-            borderRight: "2px solid #31A0D1",
+            ...cardBottomBorder,
             boxShadow: `
             0 8px 0 -2px black, 
-            0 8px 0 0 ${reportCount > 1 ? "#31A0D1" : "black"},
+            0 8px 0 0 ${reportCount > 1 ? borderBottomColor : "black"},
             0 16px 0 -2px black, 
-            0 16px 0 0 ${reportCount > 2 ? "#31A0D1" : "black"},
+            0 16px 0 0 ${reportCount > 2 ? borderBottomColor : "black"},
             0 24px 0 -2px black, 
-            0 24px 0 0 ${reportCount > 3 ? "#31A0D1" : "black"}
+            0 24px 0 0 ${reportCount > 3 ? borderBottomColor : "black"}
         `,
           }}
         >
@@ -168,7 +185,7 @@ const IntelliCard = ({
                 style={{
                   display: "flex",
                   flexDirection: "row",
-                  color: "gold",
+                  color: "#A32C5D",
                 }}
                 // className="section-title"
               >
