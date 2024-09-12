@@ -606,7 +606,7 @@ const ViewReports = ({
                 textIndent: "10px",
               }}
               lines="1"
-              placeholder="⌕ Search existing reports"
+              placeholder="⌕ Search my reports"
               onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
