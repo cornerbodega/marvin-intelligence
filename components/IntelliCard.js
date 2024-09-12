@@ -82,12 +82,12 @@ const IntelliCard = ({
       >
         <div style={{ position: "relative", width: "100%" }}>
           {displayDatums.picUrl && (
-            <img
-              src={
-                imageSize === "small"
-                  ? displayDatums.picUrl.replace("medium", "small")
-                  : displayDatums.picUrl
-              }
+            <div
+              // src={
+              //   imageSize === "small"
+              //     ? displayDatums.picUrl.replace("medium", "small")
+              //     : displayDatums.picUrl
+              // }
               style={{ width: "100%", height: "auto", ...imageStyle }}
               layout="responsive"
               alt={displayDatums.title}
