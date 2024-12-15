@@ -109,7 +109,7 @@ export default function MountainRange() {
     const baseMesh = (
       <mesh
         key={`base-${i}`}
-        position={[positionX, height / 2 - 24, positionZ - 20]}
+        position={[positionX, height / 2 - 4 * (i + 1), positionZ - 20]}
         geometry={new ConeGeometry(20, height, 4)}
         scale={[1, 1, 1]}
         material={new MeshStandardMaterial({ color: "white" })}
@@ -120,7 +120,7 @@ export default function MountainRange() {
     const overlayMesh = (
       <mesh
         key={`overlay-${i}`}
-        position={[positionX, height / 2 - 24, positionZ - 20]}
+        position={[positionX, height / 2 - 4 * (i + 1), positionZ - 20]}
         // Increase size by 0.1 for radius and height to make overlay slightly larger
         geometry={new ConeGeometry(20.2, height + 0.2, 4)}
         material={mountainShaderMaterial}
