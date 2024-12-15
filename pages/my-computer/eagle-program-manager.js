@@ -197,7 +197,7 @@ export default function EagleCommandProgramManager() {
         <DraggableWindow
           title="About Marvin"
           defaultPosition={[200, 200]}
-          defaultSize={[600, 400]}
+          defaultSize={[400, 400]}
           initialHeight={400} // Initial height for Eagle Optix window
           onClose={handleAboutMarvinClosed}
           zIndex={10} // Higher z-index for the window
