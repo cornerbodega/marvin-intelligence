@@ -32,6 +32,7 @@ export default function EagleCommandProgramManager() {
   const [isResearchToolsOpen, setResearchToolsOpen] = useState(false);
   const [isProgramManagerOpen, setProgramManagerOpen] = useState(true);
   const [isGamesOpen, setGamesOpen] = useState(false);
+  const [isJournalOpen, setJournalOpen] = useState(false);
 
   function handleProgramManagerClose() {
     setProgramManagerOpen(false);
@@ -46,24 +47,26 @@ export default function EagleCommandProgramManager() {
   function handleGamesClosed() {
     setGamesOpen(false);
   }
+  function handleJournalClosed() {
+    setJournalOpen(false);
+  }
 
   const handleProgramManagerIconClick = () => {
     console.log(`Program Manager icon clicked`);
     setProgramManagerOpen(true);
   };
   const handleAboutMarvinClick = () => {
-    console.log(`About Marvin clicked`);
     setAboutMarvinOpen(true);
   };
   const handleResearchToolsClick = () => {
-    console.log(`About Marvin clicked`);
     setResearchToolsOpen(true);
   };
   const handleGamesClick = () => {
-    console.log(`About Marvin clicked`);
     setGamesOpen(true);
   };
-
+  const handleJournalClick = () => {
+    setJournalOpen(true);
+  };
   const programManagerFolders = [
     {
       name: "About Me",
@@ -86,6 +89,11 @@ export default function EagleCommandProgramManager() {
   ];
 
   const aboutMarvinFolders = [
+    {
+      name: "Career Journal",
+      path: "/about/journal",
+      image: "/talon.jpg",
+    },
     {
       name: "Resume Google Doc",
       path: "https://docs.google.com/document/d/12ZRriMe62DBUce_ic5A4NkvMULugcnvUBtFpTsQJZdY/edit?tab=t.0",
@@ -239,6 +247,23 @@ export default function EagleCommandProgramManager() {
             windowId="researchTools"
             initialHeight={350}
           />
+        </DraggableWindow>
+      )}
+      {isJournalOpen && (
+        <DraggableWindow
+          title="Journal"
+          defaultPosition={[200, 200]}
+          defaultSize={[400, 400]}
+          initialHeight={400} // Initial height for Eagle Optix window
+          onClose={handleGamesClosed}
+          zIndex={10} // Higher z-index for the window
+        >
+          test
+          {/* <EagleOptixFolder
+            icons={gamesFolders}
+            windowId="researchTools"
+            initialHeight={350}
+          /> */}
         </DraggableWindow>
       )}
       <ProgramIcon

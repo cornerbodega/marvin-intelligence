@@ -9,7 +9,7 @@ const FullLayout = ({ children }) => {
   const router = useRouter(); // Use useRouter to get the current path
   const isRootPath = router.pathname === "/"; // Check if it's the root path
   const isComputerPath = router.pathname.includes("my-computer"); // Check if it's the root path
-
+  const isJournalPath = router.pathname.includes("journal"); // Check if it's the root path
   const showMobilemenu = () => {
     if (!isRootPath) {
       setOpen(!open);
@@ -27,7 +27,7 @@ const FullLayout = ({ children }) => {
         }}
       >
         {/* Conditionally render Sidebar if not on root path */}
-        {!isRootPath && !isComputerPath && (
+        {!isRootPath && !isComputerPath && !isJournalPath && (
           <Col
             md="auto"
             className={`sidebarArea shadow bg-black ${
