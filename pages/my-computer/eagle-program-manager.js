@@ -213,7 +213,7 @@ export default function EagleCommandProgramManager() {
         <DraggableWindow
           title="Research Tools"
           defaultPosition={[200, 200]}
-          defaultSize={[600, 400]}
+          defaultSize={[400, 400]}
           initialHeight={400} // Initial height for Eagle Optix window
           onClose={handleResearchToolsClosed}
           zIndex={10} // Higher z-index for the window
@@ -229,7 +229,7 @@ export default function EagleCommandProgramManager() {
         <DraggableWindow
           title="Games"
           defaultPosition={[200, 200]}
-          defaultSize={[600, 400]}
+          defaultSize={[400, 400]}
           initialHeight={400} // Initial height for Eagle Optix window
           onClose={handleGamesClosed}
           zIndex={10} // Higher z-index for the window
