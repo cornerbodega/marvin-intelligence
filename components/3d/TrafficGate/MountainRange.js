@@ -170,8 +170,8 @@ export default function MountainRange() {
   return (
     <>
       {showMoon && (
-        <mesh position={[20, 40, -200]}>
-          <sphereGeometry args={[30, 32, 32]} />
+        <mesh position={[30, 30, -200]}>
+          <sphereGeometry args={[48, 32, 32]} />
           <meshBasicMaterial color="white" />
         </mesh>
       )}
