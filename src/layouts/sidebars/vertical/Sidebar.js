@@ -5,6 +5,11 @@ import { useRouter } from "next/router";
 
 const navigation = [
   {
+    title: "About",
+    href: "/about/why-what-how",
+    icon: "bi bi-info-circle",
+  },
+  {
     title: "Intel-Net",
     href: "/intelnet/folders/view-intelnet",
     icon: "bi bi-globe2",
@@ -39,7 +44,7 @@ const Sidebar = ({ showMobilemenu }) => {
           size="sm"
           className="ms-auto d-lg-none"
           style={{
-            zIndex: 9999,
+            zIndex: "20",
             color: "white",
             textDecoration: "none",
             cursor: "pointer",

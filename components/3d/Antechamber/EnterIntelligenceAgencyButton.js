@@ -28,7 +28,8 @@ export default function EnterIntelligenceAgencyButton() {
     });
 
     setButtonText("Entering..."); // Update the text displayed on the button
-    router.push("/intelnet/folders/view-intelnet"); // Route the user to the specified path
+    // router.push("/intelnet/folders/view-intelnet"); // Route the user to the specified path
+    router.push("/my-computer/access-my-computer");
   };
 
   return (

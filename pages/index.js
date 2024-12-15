@@ -9,20 +9,36 @@ import EnterIntelligenceAgencyButton from "../components/3d/Antechamber/EnterInt
 import StreetLight from "../components/3d/TrafficGate/StreetLight";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import MessageOverlay from "../components/3d/MessageOverlay";
+import { getAiFacts } from "../utils/aiFacts.js";
 
 // Home component
 export default function Home() {
   // State to track if the gate is open
   const [gateOpened, setGateOpened] = useState(false);
+  const aiFacts = getAiFacts();
+  const [factIndex, setFactIndex] = useState(
+    Math.floor(Math.random() * aiFacts.length)
+  );
+  console.log(`getAiFacts: ${aiFacts}`);
+  // const factIndex = Math.floor(Math.random() * aiFacts.length);
+  console.log(`factIndex: ${factIndex}`);
+
+  const randomFact = aiFacts[factIndex];
+  console.log(`randomFact: ${randomFact}`);
+
   const messages = {
     "-80": "",
-    "-20": "AI-ify your learning",
-    "-5": "Agents will write linked reports",
-    "-1": "Approve to save the report",
-    0: "You provide feedback",
-    5: "Your agents will write reports",
-    10: "Think of what you'd like to know",
-    14: "Welcome to Intelligence",
+    // "-45": "It's time for to grow.",
+    // "-40": `Tip: ${randomFact}`,
+    "-55": "Welcome!",
+    "-45": "Now you are more intelligent, too.",
+    "-30": `${randomFact}`,
+    "-20": "This is my intelligence agency.",
+    "-10": "I used AI to make this site.",
+    "-5": "AI is changing the world.",
+    5: "*Access Granted*",
+    10: "*Pretend scanning noises*",
+    14: "Welcome to Marvin.Technology!",
   };
   // In your main scene component
   // <Canvas>

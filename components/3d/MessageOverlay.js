@@ -43,6 +43,8 @@ export default function MessageOverlay({ messages }) {
       cameraPosition.z - 2
     );
     overlayRef.current.quaternion.copy(camera.quaternion);
+    const cameraZ = camera.position.z;
+    console.log(`Camera Z: ${cameraZ}`);
   });
 
   return (
@@ -70,15 +72,18 @@ export default function MessageOverlay({ messages }) {
           {/* Text Message */}
           <Text
             position={[0, 0.6, 0.01]}
-            fontSize={0.1}
+            fontSize={currentMessage.length < 40 ? 0.1 : 0.08}
             color="black"
             anchorX="center"
             anchorY="middle"
             material-toneMapped={false}
             material-depthTest={false}
+            textAlign="center" // Center align the text
+            maxWidth={1.8} // Set a maximum width to wrap the text
           >
             {currentMessage}
           </Text>
+
           {/* Down Arrow indicating to scroll */}
 
           <Text
