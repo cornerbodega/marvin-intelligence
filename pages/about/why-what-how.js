@@ -7,7 +7,9 @@ export default function WhyWhatHow() {
       </h1>
       <div style={{ padding: 20 }}></div>
       <section style={{ marginBottom: "40px" }}>
-        <h2 style={{ marginBottom: "20px" }}>Why?</h2>
+        <h2 style={{ marginBottom: "20px" }}>
+          I wanted to save and share the good stuff
+        </h2>
         <p style={{ marginBottom: "20px" }}>
           When I first used ChatGPT, I wanted an easy way to save and organize
           the content I was reading. I was working on creating a business plan
@@ -18,7 +20,10 @@ export default function WhyWhatHow() {
       </section>
 
       <section style={{ marginBottom: "40px" }}>
-        <h2 style={{ marginBottom: "20px" }}>What?</h2>
+        <h2 style={{ marginBottom: "20px" }}>
+          Intelligence.Marvin.Technology is a recursive research at cataloging
+          platform
+        </h2>
         <p style={{ marginBottom: "20px" }}>
           This project was created with three primary goals in mind:
         </p>
@@ -39,7 +44,9 @@ export default function WhyWhatHow() {
       </section>
 
       <section style={{ marginBottom: "40px" }}>
-        <h2 style={{ marginBottom: "20px" }}>How?</h2>
+        <h2 style={{ marginBottom: "20px" }}>
+          Recruit GPT Agents to write reports
+        </h2>
 
         <h3 style={{ marginBottom: "15px" }}>Reports</h3>
         <p style={{ marginBottom: "20px" }}>
@@ -67,7 +74,9 @@ export default function WhyWhatHow() {
       </section>
 
       <section style={{ marginBottom: "40px" }}>
-        <h2 style={{ marginBottom: "20px" }}>Tech Stack</h2>
+        <h2 style={{ marginBottom: "20px" }}>
+          Built with flexible and scalable technologies
+        </h2>
         <ul style={{ marginBottom: "20px" }}>
           <li style={{ marginBottom: "10px" }}>
             <strong>Frontend:</strong> Next.js
@@ -84,7 +93,7 @@ export default function WhyWhatHow() {
         </ul>
       </section>
       <section style={{ marginBottom: "40px" }}>
-        <h2 style={{ marginBottom: "20px" }}>Get Started</h2>
+        <h2 style={{ marginBottom: "20px" }}>Getting Started</h2>
         <ul>
           <li style={{ marginBottom: "10px" }}>
             Visit{" "}

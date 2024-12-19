@@ -1,6 +1,15 @@
 import Head from "next/head";
-
+import { useState, useEffect } from "react";
 export default function Journal() {
+  const [maxWidth, setMaxWidth] = useState("none");
+
+  useEffect(() => {
+    const updateMaxWidth = () =>
+      setMaxWidth(window.innerWidth <= 767 ? "100vw" : "33vw");
+    updateMaxWidth(); // Set initial value
+    window.addEventListener("resize", updateMaxWidth);
+    return () => window.removeEventListener("resize", updateMaxWidth);
+  }, []);
   return (
     <>
       <Head>
@@ -11,7 +20,15 @@ export default function Journal() {
       </h1>
       <div style={{ lineHeight: "1.8", margin: "20px 0" }}>
         <p>
-          <img src="/Skiing.jpg" />
+          <img
+            src="/Skiing.jpg"
+            alt="Skiing"
+            style={{
+              maxWidth, // Controlled dynamically
+              width: "100%",
+              height: "auto",
+            }}
+          />
         </p>
         <h2 style={{ marginTop: "30px" }}>Current Goal</h2>
         <p>
