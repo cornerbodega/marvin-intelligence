@@ -4,18 +4,19 @@ export default function Journal() {
   return (
     <>
       <Head>
-        <title>Career Journal</title>
+        <title>Marvin's Career Journal</title>
       </Head>
-      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
-        Career Journal
+      <h1 style={{ textAlign: "left", marginBottom: "30px" }}>
+        My Career Journal
       </h1>
       <div style={{ lineHeight: "1.8", margin: "20px 0" }}>
+        <p>
+          <img src="/Skiing.jpg" />
+        </p>
         <h2 style={{ marginTop: "30px" }}>Current Goal</h2>
         <p>
-          I aim to lead cross-functional teams and drive organizational growth
-          through strategic vision, technical innovation, and scalable systems.
-          My work focuses on blending technical expertise with leadership to
-          create impactful outcomes.
+          Continue to ascend in my journey toward leadership at a leading
+          technology company.
         </p>
 
         <h2 style={{ marginTop: "40px" }}>Professional Growth</h2>
@@ -120,9 +121,10 @@ export default function Journal() {
           I majored in Economics, with enriching experiences like working as a
           Teaching Assistant in Computer Science and Management. My
           entrepreneurial spirit flourished when I won the Brown
-          Entrepreneurship Elevator Pitch competition. Studying abroad at the
-          University of Otago in New Zealand broadened my perspective, and I
-          cherished leading my intramural basketball team to four championships.
+          Entrepreneurship Club Elevator Pitch competition. Studying abroad at
+          the University of Otago in New Zealand broadened my perspective, and I
+          cherished leading my intramural basketball team to four consecutive
+          championships.
         </p>
 
         <h2 style={{ marginTop: "40px" }}>Learning & Growth</h2>
@@ -134,13 +136,8 @@ export default function Journal() {
           enrolled in the subsequent Deep Learning Specialization.
         </p>
 
-        <h3 style={{ marginTop: "20px" }}>Interests</h3>
-        <p>
-          Beyond my professional life, I find joy in basketball (inspired by
-          Duncan, Curry, and Jokic), outdoor adventures, soul food cooking, and
-          comedy. Investing and fundamental analysis remain passions that blend
-          my analytical and creative sides.
-        </p>
+        <h3 style={{ marginTop: "20px" }}>Recreation</h3>
+        <p>isSnowy(myLocation) == true ? skiing(): basketball();</p>
       </div>
     </>
   );
