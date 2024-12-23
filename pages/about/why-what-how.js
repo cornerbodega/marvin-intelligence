@@ -1,10 +1,30 @@
 import Link from "next/link";
+import { useState, useEffect } from "react";
+
 export default function WhyWhatHow() {
+  const [maxWidth, setMaxWidth] = useState("none");
+
+  useEffect(() => {
+    const updateMaxWidth = () =>
+      setMaxWidth(window.innerWidth <= 767 ? "100vw" : "33vw");
+    updateMaxWidth(); // Set initial value
+    window.addEventListener("resize", updateMaxWidth);
+    return () => window.removeEventListener("resize", updateMaxWidth);
+  }, []);
   return (
     <div>
       <h1 style={{ marginBottom: "20px" }}>
         About Intelligence.Marvin.Technology
       </h1>
+      <img
+        src="/Dollar.jpg"
+        alt="Dollar"
+        style={{
+          maxWidth, // Controlled dynamically
+          width: "100%",
+          height: "auto",
+        }}
+      />
       <div style={{ padding: 20 }}></div>
       <section style={{ marginBottom: "40px" }}>
         <h2 style={{ marginBottom: "20px" }}>
