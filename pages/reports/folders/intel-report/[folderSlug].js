@@ -1119,7 +1119,6 @@ const ViewReports = ({
                       cursor: "pointer",
                     }}
                   >
-                    Intel-Net &nbsp;
                     <i
                       onClick={handleGlobeClick}
                       className="bi bi-globe"
@@ -1127,7 +1126,6 @@ const ViewReports = ({
                     />
                   </span>
                   <span style={{ fontFamily: "monospace" }}>
-                    Print &nbsp;
                     <IntelliPrint loadedReports={loadedReports} />
                   </span>
                 </Col>
