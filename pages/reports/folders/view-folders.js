@@ -164,7 +164,12 @@ const ViewReports = ({
 
     setLoadedReports(data);
   }
-
+  function handleBillingClicked() {
+    goToPage("/agency/billing");
+  }
+  function goToPage(name) {
+    router.push(name);
+  }
   async function handleSearch(searchInput) {
     setSearchInput(searchInput);
     console.log("handleSearch");
@@ -534,7 +539,7 @@ const ViewReports = ({
         </BreadcrumbItem>
       </Breadcrumb>
       <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-        Ask a question to create a report
+        Ask a question or enter information to create a folder and a report.
       </div>
       <div id="quickDraftBriefingInput">
         <div className="textareaWrapper">
@@ -549,7 +554,7 @@ const ViewReports = ({
                 handleQuickDraftClick();
               }
             }}
-            placeholder="What would you like to know?"
+            placeholder="type or paste here."
             style={{
               padding: "12px 12px 13px 13px",
               borderWidth: "0px",
@@ -578,13 +583,42 @@ const ViewReports = ({
                     marginBottom: "16px",
                     marginRight: "8px",
                     cursor: "pointer",
-                    width: "108",
+                    // width: "190px", // Increased width to keep text on one line
+                    whiteSpace: "nowrap", // Prevents wrapping of text
+                    overflow: "hidden", // Ensures no overflow text is visible
+                    textOverflow: "ellipsis", // Adds ellipsis for long text
                   }}
                   disabled={briefingInput.length === 0 || didClickQuickDraft}
-                  className="btn btn-primary "
+                  className="btn btn-primary"
                 >
-                  <i className="bi bi-body-text"></i> Create Report
+                  <i className="bi bi-folder"></i> Create Folder
                 </Button>
+              </div>
+            </div>
+          </Col>
+          <Col>
+            <div>
+              <div style={{ marginBottom: "10px", textAlign: "right" }}>
+                <div
+                  onClick={() => handleBillingClicked()}
+                  style={{
+                    textAlign: "right",
+                    borderColor: "#31A0D1",
+                    borderWidth: "4px",
+                    marginTop: "0px",
+                    marginBottom: "16px",
+                    marginRight: "0px",
+                    cursor: "pointer",
+                    padding: "8px 16px",
+                    display: "inline-block",
+                    // backgroundColor: "#007bff",
+                    color: "white",
+                    borderRadius: "4px",
+                  }}
+                  className="btn btn-primary"
+                >
+                  Credit Balance: $10
+                </div>
               </div>
             </div>
           </Col>

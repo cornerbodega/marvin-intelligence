@@ -286,7 +286,7 @@ const CreateMission = ({}) => {
                   }
                   onClick={(e) => handleAcceptReport(e)}
                 >
-                  <i className="bi bi-floppy"></i> Save & Visualize
+                  <i className="bi bi-floppy"></i> Save Folder
                 </Button>
               </div>
             </>

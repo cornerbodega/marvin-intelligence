@@ -5,9 +5,9 @@ import { useRouter } from "next/router";
 
 const navigation = [
   {
-    title: "My Reports",
+    title: "My Folders",
     href: "/reports/folders/view-folders",
-    icon: "bi bi-body-text",
+    icon: "bi bi-folder",
   },
   {
     title: "Intel-Net",
