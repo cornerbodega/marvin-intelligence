@@ -502,4 +502,34 @@ body {
   color: rgb(203, 252, 255);
  }
 
- 
+ .reveal-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  background-color: #131313;
+  border: 1px solid #555;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.reveal-text {
+  font-size: 1.2em;
+  white-space: pre-wrap; /* Keeps newlines in the draft */
+  color: white;
+  background: linear-gradient(to right, transparent 0%, white 20%, white 80%, transparent 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: reveal 3s linear infinite;
+}
+
+@keyframes reveal {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}

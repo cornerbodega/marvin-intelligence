@@ -1,7 +1,9 @@
 // @author Marvin-Rhone
 // quick-draft.js is the page where the user can create a mission for an
 // agent to complete.
+import DOMPurify from "dompurify";
 
+import Link from "next/link";
 import saveTask from "../../../utils/saveTask";
 import {
   Card,
@@ -47,7 +49,11 @@ const CreateMission = ({}) => {
     console.log("router.query.userId");
     console.log(router.query.userId);
   }
-
+  function goToPage(name) {
+    console.log("go to page");
+    console.log(name);
+    router.push(name);
+  }
   useEffect(() => {
     if (router.query.userId) {
       setUserId(router.query.userId);
@@ -176,7 +182,9 @@ const CreateMission = ({}) => {
         style={{ fontWeight: "200", fontFamily: "monospace" }}
         className="text-white"
       >
-        <BreadcrumbItem>Reports</BreadcrumbItem>
+        <BreadcrumbItem>
+          <Link href="/reports/folders/view-folders">Reports</Link>
+        </BreadcrumbItem>
         <BreadcrumbItem>Quick Draft</BreadcrumbItem>
       </Breadcrumb>
       {feedbacks &&
@@ -205,11 +213,11 @@ const CreateMission = ({}) => {
 
       {!showLoadingImage && (
         <div>
-          {draft && !draft.endsWith(" ".repeat(3)) && (
+          {/* {draft && !draft.endsWith(" ".repeat(3)) && (
             <>
               <IntelliLoadingBar speedFactor={3} />
             </>
-          )}
+          )} */}
           {draft && (
             <Card style={{ backgroundColor: "#131313", color: "white" }}>
               <CardBody style={{ backgroundColor: "#131313", color: "white" }}>
@@ -217,72 +225,72 @@ const CreateMission = ({}) => {
                 <div
                   style={{ marginTop: "20px" }}
                   className="text-white"
-                  dangerouslySetInnerHTML={{ __html: draft }}
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(draft),
+                  }}
                 />
               </CardBody>
             </Card>
           )}
 
-          {(draft && isSubmitting) ||
-            hasSubmitted ||
-            (draft && draft.endsWith(" ".repeat(3)) && (
-              <>
-                <Form onSubmit={(e) => handleQuickDraftClick(e)}>
-                  <FormGroup>
-                    <div style={{ marginTop: "40px" }}></div>
-                    <Label htmlFor="exampleText" className="text-white">
-                      Feedback
-                    </Label>
+          {draft && draft.endsWith(" ".repeat(3)) && (
+            <>
+              <Form onSubmit={(e) => handleQuickDraftClick(e)}>
+                <FormGroup>
+                  <div style={{ marginTop: "40px" }}></div>
+                  <Label htmlFor="exampleText" className="text-white">
+                    Feedback
+                  </Label>
 
-                    <Input
-                      id="exampleText"
-                      placeholder="What do you think?"
-                      name="text"
-                      rows="5"
-                      type="textarea"
-                      style={{ backgroundColor: "#131313", color: "white" }}
-                      autoFocus
-                      value={feedbackInput}
-                      onChange={(e) => setFeedbackInput(e.target.value)}
-                    />
-                    <div
-                      style={{
-                        textAlign: "left",
-                        paddingTop: "8px",
-                      }}
-                    >
-                      <Button
-                        color="primary"
-                        style={{
-                          border: "1px solid yellow",
-                        }}
-                        disabled={
-                          !draft.endsWith(" ".repeat(3)) || !feedbackInput
-                        }
-                        onClick={(e) => handleQuickDraftClick(e)}
-                      >
-                        <i className="bi bi-arrow-clockwise"></i>
-                        &nbsp;Retry
-                      </Button>
-                    </div>
-                  </FormGroup>
-                </Form>
-                <div style={{ textAlign: "center" }}>
-                  <Button
-                    color="primary"
-                    style={{ border: "3px solid green", fontSize: "2em" }}
-                    disabled={
-                      isSubmitting ||
-                      hasSubmitted ||
-                      !draft.endsWith(" ".repeat(3))
-                    }
-                    onClick={(e) => handleAcceptReport(e)}
+                  <Input
+                    id="exampleText"
+                    placeholder="What do you think?"
+                    name="text"
+                    rows="5"
+                    type="textarea"
+                    style={{ backgroundColor: "#131313", color: "white" }}
+                    autoFocus
+                    value={feedbackInput}
+                    onChange={(e) => setFeedbackInput(e.target.value)}
+                  />
+                  <div
+                    style={{
+                      textAlign: "left",
+                      paddingTop: "8px",
+                    }}
                   >
-                    <i className="bi bi-floppy"></i> Save & Visualize
-                  </Button>
-                </div>
-              </>
-            ))}
+                    <Button
+                      color="primary"
+                      style={{
+                        border: "1px solid yellow",
+                      }}
+                      disabled={
+                        !draft.endsWith(" ".repeat(3)) || !feedbackInput
+                      }
+                      onClick={(e) => handleQuickDraftClick(e)}
+                    >
+                      <i className="bi bi-arrow-clockwise"></i>
+                      &nbsp;Retry
+                    </Button>
+                  </div>
+                </FormGroup>
+              </Form>
+              <div style={{ textAlign: "center" }}>
+                <Button
+                  color="primary"
+                  style={{ border: "3px solid green", fontSize: "2em" }}
+                  disabled={
+                    isSubmitting ||
+                    hasSubmitted ||
+                    !draft.endsWith(" ".repeat(3))
+                  }
+                  onClick={(e) => handleAcceptReport(e)}
+                >
+                  <i className="bi bi-floppy"></i> Save & Visualize
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       )}
       {showLoadingImage && (

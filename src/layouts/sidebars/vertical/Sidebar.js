@@ -5,25 +5,25 @@ import { useRouter } from "next/router";
 
 const navigation = [
   {
-    title: "About",
-    href: "/about/why-what-how",
-    icon: "bi bi-info-circle",
+    title: "My Reports",
+    href: "/reports/folders/view-folders",
+    icon: "bi bi-body-text",
   },
   {
     title: "Intel-Net",
     href: "/intelnet/folders/view-intelnet",
     icon: "bi bi-globe2",
   },
-  {
-    title: "My Reports",
-    href: "/reports/folders/view-folders",
-    icon: "bi bi-body-text",
-  },
 
   {
     title: "Agents",
     href: "/agents/view-agents",
     icon: "bi bi-person-badge",
+  },
+  {
+    title: "About",
+    href: "/about/why-what-how",
+    icon: "bi bi-info-circle",
   },
 ];
 

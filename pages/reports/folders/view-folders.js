@@ -590,40 +590,39 @@ const ViewReports = ({
           </Col>
         </Row>
       </div>
-      {loadedReports.length > 0 && (
-        <>
-          <div style={{ marginBottom: "20px", width: "100%", display: "flex" }}>
-            <input
-              type="text"
-              style={{
-                borderRadius: "8px",
-                borderWidth: "0px",
-                backgroundColor: "#000",
-                color: "white",
-                border: "1px solid grey",
-                height: "2em",
-                flexGrow: 1, // Let it grow to take the available space
-                textIndent: "10px",
-              }}
-              lines="1"
-              placeholder="⌕ Search my reports"
-              onChange={(e) => handleSearch(e.target.value)}
-            />
-          </div>
-          <div ref={containerRef}>
-            <Row className="text-primary">
-              <IntelliCardGroup
-                offset={offset}
-                handleCardClick={handleCardClick}
-                datums={loadedReports}
-                folderLikesByFolderId={folderLikesByFolderId}
-                reportCountsByFolderId={reportCountsByFolderId}
-                datumsType={"folders"}
-              ></IntelliCardGroup>
-            </Row>
-          </div>
-        </>
-      )}
+
+      <>
+        <div style={{ marginBottom: "20px", width: "100%", display: "flex" }}>
+          <input
+            type="text"
+            style={{
+              borderRadius: "8px",
+              borderWidth: "0px",
+              backgroundColor: "#000",
+              color: "white",
+              border: "1px solid grey",
+              height: "2em",
+              flexGrow: 1, // Let it grow to take the available space
+              textIndent: "10px",
+            }}
+            lines="1"
+            placeholder="⌕ Search my reports"
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </div>
+        <div ref={containerRef}>
+          <Row className="text-primary">
+            <IntelliCardGroup
+              offset={offset}
+              handleCardClick={handleCardClick}
+              datums={loadedReports}
+              folderLikesByFolderId={folderLikesByFolderId}
+              reportCountsByFolderId={reportCountsByFolderId}
+              datumsType={"folders"}
+            ></IntelliCardGroup>
+          </Row>
+        </div>
+      </>
     </>
   );
 };

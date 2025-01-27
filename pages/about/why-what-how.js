@@ -26,6 +26,17 @@ export default function WhyWhatHow() {
         }}
       />
       <div style={{ padding: 20 }}></div>
+
+      {/*     // router.push("/my-computer/access-my-computer");
+       */}
+
+      <Link
+        style={{ color: "lightblue" }}
+        href="/my-computer/access-my-computer"
+      >
+        About Marvin: Access my Computer
+      </Link>
+      <div style={{ padding: 20 }}></div>
       <section style={{ marginBottom: "40px" }}>
         <h2 style={{ marginBottom: "20px" }}>
           I wanted to save and share the good stuff
@@ -38,7 +49,6 @@ export default function WhyWhatHow() {
           AI and curated by me.
         </p>
       </section>
-
       <section style={{ marginBottom: "40px" }}>
         <h2 style={{ marginBottom: "20px" }}>
           Intelligence.Marvin.Technology is a recursive research at cataloging
@@ -62,7 +72,6 @@ export default function WhyWhatHow() {
           </li>
         </ol>
       </section>
-
       <section style={{ marginBottom: "40px" }}>
         <h2 style={{ marginBottom: "20px" }}>
           Recruit GPT Agents to write reports
@@ -92,7 +101,6 @@ export default function WhyWhatHow() {
           deeply linked reports with shared context.
         </p>
       </section>
-
       <section style={{ marginBottom: "40px" }}>
         <h2 style={{ marginBottom: "20px" }}>
           Built with flexible and scalable technologies
@@ -119,7 +127,7 @@ export default function WhyWhatHow() {
             Visit{" "}
             <Link
               style={{ color: "lightblue" }}
-              href="/intelnet/folders/view-intelnet"
+              href="/reports/folders/view-folders"
             >
               Intel-Net
             </Link>{" "}
