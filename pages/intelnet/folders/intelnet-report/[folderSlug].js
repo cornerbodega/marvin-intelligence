@@ -809,13 +809,15 @@ const ViewReports = ({
                 <div style={{ height: "700px" }} className="image-container">
                   {!report.reportPicUrl && <LibraryImage />}
                   {report.reportPicUrl && (
-                    <img
-                      src={report.reportPicUrl}
-                      alt={report.reportPicDescription}
-                      title={report.reportPicDescription}
-                      className="report-image"
-                      style={{ borderRadius: "0px" }}
-                    />
+                    <>
+                      <img
+                        src={report.reportPicUrl}
+                        alt={report.reportPicDescription}
+                        title={report.reportPicDescription}
+                        className="report-image"
+                        style={{ borderRadius: "0px" }}
+                      />
+                    </>
                   )}
                 </div>
                 {/* Speech */}

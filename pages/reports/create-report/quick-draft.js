@@ -140,7 +140,7 @@ const CreateMission = ({}) => {
     };
     const newTaskRef = await saveTask(newTask);
     console.log("newTaskRef");
-    console.log(newTaskRef);
+    console.log(newTask);
   }
 
   const [feedbacks, setFeedbacks] = useState([]);
@@ -219,8 +219,8 @@ const CreateMission = ({}) => {
             </>
           )} */}
           {draft && (
-            <Card style={{ backgroundColor: "#131313", color: "white" }}>
-              <CardBody style={{ backgroundColor: "#131313", color: "white" }}>
+            <Card style={{ backgroundColor: "black", color: "white" }}>
+              <CardBody style={{ backgroundColor: "black", color: "white" }}>
                 <i className="bi bi-body-text"> Current Draft </i>
                 <div
                   style={{ marginTop: "20px" }}

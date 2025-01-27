@@ -995,6 +995,9 @@ const ViewReports = ({
   };
 
   async function handleRefreshFolderImageClick() {
+    if (regenImageDisabled) {
+      return;
+    }
     const newTask = {
       type: "regenerateFolder",
       status: "queued",
@@ -1006,8 +1009,14 @@ const ViewReports = ({
       createdAt: new Date().toISOString(),
     };
     const newTaskRef = await saveTask(newTask);
+    // disable the button and show a message
+    setRegenImageDisabled(true);
   }
   async function handleRefreshReportImageClick(index) {
+    if (regenImageDisabled) {
+      return;
+    }
+    setRegenImageDisabled(true);
     const childReportId = loadedReports[index].reportId;
     const draft = loadedReports[index].reportContent;
     const newTask = {
@@ -1023,7 +1032,7 @@ const ViewReports = ({
     };
     const newTaskRef = await saveTask(newTask);
   }
-
+  const [regenImageDisabled, setRegenImageDisabled] = useState(false);
   return (
     <>
       {/* Notifications Area */}
@@ -1139,17 +1148,15 @@ const ViewReports = ({
                 >
                   <span
                     style={{
-                      color: "white",
-                      cursor: "pointer",
+                      color: regenImageDisabled ? "grey" : "white",
+                      cursor: regenImageDisabled ? "not-allowed" : "pointer",
                       whiteSpace: "nowrap",
                       fontFamily: "monospace",
                     }}
+                    onClick={() => handleRefreshFolderImageClick()}
                   >
                     Regen Image &nbsp;
-                    <i
-                      onClick={() => handleRefreshFolderImageClick()}
-                      className="bi bi-arrow-clockwise"
-                    />
+                    <i className="bi bi-arrow-clockwise" />
                   </span>
                 </Col>
               </Row>
@@ -1335,14 +1342,15 @@ const ViewReports = ({
                           textAlign: "right",
                           marginRight: "20px",
                           marginTop: "10px",
-                          cursor: "pointer",
+                          cursor: regenImageDisabled
+                            ? "not-allowed"
+                            : "pointer",
+                          color: regenImageDisabled ? "grey" : "white",
+
                           fontFamily: "monospace",
                         }}
                       >
                         <span
-                          style={{
-                            color: "white",
-                          }}
                           onClick={() => handleRefreshReportImageClick(index)}
                         >
                           Regen Image &nbsp;
