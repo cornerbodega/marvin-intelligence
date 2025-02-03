@@ -12,21 +12,21 @@ const IntelliCard = ({
   const reportsColor = "#31A0D1";
   const intelnetColor = "#3FFF8D";
   let borderBottomColor = reportsColor;
-  // const imageStyle = {
-  //   borderTop: `2px solid ${reportsColor}`,
-  //   borderLeft: `2px solid ${reportsColor}`,
-  //   borderRight: `2px solid ${reportsColor}`,
-  // };
+  const imageStyle = {
+    borderTop: `2px solid ${reportsColor}`,
+    borderLeft: `2px solid ${reportsColor}`,
+    borderRight: `2px solid ${reportsColor}`,
+  };
   const cardBottomBorder = {
     borderBottom: `2px solid ${reportsColor}`,
     borderLeft: `2px solid ${reportsColor}`,
     borderRight: `2px solid ${reportsColor}`,
   };
   // if (index === 0) {
-  // imageStyle.borderTopLeftRadius = "16px";
+  imageStyle.borderTopLeftRadius = "16px";
   // }
   // if (index === 2) {
-  // imageStyle.borderTopRightRadius = "16px";
+  imageStyle.borderTopRightRadius = "16px";
 
   let icon;
   let likes;
@@ -47,9 +47,9 @@ const IntelliCard = ({
     displayDatums.title = datums.folderName;
     icon = "bi bi-folder";
     if (datumsType === "intelnet") {
-      // imageStyle.borderTop = `2px solid ${intelnetColor}`;
-      // imageStyle.borderLeft = `2px solid ${intelnetColor}`;
-      // imageStyle.borderRight = `2px solid ${intelnetColor}`;
+      imageStyle.borderTop = `2px solid ${intelnetColor}`;
+      imageStyle.borderLeft = `2px solid ${intelnetColor}`;
+      imageStyle.borderRight = `2px solid ${intelnetColor}`;
       cardBottomBorder.borderBottom = `2px solid ${intelnetColor}`;
       cardBottomBorder.borderLeft = `2px solid ${intelnetColor}`;
       cardBottomBorder.borderRight = `2px solid ${intelnetColor}`;
@@ -64,10 +64,10 @@ const IntelliCard = ({
       reportCount = reportCountsByFolderId[datums.folderId];
     }
   }
-  // if (imageSize === "small") {
-  //   imageStyle.objectFit = "cover";
-  //   displayDatums.picUrl = displayDatums.picUrl;
-  // }
+  if (imageSize === "small") {
+    imageStyle.objectFit = "cover";
+    displayDatums.picUrl = displayDatums.picUrl;
+  }
 
   function handleClick() {
     handleCardClick(datums);
@@ -80,7 +80,7 @@ const IntelliCard = ({
         style={{ background: "black", cursor: "pointer" }}
         className="cardShadow text-white"
       >
-        {/* <div style={{ position: "relative", width: "100%" }}>
+        <div style={{ position: "relative", width: "100%" }}>
           {displayDatums.picUrl && (
             <div
               // src={
@@ -93,7 +93,7 @@ const IntelliCard = ({
               alt={displayDatums.title}
             />
           )}
-        </div> */}
+        </div>
 
         <CardBody
           style={{

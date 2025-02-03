@@ -596,7 +596,7 @@ const ViewReports = ({
               </div>
             </div>
           </Col>
-          <Col>
+          {/* <Col>
             <div>
               <div style={{ marginBottom: "10px", textAlign: "right" }}>
                 <div
@@ -617,11 +617,11 @@ const ViewReports = ({
                   }}
                   className="btn btn-primary"
                 >
-                  Credit Balance: $10
+                  Credit balance: $10
                 </div>
               </div>
             </div>
-          </Col>
+          </Col> */}
         </Row>
       </div>
 
