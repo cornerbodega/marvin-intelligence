@@ -64,28 +64,20 @@ const CreateMission = ({}) => {
 
   const firebaseDraftData = useFirebaseListener(
     userId
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/quickDraft/context/`
+      ? `/${"asyncTasks"}/${
+          process.env.NEXT_PUBLIC_SERVER_UID
+        }/${userId}/quickDraft/context/`
       : null
   );
 
   console.log(
-    `/${
-      process.env.NEXT_PUBLIC_env === "production"
-        ? "asyncTasks"
-        : "localAsyncTasks"
-    }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/quickDraft/context/`
+    `/${"asyncTasks"}/${
+      process.env.NEXT_PUBLIC_SERVER_UID
+    }/${userId}/quickDraft/context/`
   );
   const firebaseSaveData = useFirebaseListener(
     userId
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${
+      ? `/${"asyncTasks"}/${
           process.env.NEXT_PUBLIC_SERVER_UID
         }/${userId}/finalizeAndVisualizeReport/context/`
       : null

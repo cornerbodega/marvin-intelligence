@@ -122,29 +122,21 @@ const CreateMission = ({
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const firebaseSaveData = useFirebaseListener(
     userId
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/regenerateFolder/`
+      ? `/${"asyncTasks"}/${
+          process.env.NEXT_PUBLIC_SERVER_UID
+        }/${userId}/regenerateFolder/`
       : null
   );
   const firebaseDraftData = useFirebaseListener(
     user
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${process.env.NEXT_PUBLIC_SERVER_UID}/${user.sub}/quickDraft/context`
+      ? `/${"asyncTasks"}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
+          user.sub
+        }/quickDraft/context`
       : null
   );
   const firebaseFolderIdData = useFirebaseListener(
     user
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${process.env.NEXT_PUBLIC_SERVER_UID}/${
+      ? `/${"asyncTasks"}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
           user.sub
         }/finalizeAndVisualizeReport/context/folderId`
       : null

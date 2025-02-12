@@ -207,11 +207,7 @@ const ViewReports = ({
   const [hasStartedContinuum, setHasStartedContinuum] = useState(false);
   const firebaseSaveData = useFirebaseListener(
     user
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${
+      ? `/${"asyncTasks"}/${
           process.env.NEXT_PUBLIC_SERVER_UID
         }/${userId}/finalizeAndVisualizeReport/context/`
       : null
@@ -219,22 +215,16 @@ const ViewReports = ({
 
   const firebaseFolderData = useFirebaseListener(
     user
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${
+      ? `/${"asyncTasks"}/${
           process.env.NEXT_PUBLIC_SERVER_UID
         }/${userId}/regenerateFolder/context`
       : null
   );
   const firebaseDraftData = useFirebaseListener(
     user
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/continuum/`
+      ? `/${"asyncTasks"}/${
+          process.env.NEXT_PUBLIC_SERVER_UID
+        }/${userId}/continuum/`
       : null
   );
 

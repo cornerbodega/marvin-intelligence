@@ -265,32 +265,24 @@ const ViewReports = ({
 
   const firebaseSaveData = useFirebaseListener(
     user
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${
+      ? `/${"asyncTasks"}/${
           process.env.NEXT_PUBLIC_SERVER_UID
         }/${userId}/finalizeAndVisualizeReport/context/`
       : null
   );
 
   const [agent, setAgent] = useState({});
-  const folderPath = `/${
-    process.env.NEXT_PUBLIC_env === "production"
-      ? "asyncTasks"
-      : "localAsyncTasks"
-  }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/regenerateFolder/context/`;
+  const folderPath = `/${"asyncTasks"}/${
+    process.env.NEXT_PUBLIC_SERVER_UID
+  }/${userId}/regenerateFolder/context/`;
 
   const firebaseFolderData = useFirebaseListener(user ? folderPath : null);
 
   const firebaseDraftData = useFirebaseListener(
     user
-      ? `/${
-          process.env.NEXT_PUBLIC_env === "production"
-            ? "asyncTasks"
-            : "localAsyncTasks"
-        }/${process.env.NEXT_PUBLIC_SERVER_UID}/${userId}/continuum/`
+      ? `/${"asyncTasks"}/${
+          process.env.NEXT_PUBLIC_SERVER_UID
+        }/${userId}/continuum/`
       : null
   );
 
