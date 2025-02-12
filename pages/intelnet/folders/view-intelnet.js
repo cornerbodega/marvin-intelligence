@@ -309,7 +309,7 @@ const ViewReports = ({
           }}
           onClick={(e) => goToPage("/reports/folders/view-folders")}
         >
-          <i className="bi bi-folder"></i> Create Folder
+          <i className="bi bi-folder"></i> Create Report Folder
         </Button>
       </div>
       <Breadcrumb style={{ fontFamily: "monospace" }}>

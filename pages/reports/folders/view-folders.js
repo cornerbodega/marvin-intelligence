@@ -591,7 +591,7 @@ const ViewReports = ({
                   disabled={briefingInput.length === 0 || didClickQuickDraft}
                   className="btn btn-primary"
                 >
-                  <i className="bi bi-folder"></i> Create Folder
+                  <i className="bi bi-folder"></i> Create Report Folder
                 </Button>
               </div>
             </div>
