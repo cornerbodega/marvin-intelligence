@@ -50,6 +50,8 @@ const ViewReports = ({ user, _agencyName }) => {
 
     if (res.status === 200) {
       setAgencyName(agencyName);
+      // go to reports
+      router.push("/reports/folders/view-folders");
     } else {
       console.log(JSON.stringify(res));
       alert("An error occurred while updating the agency. Please try again.");
@@ -70,8 +72,8 @@ const ViewReports = ({ user, _agencyName }) => {
               <Input
                 autoFocus
                 type="text"
-                name="expertise1"
-                id="expertise1"
+                name="agencyName"
+                id="agencyName"
                 value={agencyName}
                 onChange={(e) => setAgencyName(e.target.value)}
                 placeholder="Enter Agency Name"
