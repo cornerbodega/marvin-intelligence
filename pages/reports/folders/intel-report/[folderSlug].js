@@ -584,6 +584,7 @@ const ViewReports = ({
     if (links && links.length > 0) {
       const container = document.createElement("div");
       container.innerHTML = report.reportContent;
+
       links.forEach((link) => {
         const element = container.querySelector(`[id="${link.elementId}"]`);
         let highlightedText = (() => {
@@ -597,21 +598,35 @@ const ViewReports = ({
         if (element) {
           const newLink = `<a href="#${link.childReportId}">${highlightedText}</a>`;
 
-          const updatedHTML = element.innerHTML.replace(
-            highlightedText,
-            newLink
-          );
-          console.log("updatedHTML");
-          console.log(updatedHTML);
-          element.innerHTML = updatedHTML;
+          // Try replacing normalized version inside the actual DOM
+          const originalText = element.textContent;
+          const normalizedText = originalText.replace(/\s+/g, " ").trim();
+          const normalizedHighlight = highlightedText
+            .replace(/\s+/g, " ")
+            .trim();
+
+          console.log("originalText:", originalText);
+          console.log("normalizedText:", normalizedText);
+          console.log("normalizedHighlight:", normalizedHighlight);
+
+          if (normalizedText.includes(normalizedHighlight)) {
+            // Build a regex to allow for whitespace between words
+            const escaped = highlightedText
+              .trim()
+              .replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&") // escape special chars
+              .replace(/\s+/g, "\\s+"); // match any whitespace
+
+            const regex = new RegExp(escaped);
+            element.innerHTML = element.innerHTML.replace(regex, newLink);
+          } else {
+            console.warn("Could not match normalized highlight in text");
+          }
         } else {
           console.log(`Element with id ${link.elementId} not found`);
-          console.log(`report.reportContent ${report.reportContent}`);
         }
       });
 
-      report.reportContent = container.innerHTML; // Update the reportContent directly
-      // console.log(report.reportContent);
+      report.reportContent = container.innerHTML;
     }
   }
 
