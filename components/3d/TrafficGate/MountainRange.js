@@ -85,13 +85,11 @@ export default function MountainRange() {
         const doorDistance = camera.position.distanceTo(
           new Vector3(doorPosition.x, doorPosition.y, doorPosition.z)
         );
-        const hideThreshold = 18;
+        const hideThreshold = 15;
         mountain.visible = doorDistance > hideThreshold;
         const shouldHideMoon = doorDistance > hideThreshold;
         if (!shouldHideMoon) {
           setShowMoon(false);
-        } else {
-          setShowMoon(true);
         }
       }
     });
