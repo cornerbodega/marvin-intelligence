@@ -149,7 +149,7 @@ const CreateMission = ({
   //         if (firebaseSaveData.folderId) {
   //           router.push({
   //             pathname: `/reports/folders/intel-report/${firebaseSaveData.folderId}`,
-  //             query: { userId },
+  //
   //           });
   //         } else {
   //           // setShowLoadingImage(true);
@@ -162,7 +162,6 @@ const CreateMission = ({
     if (firebaseFolderIdData && hasSavedReport) {
       router.push({
         pathname: `/reports/folders/intel-report/${firebaseFolderIdData}`,
-        query: { userId },
       });
     }
   }, [firebaseFolderIdData]);

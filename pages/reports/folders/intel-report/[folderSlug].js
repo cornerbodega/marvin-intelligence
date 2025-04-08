@@ -28,12 +28,12 @@ export async function getServerSideProps(context) {
   const session = await getSession(context.req, context.res);
   const user = session?.user;
   let userId = user?.sub;
-  const query = context.query;
+  // const query = context.query;
 
-  const userIdFromRouter = query.userId;
-  if (!userId && userIdFromRouter) {
-    userId = userIdFromRouter;
-  }
+  // const userIdFromRouter = query.userId;
+  // if (!userId && userIdFromRouter) {
+  //   userId = userIdFromRouter;
+  // }
 
   if (!folderId) {
     console.log("Error! No folder Id");

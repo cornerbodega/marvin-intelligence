@@ -100,7 +100,6 @@ const CreateMission = ({}) => {
         if (firebaseSaveData.folderId) {
           router.push({
             pathname: `/reports/folders/intel-report/${firebaseSaveData.folderId}`,
-            query: { userId },
           });
         } else {
           setShowLoadingImage(true);

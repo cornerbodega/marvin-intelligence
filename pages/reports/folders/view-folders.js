@@ -287,7 +287,7 @@ const ViewReports = ({
       if (response.ok) {
         router.push({
           pathname: "/reports/create-report/quick-draft",
-          query: { ...router.query, briefingInput, userId },
+          query: { ...router.query, briefingInput },
         });
       } else {
         console.error("Failed to save the task");
@@ -329,7 +329,7 @@ const ViewReports = ({
 
     router.push({
       pathname: `/reports/folders/intel-report/${folderSlug}`,
-      query: { userId },
+      //
     });
   };
 

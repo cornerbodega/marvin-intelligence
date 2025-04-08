@@ -180,7 +180,7 @@ export default function IntelliNotificationsArea() {
             paddingBottom: "10px",
             fontSize: "3vw", // Responsive font size for desktop
             minHeight: "100px",
-            "@media (max-width: 768px)": {
+            "@media (maxWidth: 768px)": {
               fontSize: "5vw", // Larger font size for mobile
             },
           }}
