@@ -35,7 +35,7 @@ export default function Journal() {
 
         <h2 style={{ marginTop: "40px" }}>Professional Growth</h2>
         <h3 style={{ marginTop: "20px" }}>
-          2022 – Present | Senior Technical Program Manager, Cookies
+          Senior Technical Program Manager, Cookies
         </h3>
         <p>
           This role has been an exciting opportunity to lead engineering efforts
@@ -48,9 +48,7 @@ export default function Journal() {
           to deliver impactful, scalable solutions.
         </p>
 
-        <h3 style={{ marginTop: "20px" }}>
-          2021 – 2022 | Senior Software Engineer, Cookies
-        </h3>
+        <h3 style={{ marginTop: "20px" }}>Senior Software Engineer, Cookies</h3>
         <p>
           I focused on optimizing operations and reducing costs by over $1M
           annually. By building a custom Node.js API with DatoCMS, I replaced
@@ -61,9 +59,7 @@ export default function Journal() {
           evaluation app, broadening the impact of our team’s work.
         </p>
 
-        <h3 style={{ marginTop: "20px" }}>
-          2014 – 2021 | Founder, ABC Traceability
-        </h3>
+        <h3 style={{ marginTop: "20px" }}>Founder, ABC Traceability</h3>
         <p>
           Starting ABC Traceability was a pivotal moment in my career. I
           developed and sold a web app to meet evolving cannabis compliance
@@ -73,9 +69,7 @@ export default function Journal() {
           work support businesses navigating new regulatory landscapes.
         </p>
 
-        <h3 style={{ marginTop: "20px" }}>
-          2010 – 2014 | Associate, BlackRock
-        </h3>
+        <h3 style={{ marginTop: "20px" }}>Associate, BlackRock</h3>
         <p>
           At BlackRock, I learned the power of leveraging data and technology at
           scale. Managing analytics for $14T+ in assets on the Aladdin platform
@@ -86,7 +80,7 @@ export default function Journal() {
         </p>
 
         <h3 style={{ marginTop: "20px" }}>
-          2008 & 2009 | Project Manager Intern, DPR Construction
+          Project Manager Intern, DPR Construction
         </h3>
         <p>
           During my internships, I contributed to large-scale projects like a
@@ -130,7 +124,7 @@ export default function Journal() {
         </p>
 
         <h2 style={{ marginTop: "40px" }}>Education</h2>
-        <h3 style={{ marginTop: "20px" }}>2006 – 2010 | Brown University</h3>
+        <h3 style={{ marginTop: "20px" }}>Brown University</h3>
         <p>
           I majored in Economics, with enriching experiences like working as a
           Teaching Assistant in Computer Science and Management. My
