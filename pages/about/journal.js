@@ -31,10 +31,7 @@ export default function Journal() {
           />
         </p>
         <h2 style={{ marginTop: "30px" }}>Current Goal</h2>
-        <p>
-          Continue to ascend in my journey toward leadership at a leading
-          technology company.
-        </p>
+        <p></p>
 
         <h2 style={{ marginTop: "40px" }}>Professional Growth</h2>
         <h3 style={{ marginTop: "20px" }}>
