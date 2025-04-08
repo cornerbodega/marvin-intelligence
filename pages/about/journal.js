@@ -21,8 +21,8 @@ export default function Journal() {
       <div style={{ lineHeight: "1.8", margin: "20px 0" }}>
         <p>
           <img
-            src="/Skiing.jpg"
-            alt="Skiing"
+            src="/piers-marvin.jpg"
+            alt="marvin at the pier"
             style={{
               maxWidth, // Controlled dynamically
               width: "100%",
@@ -30,7 +30,7 @@ export default function Journal() {
             }}
           />
         </p>
-        <h2 style={{ marginTop: "30px" }}>Current Goal</h2>
+        {/* <h2 style={{ marginTop: "30px" }}>Current Goal</h2> */}
         <p></p>
 
         <h2 style={{ marginTop: "40px" }}>Professional Growth</h2>

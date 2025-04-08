@@ -253,6 +253,8 @@ const CreateMission = ({
         },
         createdAt: new Date().toISOString(),
       };
+      console.log(`newTask ${JSON.stringify(newTask)}`);
+
       const newTaskRef = await saveTask(newTask);
 
       if (newTaskRef) {

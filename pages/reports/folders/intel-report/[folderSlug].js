@@ -181,6 +181,7 @@ export async function getServerSideProps(context) {
       specializedTraining,
       _folderLikes,
       _availability,
+      userId,
     },
   };
 }
@@ -196,16 +197,11 @@ const ViewReports = ({
   specializedTraining,
   _folderLikes,
   _availability,
+  userId,
 }) => {
   const { user } = useUser();
-  const [userId, setUserId] = useState(user?.sub);
   const router = useRouter();
-  const userIdFromRouter = router.query.userId;
-  useEffect(() => {
-    if (!userId && userIdFromRouter) {
-      setUserId(userIdFromRouter);
-    }
-  }, [userIdFromRouter]);
+
   const [loadedReports, setLoadedReports] = useState(_loadedReports);
 
   const [highlight, setHighlight] = useState({
@@ -422,6 +418,8 @@ const ViewReports = ({
     setReportLength(length);
   }
   async function handleContinuumClick(parentReport) {
+    console.log(`handleContinuumClick`);
+
     const existingHyperlinks = await getLinksForContinuum(
       parentReport.reportId
     );
@@ -450,6 +448,25 @@ const ViewReports = ({
       createdAt: new Date().toISOString(),
     });
     console.log("Handle Continuum Click");
+    console.log(
+      `save task ${JSON.stringify({
+        type: "continuum",
+        status: "queued",
+        userId,
+        context: {
+          briefingInput,
+          parentReportId,
+          userId,
+          parentReportContent,
+          agentId,
+          expertises,
+          specializedTraining,
+          existingHyperlinks,
+          reportLength,
+        },
+        createdAt: new Date().toISOString(),
+      })}`
+    );
   }
 
   useEffect(() => {
