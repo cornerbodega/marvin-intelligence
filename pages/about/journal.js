@@ -33,7 +33,14 @@ export default function Journal() {
         {/* <h2 style={{ marginTop: "30px" }}>Current Goal</h2> */}
         <p></p>
 
-        <h2 style={{ marginTop: "40px" }}>Professional Growth</h2>
+        <h2 style={{ marginTop: "40px" }}>Computer Activities</h2>
+        <h3 style={{ marginTop: "20px" }}>
+          AI-Focused Full-Stack Dev | GPT, Supabase, Swift, Real-Time Tools
+        </h3>
+        <p>
+          I'm building a system where you upload a PDF and it generates a movie
+          using Three.js. Input: PDF, Output: YouTube in one click.
+        </p>
         <h3 style={{ marginTop: "20px" }}>
           Senior Technical Program Manager, Cookies
         </h3>
