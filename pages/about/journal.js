@@ -30,29 +30,61 @@ export default function Journal() {
             }}
           />
         </p>
-        {/* <h2 style={{ marginTop: "30px" }}>Current Goal</h2> */}
-        <p></p>
 
         <h2 style={{ marginTop: "40px" }}>Computer Activities</h2>
         <h3 style={{ marginTop: "20px" }}>
-          AI-Focused Full-Stack Dev | GPT, Supabase, Swift, Real-Time Tools
+          Gunsmoke3: AI-Focused Full-Stack Dev | GPT, Supabase, Three.js
         </h3>
         <p>
           I'm building a system where you upload a PDF and it generates a movie
           using Three.js. Input: PDF, Output: YouTube in one click.
         </p>
         <h3 style={{ marginTop: "20px" }}>
-          Senior Technical Program Manager, Cookies
+          Marvin Intelligence: AI-Driven Choose-Your-Own-Adventure Wikipedia
         </h3>
         <p>
-          This role has been an exciting opportunity to lead engineering efforts
-          for a rapidly growing $500M+ international cannabis company. I’ve
-          tackled complex challenges across engineering, finance, marketing,
-          operations, retail, and sales. Highlights include introducing ChatGPT
-          API to optimize fuzzy data matching and successfully aligning teams
-          through well-structured Scrum ceremonies. Projects like E-Commerce
-          optimization and Digital Menu Syndication have strengthened my ability
-          to deliver impactful, scalable solutions.
+          I created{" "}
+          <a href="https://intelligence.marvin.technology">
+            Marvin Intelligence
+          </a>{" "}
+          to save and organize ChatGPT outputs into shareable, interlinked
+          reports.
+          <br />
+          It’s like a choose-your-own-adventure Wikipedia experience. Users can
+          save ChatGPT outputs, create links between reports, and share them
+          with others. The system uses a custom algorithm to generate HTML
+          reports, making it easy to navigate and explore different topics.
+          <br />
+          The system creates agents that learn over time. They can even estimate
+          what you're interested in and write reports automatically, giving you
+          an endless personalized learning experience with built-in structure
+          and referenceability.
+          <br />
+          Each report generates an image and you can listen via text-to-speech.
+          <br />
+          I use it all the time for recipes. I can't stand recipe websites. Too
+          many ads and life stories. I'm hungry and maybe even at the store. I
+          just want to know what and how much. I digest.
+          <br />
+          <a
+            target="_black"
+            href="https://apps.apple.com/in/app/hedge-fund-hero/id6605920631"
+          />
+        </p>
+        <h3 style={{ marginTop: "20px" }}>
+          Hedge Fund Hero: AI-Driven Stock Analysis & Gamification
+        </h3>
+        <p>
+          I built an iPhone game for to help discover new stocks. It uses
+          Retrieval Augmented Delivery to perform Fundamental Analysis for every
+          stock in the S&P 500. Live data.
+          <br />
+          <a
+            target="_black"
+            href="https://apps.apple.com/in/app/hedge-fund-hero/id6605920631"
+          >
+            Check it out!
+          </a>
         </p>
 
         <h3 style={{ marginTop: "20px" }}>Senior Software Engineer, Cookies</h3>
