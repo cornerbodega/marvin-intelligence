@@ -44,7 +44,7 @@ export default function MessageOverlay({ messages }) {
     );
     overlayRef.current.quaternion.copy(camera.quaternion);
     const cameraZ = camera.position.z;
-    console.log(`Camera Z: ${cameraZ}`);
+    // console.log(`Camera Z: ${cameraZ}`);
   });
 
   return (
