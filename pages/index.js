@@ -27,7 +27,7 @@ export default function IndexPage() {
         redirectTo:
           process.env.NODE_ENV === "development"
             ? "http://localhost:3000/reports/folders/view-folders"
-            : "https://intelligence.marvin.technolgy/reports/folders/view-folders",
+            : "https://intelligence.marvin.technology/reports/folders/view-folders",
       },
     });
 
