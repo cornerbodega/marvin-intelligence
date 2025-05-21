@@ -89,7 +89,6 @@ const IntelliCard = ({
               //     : displayDatums.picUrl
               // }
               style={{ width: "100%", height: "auto", ...imageStyle }}
-              layout="responsive"
               alt={displayDatums.title}
             />
           )}

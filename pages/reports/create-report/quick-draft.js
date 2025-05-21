@@ -23,7 +23,7 @@ import { useState, useEffect } from "react";
 
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
 
-import IntelliLoadingBar from "../../../components/IntelliLoadingBar/IntelliLoadingBar";
+// import IntelliLoadingBar from "../../../components/IntelliLoadingBar/IntelliLoadingBar";
 
 const CreateMission = ({}) => {
   const router = useRouter();

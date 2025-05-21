@@ -3,8 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { getSupabase } from "../../../../utils/supabase";
 
-const supabase = getSupabase();
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useUser } from "../../../../context/UserContext";
 import LibraryImage from "../../../../components/LibraryImage";
 import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 

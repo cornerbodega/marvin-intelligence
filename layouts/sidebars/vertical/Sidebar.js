@@ -1,5 +1,5 @@
 import { Button, Nav, NavItem } from "reactstrap";
-import Logo from "../../logo/Logo";
+// import Logo from "../../logo/Logo";
 
 import { useRouter } from "next/router";
 
@@ -58,9 +58,7 @@ const Sidebar = ({ showMobilemenu }) => {
         </a>
       </div>
       <div className="d-flex align-items-center">
-        <div style={{ marginTop: "20px" }}>
-          <Logo />
-        </div>
+        <div style={{ marginTop: "20px" }}>{/* <Logo /> */}</div>
       </div>
 
       <div className="pt-4 mt-2">

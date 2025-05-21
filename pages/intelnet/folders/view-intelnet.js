@@ -307,7 +307,6 @@ const ViewReports = () => {
             flexGrow: 1, // Let it grow to take the available space
             textIndent: "10px",
           }}
-          lines="1"
           placeholder="⌕ Search Global Reports"
           onChange={(e) => handleSearch(e.target.value)}
         />

@@ -2,7 +2,7 @@ import getEnv from "../../utils/getEnv";
 import { useFirebaseListener } from "../../utils/useFirebaseListener";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import IntelliLoadingBar from "../IntelliLoadingBar/IntelliLoadingBar";
+// import IntelliLoadingBar from "../IntelliLoadingBar/IntelliLoadingBar";
 import { useUser } from "../../context/UserContext";
 export default function IntelliNotificationsArea() {
   const router = useRouter();
@@ -192,7 +192,7 @@ export default function IntelliNotificationsArea() {
           {`${notificationString}`}
         </div>
       )}
-      <IntelliLoadingBar speedFactor={1} />
+      {/* <IntelliLoadingBar speedFactor={1} /> */}
     </>
   );
 }
