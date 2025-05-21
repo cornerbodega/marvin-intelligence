@@ -1,110 +1,104 @@
 import { Row, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import Link from "next/link";
-import useRouter from "next/router";
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
-import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { useUser } from "../../context/UserContext";
 import IntelliCardGroup from "../../components/IntelliCardGroup";
-
-import { getSupabase } from "../../utils/supabase";
-const supabase = getSupabase();
-
+import { supabase } from "../../utils/supabase";
 import { slugify } from "../../utils/slugify";
 import Head from "next/head";
+
 const PAGE_COUNT = 9;
-export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps(context) {
-    const session = await getSession(context.req, context.res);
-    const user = session?.user;
 
-    let { data: agency, agencyError } = await supabase
-      .from("users")
-      .select("agencyName")
-      .eq("userId", user.sub);
-    if (agencyError) {
-      console.log("agencyError");
-    }
-    console.log("agency");
-    console.log(agency);
-    if (!agency || agency.length === 0) {
-      return {
-        redirect: {
-          permanent: false,
-          destination: "/agency/create-agency",
-        },
-        props: {},
-      };
-    }
-
-    let { data: agents, error } = await supabase
-      .from("agents")
-      .select(
-        "agentId, expertise1, expertise2, expertise3, agentName, profilePicUrl, bio"
-      )
-      .eq("userId", user.sub)
-      .limit(PAGE_COUNT)
-      .order("agentId", { ascending: false });
-
-    // other pages will redirect here if they're empty
-    // If no agency, go to create agency page
-    // If no agents, go to crete agent page
-    // let agency;
-    return {
-      props: { agents, userId: user.sub, agencyName: agency[0].agencyName },
-    };
-  },
-});
-const ViewAgents = ({ agents, userId, agencyName }) => {
+const ViewAgents = () => {
   const [isLast, setIsLast] = useState(false);
-  const containerRef = useRef(null);
   const [offset, setOffset] = useState(1);
   const [isInView, setIsInView] = useState(false);
-  const [loadedAgents, setLoadedAgents] = useState(agents);
+  const [loadedAgents, setLoadedAgents] = useState([]);
+  const [agencyName, setAgencyName] = useState("");
+
   const [parentReportTitle, setParentReportTitle] = useState("");
   const [parentReportId, setParentReportId] = useState("");
   const [parentReportSlug, setParentReportSlug] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const router = useRouter;
+
+  const containerRef = useRef(null);
+  const router = useRouter();
+  const [userId, setUserId] = useState();
+  const userContext = useUser();
+
+  useEffect(() => {
+    if (userContext?.id) {
+      setUserId(userContext.id);
+    }
+  }, [userContext]);
+
+  useEffect(() => {
+    const initialize = async () => {
+      if (!userId) {
+        return;
+      }
+
+      const { data: agency, error: agencyError } = await supabase
+        .from("users")
+        .select("agencyName")
+        .eq("userId", userId);
+
+      if (agencyError || !agency || agency.length === 0) {
+        router.push("/agency/create-agency");
+        return;
+      }
+
+      setAgencyName(agency[0].agencyName);
+
+      const { data: agents, error: agentError } = await supabase
+        .from("agents")
+        .select(
+          "agentId, expertise1, expertise2, expertise3, agentName, profilePicUrl, bio"
+        )
+        .eq("userId", userId)
+        .limit(PAGE_COUNT)
+        .order("agentId", { ascending: false });
+
+      if (agentError || !agents || agents.length === 0) {
+        router.push("/agents/create-agent");
+        return;
+      }
+
+      setLoadedAgents(agents);
+    };
+
+    initialize();
+  }, [userId]);
+
   useEffect(() => {
     if (router.query.parentReportTitle) {
       setParentReportTitle(JSON.parse(router.query.parentReportTitle));
+      setParentReportSlug(slugify(router.query.parentReportTitle));
     }
     if (router.query.parentReportId) {
       setParentReportId(router.query.parentReportId);
     }
-    if (router.query.parentReportTitle) {
-      setParentReportSlug(slugify(router.query.parentReportTitle));
-    }
-  });
+  }, [router.query]);
 
   useEffect(() => {
-    const handleDebouncedScroll = debounce(
-      () => !isLast && handleScroll(),
-      200
-    );
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-  useEffect(() => {
-    if (!agents || agents.length === 0) {
-      goToPage("/reports/folders/view-folders");
-    }
-  });
+    const handleDebouncedScroll = debounce(() => {
+      if (!isLast) handleScroll();
+    }, 200);
 
-  const handleScroll = (container) => {
+    window.addEventListener("scroll", handleDebouncedScroll);
+    return () => window.removeEventListener("scroll", handleDebouncedScroll);
+  }, [isLast]);
+
+  const handleScroll = () => {
     if (containerRef.current && typeof window !== "undefined") {
-      const container = containerRef.current;
-      const { bottom } = container.getBoundingClientRect();
-      const { innerHeight } = window;
-      setIsInView((prev) => bottom <= innerHeight);
+      const { bottom } = containerRef.current.getBoundingClientRect();
+      setIsInView(bottom <= window.innerHeight);
     }
   };
 
-  async function loadPagedResults() {
-    console.log("Loading paged results");
-
+  const loadPagedResults = async () => {
     const { data, error } = await supabase
       .from("agents")
       .select("*")
@@ -114,54 +108,35 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
       .limit(PAGE_COUNT)
       .order("agentId", { ascending: false });
 
-    if (error) {
-      console.error("Error loading paged results:", error);
-      return;
-    }
+    if (!error) setLoadedAgents(data);
+  };
 
-    setLoadedAgents(data);
-  }
-
-  async function handleSearch(searchInput) {
+  const handleSearch = async (searchInput) => {
     setSearchInput(searchInput);
-    console.log("handleSearch");
-    console.log(searchInput);
 
     if (searchInput.trim() === "") {
       loadPagedResults();
       return;
     }
 
-    try {
-      let { data: filteredAgents, error } = await supabase
-        .from("agents")
-        .select("*")
-        .ilike("bio", `%${searchInput}%`)
-        .eq("userId", userId);
+    const { data: filteredAgents, error } = await supabase
+      .from("agents")
+      .select("*")
+      .ilike("bio", `%${searchInput}%`)
+      .eq("userId", userId);
 
-      if (error) {
-        console.error("Error fetching data:", error);
-        return;
-      }
+    if (!error) setLoadedAgents(filteredAgents);
+  };
 
-      console.log("filteredReports");
-      console.log(filteredAgents);
-      setLoadedAgents(filteredAgents);
-    } catch (error) {
-      console.error("An unexpected error occurred:", error);
-    }
-  }
   const handleCardClick = (agent) => {
     router.push({
       pathname: "/agents/detail/draft-report",
       query: { ...router.query, agentId: agent.agentId },
     });
   };
-  function goToPage(name) {
-    router.push(name);
-  }
+
   useEffect(() => {
-    if (!isLast) {
+    if (!isLast && isInView) {
       const loadMoreAgents = async () => {
         const from = offset * PAGE_COUNT;
         const to = from + PAGE_COUNT - 1;
@@ -173,19 +148,17 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
           .range(from, to)
           .order("createdAt", { ascending: false });
 
-        return data;
+        if (data && data.length > 0) {
+          setLoadedAgents((prev) => [...prev, ...data]);
+          if (data.length < PAGE_COUNT) setIsLast(true);
+        } else {
+          setIsLast(true);
+        }
       };
 
-      if (isInView) {
-        loadMoreAgents().then((moreAgents) => {
-          setLoadedAgents([...loadedAgents, ...moreAgents]);
-          if (moreAgents.length < PAGE_COUNT) {
-            setIsLast(true);
-          }
-        });
-      }
+      loadMoreAgents();
     }
-  }, [isInView, isLast]);
+  }, [isInView]);
 
   return (
     <>
@@ -197,66 +170,58 @@ const ViewAgents = ({ agents, userId, agencyName }) => {
           <i className="bi bi-briefcase" />
           &nbsp;
           <Link
-            style={{ color: "white", textDecoration: "none" }}
             href="/reports/folders/view-folders"
+            style={{ color: "white", textDecoration: "none" }}
           >
             {agencyName}
           </Link>
         </BreadcrumbItem>
         <BreadcrumbItem className="text-white">
-          <i className={`bi bi-person-badge`}></i>
-          &nbsp;
-          <div
-            style={{
-              fontWeight: "200",
-              textDecoration: "none",
-              color: "white",
-            }}
-          >
-            Agents
-          </div>
+          <i className="bi bi-person-badge" />
+          &nbsp; <span style={{ color: "white" }}>Agents</span>
         </BreadcrumbItem>
         {parentReportTitle && (
           <BreadcrumbItem className="text-white">
             <Link
-              className="text-white"
-              style={{ fontWeight: "200", textDecoration: "none" }}
               href={`/missions/report/${parentReportId}-${parentReportSlug}`}
+              style={{ color: "white", textDecoration: "none" }}
             >
               {parentReportTitle}
             </Link>
           </BreadcrumbItem>
         )}
       </Breadcrumb>
-      <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+
+      <div style={{ marginTop: 20, marginBottom: 20 }}>
         Agents write reports. They have different expertise and skills, and
         remember their past missions.
       </div>
-      <div style={{ marginBottom: "40px", width: "100%", display: "flex" }}>
+
+      <div style={{ marginBottom: 40, width: "100%", display: "flex" }}>
         <input
           type="text"
+          placeholder="⌕ Search Agents"
           style={{
             borderRadius: "8px",
             borderWidth: "0px",
             backgroundColor: "#444",
             color: "white",
             height: "2em",
-            flexGrow: 1, // Let it grow to take the available space
+            flexGrow: 1,
             textIndent: "10px",
           }}
-          lines="1"
-          placeholder="⌕ Search Agents"
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
+
       <div ref={containerRef}>
         <Row className="text-primary">
           <IntelliCardGroup
             offset={offset}
             handleCardClick={handleCardClick}
             datums={loadedAgents}
-            datumsType={"agents"}
-          ></IntelliCardGroup>
+            datumsType="agents"
+          />
         </Row>
       </div>
     </>

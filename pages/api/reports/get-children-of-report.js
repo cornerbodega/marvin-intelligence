@@ -1,9 +1,8 @@
-import { getSupabase } from "../../../utils/supabase";
+import { supabase } from "../../../utils/supabase";
 
 export default async function getChildrenOfReport(req, res) {
   const { parentReportId } = req.body;
-
-  const supabase = getSupabase();
+  console.log(`getChildrenOfReport parentReportId: ${parentReportId}`);
 
   let { data: childReports, error } = await supabase
     .from("links")

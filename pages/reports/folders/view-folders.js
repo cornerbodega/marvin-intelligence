@@ -3,13 +3,10 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
 
-import { v4 as uuidv4 } from "uuid"; // UUID library
+import { useUser } from "../../../context/UserContext";
 
-import { getSession } from "@auth0/nextjs-auth0";
+import { supabase } from "../../../utils/supabase";
 
-import { getSupabase } from "../../../utils/supabase";
-import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-// rest of component
 import { slugify } from "../../../utils/slugify";
 import IntelliCardGroup from "../../../components/IntelliCardGroup";
 import Link from "next/link";
@@ -17,122 +14,14 @@ import Link from "next/link";
 import Head from "next/head";
 import { saveToSupabase } from "../../../utils/saveToSupabase";
 const PAGE_COUNT = 9;
-const supabase = getSupabase();
 
-export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps(context) {
-    const session = await getSession(context.req, context.res);
-    let userId = session?.user.sub;
-    const contextUserId = context.query.userId;
-    if (!userId) {
-      userId = contextUserId;
-    }
-    if (userId) {
-      let { data: agency, agencyError } = await supabase
-        .from("users")
-        .select("agencyName")
-        .eq("userId", userId);
-      if (agencyError) {
-        console.log("agencyError");
-      }
+const ViewReports = () => {
+  const folders = [];
 
-      if (!agency || agency.length === 0) {
-        return {
-          redirect: {
-            permanent: false,
-            destination: "/agency/create-agency",
-          },
-          props: {},
-        };
-      }
+  const _agencyName = null;
+  const _folderLikesByFolderId = {};
+  const _reportCountsByFolderId = {};
 
-      let { data: folders, error } = await supabase
-        .from("folders")
-        .select("*")
-        .eq("userId", userId)
-        .filter("folderName", "neq", null)
-        .filter("folderPicUrl", "neq", null)
-        .or(`availability.neq.DELETED,availability.is.null`)
-        .limit(PAGE_COUNT)
-        .order("folderId", { ascending: false });
-
-      // Extract folderIds from the obtained folders data
-      const folderIds = folders.map((folder) => folder.folderId);
-
-      let folderLikes = [];
-
-      // Check if there are any folderIds to avoid unnecessary query
-      if (folderIds.length > 0) {
-        let { data, folderLikesError } = await supabase
-          .from("folderLikes")
-          .select()
-          .in("folderId", folderIds); // Filter folderLikes by folderIds from the first query
-
-        if (!folderLikesError) {
-          folderLikes = data;
-        } else {
-          console.error("Error fetching folder likes:", folderLikesError);
-        }
-      } else {
-        console.log("No folders found for the given criteria");
-      }
-
-      const _folderLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
-        if (!acc[folderLike.folderId]) {
-          acc[folderLike.folderId] = 0;
-        }
-
-        acc[folderLike.folderId] += folderLike.likeValue; // Updated to sum the likeValue
-        return acc;
-      }, {});
-
-      console.log("_folderLikesByFolderId");
-      console.log(_folderLikesByFolderId);
-
-      // Query the reportFolders table to get the count of reports for each folderId
-      let { data: reportCountsData, error: reportCountsError } = await supabase
-        .from("folders")
-        .select(`folderId, reportFolders(count)`)
-        .in("folderId", folderIds);
-
-      if (reportCountsError) {
-        console.error("Error fetching report counts:", reportCountsError);
-      }
-
-      const _reportCountsByFolderId = reportCountsData.reduce((acc, item) => {
-        acc[item.folderId] = item.reportFolders[0].count || null;
-        return acc;
-      }, {});
-
-      return {
-        props: {
-          folders,
-          _userId: userId,
-          _agencyName: agency[0].agencyName,
-          _folderLikesByFolderId,
-          _reportCountsByFolderId,
-        },
-      };
-    } else {
-      return {
-        props: {
-          folders: [],
-          _userId: null,
-          _agencyName: null,
-          _folderLikesByFolderId: null,
-          _reportCountsByFolderId: null,
-        },
-      };
-    }
-  },
-});
-const ViewReports = ({
-  folders,
-  _userId,
-  _agencyName,
-  _folderLikesByFolderId,
-  _reportCountsByFolderId,
-}) => {
   const [isLast, setIsLast] = useState(false);
   const containerRef = useRef(null);
   const [offset, setOffset] = useState(2);
@@ -140,15 +29,136 @@ const ViewReports = ({
   const [loadedReports, setLoadedReports] = useState(folders);
   const [briefingInput, setBriefingInput] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [userId, setUserId] = useState(_userId);
+  const [userId, setUserId] = useState();
   const [agencyName, setAgencyName] = useState(_agencyName);
-  console.log("loadedReports");
-  console.log(loadedReports);
-  console.log("userId");
-  console.log(userId);
-  async function loadPagedResults() {
-    console.log("Loading paged results");
+  const [triedToLoadReports, setTriedToLoadReports] = useState(false);
+  const [didClickQuickDraft, setDidClickQuickDraft] = useState(false);
+  const [reportLength, setReportLength] = useState("short");
+  const textareaRef = useRef(null);
 
+  const userContext = useUser();
+  const router = useRouter();
+
+  const [folderLikesByFolderId, setFolderLikesByFolderId] = useState(
+    _folderLikesByFolderId
+  );
+  const [reportCountsByFolderId, setReportCountsByFolderId] = useState(
+    _reportCountsByFolderId
+  );
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      const computedStyle = window.getComputedStyle(textareaRef.current);
+      const textWidth = getTextWidth(briefingInput, computedStyle.fontSize);
+      const paddingLeft = parseFloat(computedStyle.paddingLeft);
+      const paddingRight = parseFloat(computedStyle.paddingRight);
+      const lineHeight = parseFloat(computedStyle.lineHeight);
+      const contentWidth =
+        textareaRef.current.offsetWidth - paddingLeft - paddingRight;
+
+      const lines = Math.ceil(textWidth / contentWidth);
+      const lastLineWidth = textWidth % contentWidth || textWidth;
+
+      const cursorLeft = lastLineWidth + paddingLeft;
+      const cursorTop = (lines - 1) * lineHeight;
+
+      const wrapper = textareaRef.current.parentElement;
+      wrapper.style.setProperty("--cursor-pos-x", `${cursorLeft}px`);
+      wrapper.style.setProperty("--cursor-pos-y", `${cursorTop + 18}px`);
+
+      if (briefingInput.length === 0) {
+        wrapper.style.setProperty("--cursor-pos-x", `13px`);
+        wrapper.style.setProperty("--cursor-pos-y", `18px`);
+      }
+    }
+  }, [briefingInput]);
+
+  function getTextWidth(text, fontSize) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.font = fontSize + " Arial";
+    return ctx.measureText(text).width;
+  }
+
+  useEffect(() => {
+    if (userContext?.id) {
+      setUserId(userContext.id);
+    }
+  }, [userContext]);
+
+  useEffect(() => {
+    const initData = async () => {
+      if (!userId || triedToLoadReports) return;
+
+      setTriedToLoadReports(true);
+
+      if (!agencyName) {
+        try {
+          const { data, error } = await supabase
+            .from("users")
+            .select("agencyName")
+            .eq("userId", userId)
+            .single();
+
+          if (data?.agencyName) {
+            setAgencyName(data.agencyName);
+          } else {
+            const res = await fetch("/api/agency/generate-guest-agency-name");
+            const json = await res.json();
+            setAgencyName(`Guest ${json.agencyName}`);
+          }
+        } catch (err) {
+          console.error("Error fetching agency name:", err);
+        }
+      }
+
+      const { data: folders, error } = await supabase
+        .from("folders")
+        .select("*")
+        .eq("userId", userId)
+        .filter("folderName", "neq", null)
+        .filter("folderPicUrl", "neq", null)
+        .or("availability.neq.DELETED,availability.is.null")
+        .limit(PAGE_COUNT)
+        .order("folderId", { ascending: false });
+
+      if (error) {
+        console.error("Error loading folders:", error);
+        return;
+      }
+
+      setLoadedReports(folders || []);
+
+      const folderIds = (folders || []).map((f) => f.folderId);
+      if (folderIds.length === 0) return;
+
+      const { data: folderLikes } = await supabase
+        .from("folderLikes")
+        .select()
+        .in("folderId", folderIds);
+
+      const likesMap = (folderLikes || []).reduce((acc, like) => {
+        acc[like.folderId] = (acc[like.folderId] || 0) + like.likeValue;
+        return acc;
+      }, {});
+      setFolderLikesByFolderId((prev) => ({ ...prev, ...likesMap }));
+
+      const { data: reportCounts } = await supabase
+        .from("folders")
+        .select("folderId, reportFolders(count)")
+        .in("folderId", folderIds);
+
+      const countsMap = (reportCounts || []).reduce((acc, item) => {
+        acc[item.folderId] = item.reportFolders?.[0]?.count || null;
+        return acc;
+      }, {});
+      setReportCountsByFolderId((prev) => ({ ...prev, ...countsMap }));
+    };
+
+    initData();
+  }, [userId]);
+
+  async function loadPagedResults() {
     const { data, error } = await supabase
       .from("folders")
       .select("*")
@@ -157,365 +167,147 @@ const ViewReports = ({
       .filter("folderPicUrl", "neq", null)
       .limit(PAGE_COUNT)
       .order("folderId", { ascending: false });
-    if (error) {
-      console.error("Error loading paged results:", error);
-      return;
-    }
 
-    setLoadedReports(data);
+    if (!error) setLoadedReports(data);
   }
-  function handleBillingClicked() {
-    goToPage("/agency/billing");
-  }
+
   function goToPage(name) {
     router.push(name);
   }
+
   async function handleSearch(searchInput) {
     setSearchInput(searchInput);
-    console.log("handleSearch");
-    console.log(searchInput);
 
     if (searchInput.trim() === "") {
       loadPagedResults();
       return;
     }
 
-    try {
-      let { data: filteredReports, error } = await supabase
-        .from("folders")
-        .select("*")
-        .ilike("folderName", `%${searchInput}%`)
-        .eq("userId", userId);
+    const { data, error } = await supabase
+      .from("folders")
+      .select("*")
+      .ilike("folderName", `%${searchInput}%`)
+      .eq("userId", userId);
 
-      if (error) {
-        console.error("Error fetching data:", error);
-        return;
-      }
-
-      setLoadedReports(filteredReports);
-    } catch (error) {
-      console.error("An unexpected error occurred:", error);
-    }
-  }
-  const [triedToLoadReports, setTriedToLoadReports] = useState(false);
-  // Fetch or Create User ID to allow for guest access
-  useEffect(() => {
-    const userId = fetchOrCreateUserId(_userId);
-
-    if (userId && loadedReports.length === 0 && !triedToLoadReports) {
-      loadPagedResults();
-    }
-    setTriedToLoadReports(true);
-  }, []);
-
-  async function fetchOrCreateUserId(authUserId) {
-    let guestUserId = authUserId || localStorage.getItem("guestUserId");
-    let guestAgencyName = agencyName || localStorage.getItem("guestAgencyName");
-
-    // set;
-    if (!guestAgencyName) {
-      const agencyName = await fetchFunnyAgencyName(guestUserId);
-      localStorage.setItem("guestAgencyName", agencyName);
-      guestAgencyName = agencyName;
-    }
-    setAgencyName(guestAgencyName);
-    if (!guestUserId) {
-      guestUserId = uuidv4();
-      localStorage.setItem("guestUserId", guestUserId);
-    }
-    setUserId(guestUserId);
-
-    return guestUserId;
+    if (!error) setLoadedReports(data);
   }
 
-  const fetchFunnyAgencyName = async (guestUserId) => {
-    if (_agencyName) {
-      return _agencyName;
-    }
-    try {
-      const response = await fetch("/api/agency/generate-guest-agency-name");
-      if (response.ok) {
-        const { agencyName } = await response.json();
-        setAgencyName(`Guest ${agencyName}`);
-        return agencyName;
-      }
-    } catch (error) {
-      console.error("Error fetching funny agency name:", error);
+  const handleScroll = () => {
+    if (containerRef.current && typeof window !== "undefined") {
+      const { bottom } = containerRef.current.getBoundingClientRect();
+      const { innerHeight } = window;
+      setIsInView((prev) => bottom <= innerHeight);
     }
   };
 
-  const [didClickQuickDraft, setDidClickQuickDraft] = useState(false);
-  async function handleQuickDraftClick() {
-    if (didClickQuickDraft) {
-      return;
+  useEffect(() => {
+    const handleDebouncedScroll = debounce(() => {
+      if (!isLast) handleScroll();
+    }, 200);
+    window.addEventListener("scroll", handleDebouncedScroll);
+    return () => window.removeEventListener("scroll", handleDebouncedScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!isLast && !searchInput && userId && isInView) {
+      const loadMoreReports = async () => {
+        const from = offset * PAGE_COUNT;
+        const to = from + PAGE_COUNT - 1;
+        setOffset((prev) => prev + 1);
+
+        const { data: moreFolders } = await supabase
+          .from("folders")
+          .select("*")
+          .range(from, to)
+          .or("availability.neq.DELETED,availability.is.null")
+          .filter("folderName", "neq", null)
+          .filter("folderPicUrl", "neq", null)
+          .eq("userId", userId)
+          .order("createdAt", { ascending: false });
+
+        const folderIds = moreFolders.map((f) => f.folderId);
+
+        const { data: likes } = await supabase
+          .from("folderLikes")
+          .select()
+          .in("folderId", folderIds);
+
+        const newLikes = (likes || []).reduce((acc, like) => {
+          acc[like.folderId] = (acc[like.folderId] || 0) + like.likeValue;
+          return acc;
+        }, {});
+
+        setFolderLikesByFolderId((prev) => ({ ...prev, ...newLikes }));
+
+        const { data: counts } = await supabase
+          .from("folders")
+          .select("folderId, reportFolders(count)")
+          .in("folderId", folderIds);
+
+        const newCounts = (counts || []).reduce((acc, item) => {
+          acc[item.folderId] = item.reportFolders?.[0]?.count || null;
+          return acc;
+        }, {});
+
+        setReportCountsByFolderId((prev) => ({ ...prev, ...newCounts }));
+
+        setLoadedReports((prev) => getUniqueFolders([...prev, ...moreFolders]));
+
+        if ((moreFolders || []).length < PAGE_COUNT) setIsLast(true);
+      };
+
+      loadMoreReports();
     }
+  }, [isInView, isLast]);
+
+  function getUniqueFolders(folders) {
+    const seenIds = new Set();
+    return folders.filter((f) => {
+      if (seenIds.has(f.folderId)) return false;
+      seenIds.add(f.folderId);
+      return true;
+    });
+  }
+
+  const handleCardClick = (folder) => {
+    const folderSlug = slugify(`${folder.folderId}-${folder.folderName}`);
+    router.push(`/reports/folders/intel-report/${folderSlug}`);
+  };
+
+  async function handleQuickDraftClick() {
+    if (didClickQuickDraft) return;
 
     setDidClickQuickDraft(true);
 
-    const createUserModel = {
-      userId,
-      agencyName,
-    };
-    const savedUser = await saveToSupabase("users", createUserModel).catch(
-      (error) => {
-        console.log(error);
-      }
-    );
+    const createUserModel = { userId, agencyName };
+    await saveToSupabase("users", createUserModel).catch(console.log);
 
-    const draftData = { briefingInput };
     const newTask = {
       type: "quickDraft",
       status: "queued",
       userId,
       context: {
-        ...draftData,
+        briefingInput,
         userId,
         reportLength,
       },
       createdAt: new Date().toISOString(),
     };
 
-    try {
-      const response = await fetch("/api/tasks/save-task", {
-        method: "POST", // Specify the request method
-        headers: {
-          "Content-Type": "application/json", // Content type header to tell the server the nature of the request body
-        },
-        body: JSON.stringify(newTask), // Convert the JavaScript object to a JSON string
-      });
-
-      if (response.ok) {
-        router.push({
-          pathname: "/reports/create-report/quick-draft",
-          query: { ...router.query, briefingInput },
-        });
-      } else {
-        console.error("Failed to save the task");
-      }
-    } catch (error) {
-      console.error("An error occurred while saving the task:", error);
-    }
-  }
-
-  useEffect(() => {
-    const handleDebouncedScroll = debounce(
-      () => !isLast && handleScroll(),
-      200
-    );
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  const handleScroll = (container) => {
-    if (containerRef.current && typeof window !== "undefined") {
-      const container = containerRef.current;
-      const { bottom } = container.getBoundingClientRect();
-      const { innerHeight } = window;
-      setIsInView((prev) => bottom <= innerHeight);
-    }
-  };
-  const router = useRouter();
-
-  const handleCardClick = (folder) => {
-    console.log(folder);
-    const folderName = folder.folderName;
-    const folderId = folder.folderId;
-
-    console.log("ViewReports HandleCardClick Clicked!");
-
-    const folderSlug = slugify(`${folderId}-${folderName}`);
-
-    router.push({
-      pathname: `/reports/folders/intel-report/${folderSlug}`,
-      //
+    const response = await fetch("/api/tasks/save-task", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newTask),
     });
-  };
 
-  const [folderLikesByFolderId, setFolderLikesByFolderId] = useState(
-    _folderLikesByFolderId
-  );
-  const [reportCountsByFolderId, setReportCountsByFolderId] = useState(
-    _reportCountsByFolderId
-  );
-  useEffect(() => {
-    if (!isLast && !searchInput && userId) {
-      const loadMoreReports = async () => {
-        const from = offset * PAGE_COUNT;
-        const to = from + PAGE_COUNT - 1;
-        setOffset((prev) => prev + 1);
-
-        let { data: folders } = await supabase
-          .from("folders")
-          .select("*")
-          .range(from, to)
-          .or(`availability.neq.DELETED,availability.is.null`)
-          // and name and image exist
-          .filter("folderName", "neq", null)
-          .filter("folderPicUrl", "neq", null)
-          .eq("userId", userId)
-          .order("createdAt", { ascending: false });
-
-        // Extract folderIds from the obtained folders data
-        const folderIds = folders.map((folder) => folder.folderId);
-
-        let folderLikes = [];
-
-        if (folderIds.length > 0) {
-          let { data } = await supabase
-            .from("folderLikes")
-            .select()
-            .in("folderId", folderIds);
-
-          folderLikes = data;
-        }
-
-        const newLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
-          if (!acc[folderLike.folderId]) {
-            acc[folderLike.folderId] = 0;
-          }
-
-          acc[folderLike.folderId] += folderLike.likeValue;
-          return acc;
-        }, {});
-
-        // Update the folderLikesByFolderId state with the new data
-        setFolderLikesByFolderId((prev) => ({
-          ...prev,
-          ...newLikesByFolderId,
-        }));
-
-        // Fetch the report counts for the new folders
-        let { data: reportCountsData } = await supabase
-          .from("folders")
-          .select(`folderId, reportFolders(count)`)
-          .in("folderId", folderIds);
-
-        const newReportCountsByFolderId = reportCountsData.reduce(
-          (acc, item) => {
-            acc[item.folderId] = item.reportFolders[0].count || null;
-            return acc;
-          },
-          {}
-        );
-
-        setReportCountsByFolderId((prev) => ({
-          ...prev,
-          ...newReportCountsByFolderId,
-        }));
-        return folders;
-      };
-
-      if (isInView && !isLast && !searchInput) {
-        loadMoreReports().then((moreReports) => {
-          setLoadedReports((prev) =>
-            getUniqueFolders([...prev, ...moreReports])
-          );
-          if (moreReports.length < PAGE_COUNT) {
-            setIsLast(true);
-          }
-        });
-      }
+    if (response.ok) {
+      router.push({
+        pathname: "/reports/create-report/quick-draft",
+        query: { ...router.query, briefingInput },
+      });
+    } else {
+      console.error("Failed to save the task");
     }
-  }, [isInView, isLast]);
-
-  function getUniqueFolders(folders) {
-    const seenIds = new Set();
-    const uniqueFolders = [];
-
-    for (const folder of folders) {
-      if (!seenIds.has(folder.folderId)) {
-        seenIds.add(folder.folderId);
-        uniqueFolders.push(folder);
-      }
-    }
-
-    return uniqueFolders;
-  }
-  const textareaRef = useRef(null);
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      // textareaRef.current.parentElement.style.setProperty(
-      //   "--cursor-pos-x",
-      //   "6px"
-      // );
-      const textWidth = getTextWidth(
-        briefingInput,
-        window.getComputedStyle(textareaRef.current).fontSize
-      );
-      const paddingLeft = parseFloat(
-        window.getComputedStyle(textareaRef.current).paddingLeft
-      );
-      const paddingRight = parseFloat(
-        window.getComputedStyle(textareaRef.current).paddingRight
-      );
-
-      const lineHeight = parseFloat(
-        window.getComputedStyle(textareaRef.current).lineHeight
-      );
-
-      const textareaContentWidth =
-        textareaRef.current.offsetWidth - paddingLeft - paddingRight;
-
-      const lines = Math.ceil(textWidth / textareaContentWidth);
-      const lastLineWidth = textWidth % textareaContentWidth || textWidth;
-
-      const cursorLeft = lastLineWidth + paddingLeft;
-      const cursorTop = (lines - 1) * lineHeight;
-
-      textareaRef.current.parentElement.style.setProperty(
-        "--cursor-pos-x",
-        `${cursorLeft}px`
-      );
-      if (lines > 1) {
-        textareaRef.current.parentElement.style.setProperty(
-          "--cursor-pos-x",
-          `${cursorLeft + lines * 5}px`
-        );
-      }
-
-      if (briefingInput.length === 0) {
-        console.log("briefingInput.length === 0");
-        // textareaRef.current.parentElement.style.setProperty("top", "14px");
-        textareaRef.current.parentElement.style.setProperty(
-          "--cursor-pos-y",
-          `${cursorTop + 45}px`
-        );
-        textareaRef.current.parentElement.style.setProperty(
-          "caret-color",
-          "transparent"
-        );
-        textareaRef.current.parentElement.classList.remove("no-background");
-      } else {
-        textareaRef.current.parentElement.style.setProperty(
-          "caret-color",
-          "limegreen"
-        );
-        textareaRef.current.parentElement.classList.add("no-background");
-      }
-    }
-  }, [briefingInput, textareaRef]);
-
-  function getTextWidth(text, fontSize) {
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    context.font = fontSize + " Arial";
-    return context.measureText(text).width;
-  }
-
-  useEffect(() => {
-    if (textareaRef && textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  }, []);
-
-  const [reportLength, setReportLength] = useState("short");
-  function handleSelectedLength(length) {
-    console.log("handleselected length");
-    console.log(length);
-    setReportLength(length);
   }
 
   return (
@@ -528,7 +320,7 @@ const ViewReports = ({
           <i className="bi bi-briefcase" />
           &nbsp;
           <Link
-            href="/agency/rename-agency"
+            href="/agency/create-agency"
             style={{ color: "white", textDecoration: "none" }}
           >
             {agencyName}
@@ -538,9 +330,11 @@ const ViewReports = ({
           Create Report
         </BreadcrumbItem>
       </Breadcrumb>
+
       <div style={{ marginTop: "20px", marginBottom: "20px" }}>
         Ask a question or enter information to create a folder and a report.
       </div>
+
       <div id="quickDraftBriefingInput">
         <div className="textareaWrapper">
           <textarea
@@ -556,107 +350,65 @@ const ViewReports = ({
             }}
             placeholder="type or paste here."
             style={{
-              padding: "12px 12px 13px 13px",
-              borderWidth: "0px",
+              padding: "12px",
               width: "100%",
               height: "180px",
               color: "white",
               borderRadius: "8px",
               border: "1px solid white",
               backgroundColor: "#000",
-              "--cursor-pos": "0px",
             }}
           />
         </div>
         <Row>
           <Col>
-            <div>
-              <div style={{ marginBottom: "10px" }}>
-                <Button
-                  onClick={handleQuickDraftClick}
-                  style={{
-                    textAlign: "left",
-                    borderColor: "#31A0D1",
-                    borderWidth: "4px",
-                    alignContent: "right",
-                    marginTop: "0px",
-                    marginBottom: "16px",
-                    marginRight: "8px",
-                    cursor: "pointer",
-                    // width: "190px", // Increased width to keep text on one line
-                    whiteSpace: "nowrap", // Prevents wrapping of text
-                    overflow: "hidden", // Ensures no overflow text is visible
-                    textOverflow: "ellipsis", // Adds ellipsis for long text
-                  }}
-                  disabled={briefingInput.length === 0 || didClickQuickDraft}
-                  className="btn btn-primary"
-                >
-                  <i className="bi bi-folder"></i> Create Report Folder
-                </Button>
-              </div>
-            </div>
+            <Button
+              onClick={handleQuickDraftClick}
+              style={{
+                borderColor: "#31A0D1",
+                borderWidth: "4px",
+                marginTop: "0px",
+                marginBottom: "16px",
+                marginRight: "8px",
+              }}
+              disabled={briefingInput.length === 0 || didClickQuickDraft}
+              className="btn btn-primary"
+            >
+              <i className="bi bi-folder"></i> Create Report Folder
+            </Button>
           </Col>
-          {/* <Col>
-            <div>
-              <div style={{ marginBottom: "10px", textAlign: "right" }}>
-                <div
-                  onClick={() => handleBillingClicked()}
-                  style={{
-                    textAlign: "right",
-                    borderColor: "#31A0D1",
-                    borderWidth: "4px",
-                    marginTop: "0px",
-                    marginBottom: "16px",
-                    marginRight: "0px",
-                    cursor: "pointer",
-                    padding: "8px 16px",
-                    display: "inline-block",
-                    // backgroundColor: "#007bff",
-                    color: "white",
-                    borderRadius: "4px",
-                  }}
-                  className="btn btn-primary"
-                >
-                  Credit balance: $10
-                </div>
-              </div>
-            </div>
-          </Col> */}
         </Row>
       </div>
-
-      <>
+      {loadedReports.length > 0 && (
         <div style={{ marginBottom: "20px", width: "100%", display: "flex" }}>
           <input
             type="text"
+            placeholder="⌕ Search my reports"
+            onChange={(e) => handleSearch(e.target.value)}
             style={{
               borderRadius: "8px",
-              borderWidth: "0px",
               backgroundColor: "#000",
               color: "white",
               border: "1px solid grey",
               height: "2em",
-              flexGrow: 1, // Let it grow to take the available space
+              flexGrow: 1,
               textIndent: "10px",
             }}
-            lines="1"
-            placeholder="⌕ Search my reports"
-            onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
-        <div ref={containerRef}>
-          <Row className="text-primary">
-            <IntelliCardGroup
-              offset={offset}
-              handleCardClick={handleCardClick}
-              datums={loadedReports}
-              folderLikesByFolderId={folderLikesByFolderId}
-              reportCountsByFolderId={reportCountsByFolderId}
-              datumsType={"folders"}
-            ></IntelliCardGroup>
-          </Row>
-        </div>
-      </>
+      )}
+      <div ref={containerRef}>
+        <Row className="text-primary">
+          <IntelliCardGroup
+            offset={offset}
+            handleCardClick={handleCardClick}
+            datums={loadedReports}
+            folderLikesByFolderId={folderLikesByFolderId}
+            reportCountsByFolderId={reportCountsByFolderId}
+            datumsType={"folders"}
+          />
+        </Row>
+      </div>
     </>
   );
 };

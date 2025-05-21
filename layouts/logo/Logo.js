@@ -3,7 +3,7 @@ import Head from "next/head";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 // import RotatingLight from "@/components/RotatingLight";
-import Mtree from "../../../components/3d/Mtree/1Mtree";
+import Mtree from "../../components/3d/Mtree/1Mtree";
 const Logo = () => {
   return (
     <>

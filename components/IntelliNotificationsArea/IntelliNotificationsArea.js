@@ -1,17 +1,11 @@
-import { useUser } from "@auth0/nextjs-auth0/client";
 import getEnv from "../../utils/getEnv";
 import { useFirebaseListener } from "../../utils/useFirebaseListener";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import IntelliLoadingBar from "../IntelliLoadingBar/IntelliLoadingBar";
-
+import { useUser } from "../../context/UserContext";
 export default function IntelliNotificationsArea() {
-  let { user } = useUser();
-  let userId = user?.sub;
   const router = useRouter();
-  if (!userId) {
-    userId = router.query.userId;
-  }
 
   const numberOfFinalizeAndVisualizeReportSubtasks = 13;
   const numberOfContinuumSubtasks = 11;
@@ -23,6 +17,16 @@ export default function IntelliNotificationsArea() {
   );
   const [LibraryImage, setLibraryImage] = useState("");
   const [briefingInput, setBriefingInput] = useState();
+
+  const [userId, setUserId] = useState();
+  const userContext = useUser();
+
+  useEffect(() => {
+    if (userContext?.id) {
+      setUserId(userContext.id);
+    }
+  }, [userContext]);
+
   // Firebase listeners - always called
   const firebaseContinuumStatus = useFirebaseListener(
     `/${getEnv()}/${process.env.NEXT_PUBLIC_SERVER_UID}/${

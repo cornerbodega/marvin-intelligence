@@ -1,8 +1,8 @@
-import FullLayout from "../src/layouts/FullLayout";
+import FullLayout from "../layouts/FullLayout";
 import Head from "next/head";
 import "../styles/style.scss";
 
-import { UserProvider } from "@auth0/nextjs-auth0/client";
+import { UserProvider } from "../context/UserContext";
 import Script from "next/script";
 import "../styles/globals.css";
 import { useEffect } from "react";

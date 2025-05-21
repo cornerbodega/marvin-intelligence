@@ -17,10 +17,8 @@ import {
   BreadcrumbItem,
 } from "reactstrap";
 
-import { useUser } from "@auth0/nextjs-auth0/client";
-
 import { useRouter } from "next/router";
-
+import { useUser } from "../../../context/UserContext";
 import { useState, useEffect } from "react";
 
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
@@ -30,13 +28,19 @@ import IntelliLoadingBar from "../../../components/IntelliLoadingBar/IntelliLoad
 const CreateMission = ({}) => {
   const router = useRouter();
 
-  const { user } = useUser();
-  const [userId, setUserId] = useState(user?.sub);
-
   const [draft, setDraft] = useState("");
   const [feedbackInput, setFeedbackInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  const [userId, setUserId] = useState();
+  const userContext = useUser();
+
+  useEffect(() => {
+    if (userContext?.id) {
+      setUserId(userContext.id);
+    }
+  }, [userContext]);
 
   if (!router.query.briefingInput || router.query.briefingInput.length == 0) {
     console.log("no briefing input. ");
@@ -44,21 +48,16 @@ const CreateMission = ({}) => {
     console.log(router.query.briefingInput);
   }
 
-  if (!router.query.userId || router.query.userId.length == 0) {
-    console.log("no briefing userId query param.");
-    console.log("router.query.userId");
-    console.log(router.query.userId);
-  }
+  // if (!router.query.userId || router.query.userId.length == 0) {
+  //   console.log("no briefing userId query param.");
+  //   console.log("router.query.userId");
+  //   console.log(router.query.userId);
+  // }
   function goToPage(name) {
     console.log("go to page");
     console.log(name);
     router.push(name);
   }
-  useEffect(() => {
-    if (router.query.userId) {
-      setUserId(router.query.userId);
-    }
-  }, [router.query.userId]);
 
   const [expertiseOutput, setExpertiseOutput] = useState("");
 
@@ -284,11 +283,11 @@ const CreateMission = ({}) => {
           )}
         </div>
       )}
-      {showLoadingImage && (
+      {/* {showLoadingImage && (
         <div style={{ textAlign: "center", width: "100%" }}>
           <img style={{ width: "100%", height: "auto" }} src="/library.png" />
         </div>
-      )}
+      )} */}
     </div>
   );
 };

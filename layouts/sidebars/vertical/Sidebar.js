@@ -9,22 +9,22 @@ const navigation = [
     href: "/reports/folders/view-folders",
     icon: "bi bi-folder",
   },
-  {
-    title: "Intel-Net",
-    href: "/intelnet/folders/view-intelnet",
-    icon: "bi bi-globe2",
-  },
+  // {
+  //   title: "Intel-Net",
+  //   href: "/intelnet/folders/view-intelnet",
+  //   icon: "bi bi-globe2",
+  // },
 
   {
     title: "Agents",
     href: "/agents/view-agents",
     icon: "bi bi-person-badge",
   },
-  {
-    title: "About",
-    href: "/about/why-what-how",
-    icon: "bi bi-info-circle",
-  },
+  // {
+  //   title: "About",
+  //   href: "/about/why-what-how",
+  //   icon: "bi bi-info-circle",
+  // },
 ];
 
 const Sidebar = ({ showMobilemenu }) => {

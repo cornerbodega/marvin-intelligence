@@ -22,14 +22,13 @@ import {
   BreadcrumbItem,
 } from "reactstrap";
 
-import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
 
 import { useRouter } from "next/router";
 
 import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
-
-import { getSupabase } from "../../../utils/supabase";
+import { useUser } from "../../../context/UserContext";
+import { supabase } from "../../../utils/supabase";
 import { useState, useRef, useEffect } from "react";
 
 import { slugify } from "../../../utils/slugify";
@@ -37,68 +36,8 @@ import { slugify } from "../../../utils/slugify";
 import saveTask from "../../../utils/saveTask";
 import { useFirebaseListener } from "../../../utils/useFirebaseListener";
 import Head from "next/head";
-export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps(context) {
-    const supabase = getSupabase();
-    const session = await getSession(context.req, context.res);
-    const user = session?.user;
-    const userId = user.sub;
-    const { data: agency, agencyError } = await supabase
-      .from("users")
-      .select("agencyName")
-      .eq("userId", user.sub);
-    const agencyName = agency[0].agencyName;
-    if (agencyError) {
-      console.log("agencyError");
-    }
-    console.log("agency");
-    console.log(agency);
-    if (!agency || agency.length === 0) {
-      return {
-        redirect: {
-          permanent: false,
-          destination: "/agency/create-agency",
-        },
-        props: {},
-      };
-    }
 
-    const { agentId, parentReportId } = context.query;
-    console.log("parentReportId");
-    console.log(parentReportId);
-
-    console.log("agentId");
-    console.log(agentId);
-    let { data: agents, error } = await supabase
-      .from("agents")
-      .select(
-        "agentId, expertise1, expertise2, expertise3, agentName, profilePicUrl, bio, specializedTraining"
-      )
-      .eq("agentId", agentId);
-    if (error) {
-      console.log(error);
-    }
-    const agent = agents[0];
-    const expertiseOutput = [
-      agent.expertise1,
-      agent.expertise2,
-      agent.expertise3,
-    ];
-
-    return {
-      props: { userId, agent, expertiseOutput, agencyName },
-    };
-  },
-});
-
-const CreateMission = ({
-  userId,
-  agent,
-  agencyName,
-
-  expertiseOutput,
-}) => {
-  const { user, error, isLoading } = useUser();
+const CreateMission = () => {
   const [briefingSuggestion, setBriefingSuggestion] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [parentReportSummary, setParentReportSummary] = useState();
@@ -108,7 +47,7 @@ const CreateMission = ({
   const [draft, setDraft] = useState();
   const [isStreaming, setIsStreaming] = useState(false);
   const [feedbackInput, setFeedbackInput] = useState("");
-  const router = useRouter();
+
   const draftRef = useRef();
   const [parentReportTitle, setParentReportTitle] = useState("");
   const [parentReportId, setParentReportId] = useState("");
@@ -120,27 +59,93 @@ const CreateMission = ({
   const [writeDraftTaskId, setWriteDraftTaskId] = useState();
   const [isSaving, setIsSaving] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  const [agent, setAgent] = useState(null);
+  const [agencyName, setAgencyName] = useState("");
+  const [expertiseOutput, setExpertiseOutput] = useState([]);
+  const router = useRouter();
+  const [userId, setUserId] = useState();
+  const userContext = useUser();
+
+  useEffect(() => {
+    if (userContext?.id) {
+      setUserId(userContext.id);
+    }
+  }, [userContext]);
+  // Fetch session and required data on client
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+    const fetchInitialData = async () => {
+      // Get agency info
+      const { data: agency, error: agencyError } = await supabase
+        .from("users")
+        .select("agencyName")
+        .eq("userId", userId);
+
+      if (agencyError || !agency?.length) {
+        router.push("/agency/create-agency");
+        return;
+      }
+
+      setAgencyName(agency[0].agencyName);
+
+      // Get agent info from query
+      const { agentId } = router.query;
+
+      if (!agentId) return;
+
+      const { data: agents, error: agentError } = await supabase
+        .from("agents")
+        .select(
+          "agentId, expertise1, expertise2, expertise3, agentName, profilePicUrl, bio, specializedTraining"
+        )
+        .eq("agentId", agentId);
+
+      if (agentError || !agents?.length) {
+        console.error("Agent not found or error fetching");
+        return;
+      }
+
+      const agent = agents[0];
+      setAgent(agent);
+      setExpertiseOutput([
+        agent.expertise1,
+        agent.expertise2,
+        agent.expertise3,
+      ]);
+    };
+
+    if (router.isReady) {
+      fetchInitialData();
+    }
+  }, [router.isReady, userId]);
+
+  // Don't render until agent is loaded
+  // if (!agent) {
+  //   return (
+  //     <div style={{ color: "white", padding: "2em" }}>Loading agent...</div>
+  //   );
+  // }
   const firebaseSaveData = useFirebaseListener(
-    userId
-      ? `/${"asyncTasks"}/${
-          process.env.NEXT_PUBLIC_SERVER_UID
-        }/${userId}/regenerateFolder/`
-      : null
+    `/${"asyncTasks"}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
+      userId || "undefined"
+    }/regenerateFolder/`
   );
+
   const firebaseDraftData = useFirebaseListener(
-    user
-      ? `/${"asyncTasks"}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
-          user.sub
-        }/quickDraft/context`
-      : null
+    `/${"asyncTasks"}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
+      userId || "undefined"
+    }/quickDraft/context`
   );
+
   const firebaseFolderIdData = useFirebaseListener(
-    user
-      ? `/${"asyncTasks"}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
-          user.sub
-        }/finalizeAndVisualizeReport/context/folderId`
-      : null
+    `/${"asyncTasks"}/${process.env.NEXT_PUBLIC_SERVER_UID}/${
+      userId || "undefined"
+    }/finalizeAndVisualizeReport/context/folderId`
   );
+
   const [hasSavedReport, setHasSavedReport] = useState(false);
   // useEffect(() => {
   //   if (firebaseSaveData) {
@@ -220,7 +225,7 @@ const CreateMission = ({
       const clearQuickDraftTask = {
         type: "quickDraft",
         status: "cleared",
-        userId: user.sub,
+        userId: userId,
         context: {},
         createdAt: new Date().toISOString(),
       };
@@ -228,7 +233,7 @@ const CreateMission = ({
       const clearSaveReportTask = {
         type: "saveLinkedReport",
         status: "cleared",
-        userId: user.sub,
+        userId: userId,
         context: {},
         createdAt: new Date().toISOString(),
       };
@@ -236,7 +241,7 @@ const CreateMission = ({
       const clearFinalizeAndVisualizeReport = {
         type: "finalizeAndVisualizeReport",
         status: "cleared",
-        userId: user.sub,
+        userId: userId,
         context: {},
         createdAt: new Date().toISOString(),
       };
@@ -245,10 +250,10 @@ const CreateMission = ({
       const newTask = {
         type: "quickDraft",
         status: "queued",
-        userId: user.sub,
+        userId: userId,
         context: {
           ...draftData,
-          userId: user.sub,
+          userId: userId,
           existingExpertise: expertiseOutput,
         },
         createdAt: new Date().toISOString(),
@@ -297,13 +302,13 @@ const CreateMission = ({
       const saveReportTask = {
         type: reportType,
         status: "queued",
-        userId: user.sub,
+        userId: userId,
         context: {
           ...draftData,
           draft,
           agentId: agent.agentId,
           expertises: expertiseOutput,
-          userId: user.sub,
+          userId: userId,
         },
         createdAt: new Date().toISOString(),
       };
@@ -321,6 +326,7 @@ const CreateMission = ({
 
   useEffect(() => {
     async function fetchBriefingSuggestion() {
+      if (!agent) return;
       // Logic to build expertiseString from agent prop
       const expertises = [agent.expertise1, agent.expertise2, agent.expertise3];
       let expertiseString = expertises[0];
@@ -454,337 +460,361 @@ const CreateMission = ({
 
   return (
     <div>
-      <Head>
-        <title>
-          Agent {agent.agentName} | {agencyName}
-        </title>
-      </Head>
-
-      <Breadcrumb
-        style={{ fontWeight: "200", fontFamily: "monospace" }}
-        className="text-white"
-      >
-        <BreadcrumbItem>
-          <i className={`bi bi-person-badge`}></i>
-          &nbsp;
-          <Link
-            style={{ fontWeight: "200", textDecoration: "none" }}
+      {agent && (
+        <>
+          {" "}
+          <Head>
+            <title>
+              Agent {agent.agentName} | {agencyName}
+            </title>
+          </Head>
+          <Breadcrumb
+            style={{ fontWeight: "200", fontFamily: "monospace" }}
             className="text-white"
-            href="/agents/view-agents"
           >
-            Agents
-          </Link>
-        </BreadcrumbItem>
-
-        <BreadcrumbItem style={{ fontWeight: "800" }} className="">
-          Agent {agent.agentName}
-        </BreadcrumbItem>
-      </Breadcrumb>
-
-      <Row>
-        <Col md={{ size: 7, offset: 2 }}>
-          <Form onSubmit={handleQuickDraft}>
-            <FormGroup>
-              <div>
-                <div style={{ marginTop: "20px" }}></div>
-
-                <FormGroup>
-                  <Row>
-                    <Col className="col-8">
-                      <Label htmlFor="exampleText" className="text-white">
-                        What would you like to know?
-                      </Label>
-                    </Col>
-                    <Col>
-                      <div
-                        onClick={(e) => {
-                          setBriefingInput("");
-                        }}
-                        style={{
-                          paddingTop: "4px",
-                          fontSize: "0.75em",
-                          display: "flex",
-                          justifyContent: "flex-end",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <i className="bi bi-x-circle"></i>
-                      </div>
-                    </Col>
-                  </Row>
-
-                  <div className="textareaWrapper">
-                    <textarea
-                      ref={textareaRef}
-                      autoFocus
-                      value={briefingInput}
-                      onChange={(e) => setBriefingInput(e.target.value)}
-                      placeholder="What would you like to know?"
-                      style={{
-                        padding: "12px 12px 13px 13px",
-                        borderWidth: "0px",
-                        width: "100%",
-                        height: "180px",
-                        color: "white",
-                        borderRadius: "8px",
-                        border: "1px solid white",
-                        backgroundColor: "#000",
-                        "--cursor-pos": "0px", // Initial value
-                      }}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "flex-start",
-                      paddingTop: "8px",
-                    }}
-                  >
-                    <Button
-                      color="primary"
-                      style={{ border: "1px solid green", marginRight: "16px" }}
-                      disabled={isSubmitting || !briefingInput}
-                    >
-                      <i className="bi bi-folder"></i>+ Create Report
-                    </Button>
-                  </div>
-                </FormGroup>
-              </div>
-            </FormGroup>
-            <div>
-              <Card
-                style={{
-                  backgroundColor: "black",
-                  color: "white",
-                  border: "1px solid white",
-                  borderRadius: "16px",
-                }}
+            <BreadcrumbItem>
+              <i className={`bi bi-person-badge`}></i>
+              &nbsp;
+              <Link
+                style={{ fontWeight: "200", textDecoration: "none" }}
+                className="text-white"
+                href="/agents/view-agents"
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    borderRadius: "16px",
-                    marginBottom: "16px",
-                    marginTop: "0px",
-                    height: "100%",
-                  }}
-                >
-                  <div
-                    style={{
-                      height: "337px",
-                      width: "100%", // Make the width 100% to fill the container
-                      position: "relative",
-                    }}
-                  >
-                    <img
-                      src={`${agent.profilePicUrl}`}
-                      style={{
-                        height: "100%",
-                        width: "100%",
-                        borderTopLeftRadius: "16px",
-                        borderTopRightRadius: "16px",
-                        objectFit: "cover", // This is key for maintaining aspect ratio
-                        objectPosition: "center", // Adjusts the position of the image within its frame
-                      }}
-                      alt="agent"
-                    />
-                  </div>
-                </div>
+                Agents
+              </Link>
+            </BreadcrumbItem>
 
-                <CardBody>
-                  <CardTitle
-                    style={{
-                      display: "flex",
-                      marginTop: "16px",
-                      justifyContent: "center",
-                      fontWeight: 800,
-                      color: "white",
-                      fontSize: "1.2rem",
-                    }}
-                  >
-                    Agent {agent.agentName}
-                  </CardTitle>
-                  <CardSubtitle
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      marginTop: "16px",
-                      marginBottom: "16px",
-                      justifyContent: "center",
-                    }}
-                    className="mb-2 text-muted"
-                    tag="h6"
-                  >
-                    <Badge
-                      style={{ marginBottom: "5px" }}
-                      color="info"
-                      className="ms-3 expertiseBadge"
-                    >
-                      {agent.expertise1}
-                    </Badge>
-                    <Badge
-                      color="info"
-                      style={{ marginBottom: "5px" }}
-                      className="ms-3 expertiseBadge"
-                    >
-                      {agent.expertise2}
-                    </Badge>
-                    <Badge
-                      color="info"
-                      className="ms-3 expertiseBadge"
-                      // style={{ marginTop: "10px" }}
-                    >
-                      {agent.expertise3}
-                    </Badge>
-                  </CardSubtitle>
+            <BreadcrumbItem style={{ fontWeight: "800" }} className="">
+              Agent {agent.agentName}
+            </BreadcrumbItem>
+          </Breadcrumb>
+          <Row>
+            <Col md={{ size: 7, offset: 2 }}>
+              <Form onSubmit={handleQuickDraft}>
+                <FormGroup>
                   <div>
-                    <div
-                      style={{ marginLeft: "auto", textAlign: "right" }}
-                    ></div>
-                    <div>
-                      <h4>Bio</h4>
-                    </div>
-                    <div style={{ fontSize: "0.8em" }}>{agent.bio}</div>
+                    <div style={{ marginTop: "20px" }}></div>
 
-                    {agentMissionHistory && (
-                      <>
-                        <div style={{ marginTop: "12px" }}>
-                          <h4>Report History</h4>
-                        </div>
-                        <ul>
-                          {agentMissionHistory.map((mission, index) => {
-                            if (mission.reportFolders.length == 0) {
-                              return <></>;
-                            }
-                            return (
-                              <li key={index}>
-                                {/* {JSON.stringify(mission)} */}
-                                <Link
-                                  className="reportFont"
-                                  style={{
-                                    textDecoration: "none",
-                                    fontWeight: 300,
-                                    color: "#00fff2",
-                                    cursor: "pointer",
-                                  }}
-                                  href={`/reports/folders/intel-report/${mission.reportFolders[0].folderId}`}
-                                >
-                                  {mission.reportTitle}
-                                </Link>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      </>
-                    )}
-
-                    {parentReportSummary && (
-                      <>
-                        <div>
-                          <h4>Parent Report Context</h4>
-                        </div>
-                        <div>
-                          <Link
-                            className="reportFont"
+                    <FormGroup>
+                      <Row>
+                        <Col className="col-8">
+                          <Label htmlFor="exampleText" className="text-white">
+                            What would you like to know?
+                          </Label>
+                        </Col>
+                        <Col>
+                          <div
+                            onClick={(e) => {
+                              setBriefingInput("");
+                            }}
                             style={{
-                              textDecoration: "none",
-                              fontWeight: 300,
-                              color: "#00fff2",
+                              paddingTop: "4px",
+                              fontSize: "0.75em",
+                              display: "flex",
+                              justifyContent: "flex-end",
                               cursor: "pointer",
                             }}
-                            href={`/reports/folders/intel-report/${parentReportId}`}
                           >
-                            {parentReportTitle}
-                          </Link>
-                        </div>
-                        <div style={{ fontSize: "0.85em" }}>
-                          {parentReportSummary}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </CardBody>
-              </Card>
-            </div>
-          </Form>
-          <div style={{ marginTop: "50px" }} ref={draftRef}></div>
-          {draft && (
-            <Card style={{ background: "black", color: "white" }}>
-              <CardBody className="report">
-                <i className="bi bi-body-text"> New Draft </i>
-                <div
-                  style={{ color: "white" }}
-                  dangerouslySetInnerHTML={{ __html: draft }}
-                />
-              </CardBody>
-            </Card>
-          )}
-          {draft && !draft.endsWith(" ".repeat(3)) && (
-            <>
-              Loading...
-              <div className="scroll-downs">
-                <div className="mousey">
-                  <div className="scroller"></div>
-                </div>
-              </div>
-            </>
-          )}
-          {draft && !isSubmitting && draft.endsWith(" ".repeat(3)) && (
-            <>
-              <Form onSubmit={(e) => handleQuickDraft(e)}>
-                <FormGroup>
-                  <div style={{ marginTop: "40px" }}></div>
-                  <Label htmlFor="exampleText" className="text-white">
-                    Feedback
-                  </Label>
-                  <Input
-                    style={{ backgroundColor: "#131313", color: "white" }}
-                    id="exampleText"
-                    placeholder="What do you think?"
-                    name="text"
-                    rows="5"
-                    type="textarea"
-                    value={feedbackInput}
-                    onChange={(e) => setFeedbackInput(e.target.value)}
-                  />
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "flex-end",
-                      paddingTop: "8px",
-                    }}
-                  >
-                    <Button
-                      color="primary"
-                      style={{
-                        border: "1px solid yellow",
-                        marginRight: "16px",
-                      }}
-                      disabled={isSubmitting}
-                    >
-                      <i className="bi bi-arrow-clockwise"></i>
-                      &nbsp;Refine
-                    </Button>
+                            <i className="bi bi-x-circle"></i>
+                          </div>
+                        </Col>
+                      </Row>
+
+                      <div className="textareaWrapper">
+                        <textarea
+                          ref={textareaRef}
+                          autoFocus
+                          value={briefingInput}
+                          onChange={(e) => setBriefingInput(e.target.value)}
+                          placeholder="What would you like to know?"
+                          style={{
+                            padding: "12px 12px 13px 13px",
+                            borderWidth: "0px",
+                            width: "100%",
+                            height: "180px",
+                            color: "white",
+                            borderRadius: "8px",
+                            border: "1px solid white",
+                            backgroundColor: "#000",
+                            "--cursor-pos": "0px", // Initial value
+                          }}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "flex-start",
+                          paddingTop: "8px",
+                        }}
+                      >
+                        <Button
+                          color="primary"
+                          style={{
+                            border: "1px solid green",
+                            marginRight: "16px",
+                          }}
+                          disabled={isSubmitting || !briefingInput}
+                        >
+                          <i className="bi bi-folder"></i>+ Create Report
+                        </Button>
+                      </div>
+                    </FormGroup>
                   </div>
                 </FormGroup>
-              </Form>
+                <div>
+                  <Card
+                    style={{
+                      backgroundColor: "black",
+                      color: "white",
+                      border: "1px solid white",
+                      borderRadius: "16px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        borderRadius: "16px",
+                        marginBottom: "16px",
+                        marginTop: "0px",
+                        height: "100%",
+                      }}
+                    >
+                      <div
+                        style={{
+                          height: "337px",
+                          width: "100%", // Make the width 100% to fill the container
+                          position: "relative",
+                        }}
+                      >
+                        <img
+                          src={`${agent.profilePicUrl}`}
+                          style={{
+                            height: "100%",
+                            width: "100%",
+                            borderTopLeftRadius: "16px",
+                            borderTopRightRadius: "16px",
+                            objectFit: "cover", // This is key for maintaining aspect ratio
+                            objectPosition: "center", // Adjusts the position of the image within its frame
+                          }}
+                          alt="agent"
+                        />
+                      </div>
+                    </div>
 
-              <Button
-                color="primary"
-                style={{ border: "3px solid green", marginTop: "40px" }}
-                disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
-                onClick={(e) => handleAcceptReport(e)}
-              >
-                <i className="bi bi-floppy"></i> Save Report
-              </Button>
-            </>
-          )}
-          <div style={{ marginTop: "10px" }}>
-            {hasSubmitted && isSubmitting && "Saving Report..."}
-          </div>
-        </Col>
-      </Row>
+                    <CardBody>
+                      <CardTitle
+                        style={{
+                          display: "flex",
+                          marginTop: "16px",
+                          justifyContent: "center",
+                          fontWeight: 800,
+                          color: "white",
+                          fontSize: "1.2rem",
+                        }}
+                      >
+                        Agent {agent.agentName}
+                      </CardTitle>
+                      <CardSubtitle
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          marginTop: "16px",
+                          marginBottom: "16px",
+                          justifyContent: "center",
+                        }}
+                        className="mb-2 text-muted"
+                        tag="h6"
+                      >
+                        <Badge
+                          style={{ marginBottom: "5px" }}
+                          color="info"
+                          className="ms-3 expertiseBadge"
+                        >
+                          {agent.expertise1}
+                        </Badge>
+                        <Badge
+                          color="info"
+                          style={{ marginBottom: "5px" }}
+                          className="ms-3 expertiseBadge"
+                        >
+                          {agent.expertise2}
+                        </Badge>
+                        <Badge
+                          color="info"
+                          className="ms-3 expertiseBadge"
+                          // style={{ marginTop: "10px" }}
+                        >
+                          {agent.expertise3}
+                        </Badge>
+                      </CardSubtitle>
+                      <div>
+                        <div
+                          style={{ marginLeft: "auto", textAlign: "right" }}
+                        ></div>
+                        <div>
+                          <h4>Bio</h4>
+                        </div>
+                        <div style={{ fontSize: "0.8em" }}>{agent.bio}</div>
+
+                        {agentMissionHistory && (
+                          <>
+                            <div style={{ marginTop: "12px" }}>
+                              <h4>Report History</h4>
+                            </div>
+                            <ul>
+                              {agentMissionHistory.map((mission, index) => {
+                                if (mission.reportFolders.length == 0) {
+                                  return <></>;
+                                }
+                                return (
+                                  <li key={index}>
+                                    {/* {JSON.stringify(mission)} */}
+                                    <Link
+                                      className="reportFont"
+                                      style={{
+                                        textDecoration: "none",
+                                        fontWeight: 300,
+                                        color: "#00fff2",
+                                        cursor: "pointer",
+                                      }}
+                                      href={`/reports/folders/intel-report/${mission.reportFolders[0].folderId}`}
+                                    >
+                                      {mission.reportTitle}
+                                    </Link>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </>
+                        )}
+
+                        {parentReportSummary && (
+                          <>
+                            <div>
+                              <h4>Parent Report Context</h4>
+                            </div>
+                            <div>
+                              <Link
+                                className="reportFont"
+                                style={{
+                                  textDecoration: "none",
+                                  fontWeight: 300,
+                                  color: "#00fff2",
+                                  cursor: "pointer",
+                                }}
+                                href={`/reports/folders/intel-report/${parentReportId}`}
+                              >
+                                {parentReportTitle}
+                              </Link>
+                            </div>
+                            <div style={{ fontSize: "0.85em" }}>
+                              {parentReportSummary}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </CardBody>
+                  </Card>
+                </div>
+              </Form>
+              <div style={{ marginTop: "50px" }} ref={draftRef}></div>
+              {draft && hasSubmitted && (
+                <Card style={{ background: "black", color: "white" }}>
+                  <CardBody className="report">
+                    <i className="bi bi-body-text"> New Draft </i>
+                    <div
+                      style={{ color: "white" }}
+                      dangerouslySetInnerHTML={{ __html: draft }}
+                    />
+                  </CardBody>
+                </Card>
+              )}
+              {draft && !draft.endsWith(" ".repeat(3)) && (
+                <>
+                  Loading...
+                  <div className="scroll-downs">
+                    <div className="mousey">
+                      <div className="scroller"></div>
+                    </div>
+                  </div>
+                </>
+              )}
+              {draft &&
+                hasSubmitted &&
+                !isSubmitting &&
+                draft.endsWith(" ".repeat(3)) && (
+                  <>
+                    <Form onSubmit={(e) => handleQuickDraft(e)}>
+                      <FormGroup>
+                        <div style={{ marginTop: "40px" }}></div>
+                        <Label htmlFor="exampleText" className="text-white">
+                          Feedback
+                        </Label>
+                        <Input
+                          style={{ backgroundColor: "#131313", color: "white" }}
+                          id="exampleText"
+                          placeholder="What do you think?"
+                          name="text"
+                          rows="5"
+                          type="textarea"
+                          value={feedbackInput}
+                          onChange={(e) => setFeedbackInput(e.target.value)}
+                        />
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "flex-end",
+                            paddingTop: "8px",
+                          }}
+                        >
+                          <Button
+                            color="primary"
+                            style={{
+                              border: "1px solid yellow",
+                              marginRight: "16px",
+                            }}
+                            disabled={isSubmitting}
+                          >
+                            <i className="bi bi-arrow-clockwise"></i>
+                            &nbsp;Refine
+                          </Button>
+                        </div>
+                      </FormGroup>
+                    </Form>
+
+                    <Button
+                      color="primary"
+                      style={{ border: "3px solid green", marginTop: "40px" }}
+                      disabled={isSubmitting || !draft.endsWith(" ".repeat(3))}
+                      onClick={(e) => handleAcceptReport(e)}
+                    >
+                      <i className="bi bi-floppy"></i> Save Report
+                    </Button>
+                  </>
+                )}
+              <div style={{ marginTop: "10px" }}>
+                {hasSubmitted &&
+                  hasSubmitted &&
+                  isSubmitting &&
+                  "Saving Report..."}
+              </div>
+            </Col>
+          </Row>
+        </>
+      )}
+      {(!agent || !agencyName) && (
+        <div
+          style={{
+            color: "white",
+            padding: "2em",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          Loading agent...
+        </div>
+      )}
     </div>
   );
 };

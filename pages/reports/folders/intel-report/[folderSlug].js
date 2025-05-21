@@ -2,14 +2,11 @@ import { Button, Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import getEnv from "../../../../utils/getEnv";
-import { getSession } from "@auth0/nextjs-auth0";
-
-import { getSupabase } from "../../../../utils/supabase";
+import { useUser } from "../../../../context/UserContext";
+import { supabase } from "../../../../utils/supabase";
 
 import IntelliFab from "../../../../components/IntelliFab";
 
-const supabase = getSupabase();
-import { useUser } from "@auth0/nextjs-auth0/client";
 import LibraryImage from "../../../../components/LibraryImage";
 import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
@@ -23,206 +20,45 @@ import Head from "next/head";
 import IntelliNotificationsArea from "../../../../components/IntelliNotificationsArea/IntelliNotificationsArea";
 import IntelliEditor from "../../../../components/IntelliEditor";
 
-export async function getServerSideProps(context) {
-  const folderId = context.params.folderSlug.split("-")[0];
-  const session = await getSession(context.req, context.res);
-  const user = session?.user;
-  let userId = user?.sub;
-  // const query = context.query;
-
-  // const userIdFromRouter = query.userId;
-  // if (!userId && userIdFromRouter) {
-  //   userId = userIdFromRouter;
-  // }
-
-  if (!folderId) {
-    console.log("Error! No folder Id");
-    return {};
-  }
-  let { data: agency, agencyError } = await supabase
-    .from("users")
-    .select("agencyName")
-    .eq("userId", userId);
-  if (agencyError) {
-    console.log("agencyError");
-  }
-  console.log("agency");
-  console.log(agency);
-  if (!agency || agency.length === 0) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/agency/create-agency",
-      },
-      props: {},
-    };
-  }
-
-  let { data: missionsResponse, error } = await supabase
-    .from("reportFolders")
-    .select(
-      `
-        reportId,
-        folderId,
-        folders:folders (
-            folderName,
-            folderDescription,
-            folderPicDescription,
-            folderPicUrl,
-            availability
-        ),
-        reports:reports (
-            availability,
-            reportTitle,
-            reportPicUrl,
-            reportPicDescription,
-            reportId,
-            reportContent,
-            agentId,
-            createdAt,
-            agent:agentId (
-                agentId,
-                agentName,
-                expertise1,
-                expertise2,
-                expertise3,
-                specializedTraining
-            )
-        )
-    `
-    )
-    .eq("folderId", folderId);
-
-  // Get the list fo users who have liked this folder
-  let { data: _folderLikes, folderLikesError } = await supabase
-    .from("folderLikes")
-    .select()
-    .eq("folderId", folderId);
-
-  if (!_folderLikes) {
-    _folderLikes = [];
-  }
-  if (folderLikesError) {
-    console.error("folderLikesError");
-    console.error(folderLikesError);
-  }
-
-  console.log("missionsResponse");
-  console.log(missionsResponse);
-  if (!missionsResponse || missionsResponse.length === 0) {
-    return console.log("No missions found");
-  }
-  let expertises = [];
-  let agentId = 0;
-  let specializedTraining = "";
-
-  if (missionsResponse[0].reports.agent) {
-    agentId = missionsResponse[0].reports.agent.agentId;
-
-    if (missionsResponse[0].reports.agent.expertise1) {
-      expertises.push(missionsResponse[0].reports.agent.expertise1);
-    }
-    if (missionsResponse[0].reports.agent.expertise2) {
-      expertises.push(missionsResponse[0].reports.agent.expertise2);
-    }
-    if (missionsResponse[0].reports.agent.expertise3) {
-      expertises.push(missionsResponse[0].reports.agent.expertise3);
-    }
-  }
-
-  let { data: linksResponse, error: linksError } = await supabase
-    .from("links")
-    .select("parentReportId, childReportId");
-
-  if (error || linksError) {
-    console.log("intel-report error");
-    console.error(error);
-    console.error(linksError);
-  }
-
-  const _loadedReports = [];
-  let _folderName = "";
-  let _folderDescription = "";
-  let _folderPicDescription = "";
-  let _folderPicUrl = "";
-
-  let _availability = "";
-  missionsResponse.forEach((mission) => {
-    if (mission.reports.availability == "DELETED") {
-      return;
-    }
-    _loadedReports.push(mission.reports);
-
-    _folderName = mission.folders.folderName;
-    _folderDescription = mission.folders.folderDescription;
-    _folderPicDescription = mission.folders.folderPicDescription;
-    _folderPicUrl = mission.folders.folderPicUrl;
-
-    _availability = mission.folders.availability;
-  });
-
-  // Sort Initial Loaded Reports by cretedAt
-  _loadedReports.sort((a, b) => {
-    const dateA = new Date(a.createdAt);
-    const dateB = new Date(b.createdAt);
-    return dateA - dateB; // sort by date ascending
-  });
-
-  return {
-    props: {
-      _loadedReports,
-      _folderName,
-      folderId,
-      _folderDescription,
-      _folderPicDescription,
-      _folderPicUrl,
-      agentId,
-      expertises,
-      specializedTraining,
-      _folderLikes,
-      _availability,
-      userId,
-    },
-  };
-}
-const ViewReports = ({
-  _loadedReports,
-  _folderName,
-  folderId,
-  _folderDescription,
-  _folderPicDescription,
-  _folderPicUrl,
-  agentId,
-  expertises,
-  specializedTraining,
-  _folderLikes,
-  _availability,
-  userId,
-}) => {
-  const { user } = useUser();
+const ViewReports = () => {
   const router = useRouter();
 
-  const [loadedReports, setLoadedReports] = useState(_loadedReports);
+  const [loadedReports, setLoadedReports] = useState([]);
 
   const [highlight, setHighlight] = useState({
     text: "",
     startIndex: undefined,
     endIndex: undefined,
   });
+  const [folderId, setFolderId] = useState();
+
+  const [agentId, setAgentId] = useState(0);
+  const [expertises, setExpertises] = useState([]);
+  const [specializedTraining, setSpecializedTraining] = useState("");
+  const [folderLikes, setFolderLikes] = useState([]);
+
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [availability, setAvailability] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [folderName, setFolderName] = useState(_folderName);
-  const [folderDescription, setFolderDescription] =
-    useState(_folderDescription);
-  const [folderPicDescription, setFolderPicDescription] = useState(
-    _folderPicDescription
-  );
-  const [folderPicUrl, setFolderPicUrl] = useState(_folderPicUrl || "");
+  const [folderName, setFolderName] = useState([]);
+  const [folderDescription, setFolderDescription] = useState();
+  const [folderPicDescription, setFolderPicDescription] = useState();
+  const [folderPicUrl, setFolderPicUrl] = useState();
   const [continuumCompleted, setContinuumCompleted] = useState(false);
   const [hasStartedContinuum, setHasStartedContinuum] = useState(false);
   const [editorReportId, setEditorReportId] = useState(null);
   const editorRef = useRef(null);
   const [editorContent, setEditorContent] = useState("");
+
+  const [userId, setUserId] = useState();
+  const userContext = useUser();
+
+  useEffect(() => {
+    if (userContext?.id) {
+      setUserId(userContext.id);
+    }
+  }, [userContext]);
 
   function handleContentChange(newContent) {
     setEditorContent(newContent);
@@ -260,7 +96,7 @@ const ViewReports = ({
   }, [userId, firebaseVisualizeAndSaveStatus, firebaseContinuumStatus]);
 
   const firebaseSaveData = useFirebaseListener(
-    user
+    userId
       ? `/${"asyncTasks"}/${
           process.env.NEXT_PUBLIC_SERVER_UID
         }/${userId}/finalizeAndVisualizeReport/context/`
@@ -272,15 +108,140 @@ const ViewReports = ({
     process.env.NEXT_PUBLIC_SERVER_UID
   }/${userId}/regenerateFolder/context/`;
 
-  const firebaseFolderData = useFirebaseListener(user ? folderPath : null);
+  const firebaseFolderData = useFirebaseListener(userId ? folderPath : null);
 
   const firebaseDraftData = useFirebaseListener(
-    user
+    userId
       ? `/${"asyncTasks"}/${
           process.env.NEXT_PUBLIC_SERVER_UID
         }/${userId}/continuum/`
       : null
   );
+
+  useEffect(() => {
+    async function fetchInitialData() {
+      try {
+        const extractedFolderId = router.query.folderSlug?.split("-")[0];
+        if (!extractedFolderId) {
+          console.error("No folderSlug or folderId found");
+          return;
+        }
+        setFolderId(extractedFolderId); // Set state, but also use directly
+        const currentFolderId = extractedFolderId;
+        console.log(`FOUND folderId: ${currentFolderId}`);
+
+        if (!userId) {
+          console.error("No userId found");
+          return;
+        }
+        console.log(`FOUND userId: ${userId}`);
+        // Check if the user has an agency
+        // if (!agency) {
+        //   console.error("No agency found");
+        //   return;
+        // }
+
+        const { data: agency, error: agencyError } = await supabase
+          .from("users")
+          .select("agencyName")
+          .eq("userId", userId);
+
+        if (agencyError) console.error(agencyError);
+
+        if (!agency || agency.length === 0) {
+          router.push("/agency/create-agency");
+          return;
+        }
+
+        const { data: missionsResponse, error } = await supabase
+          .from("reportFolders")
+          .select(
+            `
+          reportId,
+          folderId,
+          folders (
+            folderName,
+            folderDescription,
+            folderPicDescription,
+            folderPicUrl,
+            availability
+          ),
+          reports (
+            availability,
+            reportTitle,
+            reportPicUrl,
+            reportPicDescription,
+            reportId,
+            reportContent,
+            agentId,
+            createdAt,
+            agent:agentId (
+              agentId,
+              agentName,
+              expertise1,
+              expertise2,
+              expertise3,
+              specializedTraining
+            )
+          )
+        `
+          )
+          .eq("folderId", folderId);
+
+        if (!missionsResponse || missionsResponse.length === 0) {
+          console.warn("No reports found.");
+          return;
+        }
+
+        const _loadedReports = [];
+        let folderData = {};
+
+        missionsResponse.forEach((mission) => {
+          if (mission.reports.availability !== "DELETED") {
+            _loadedReports.push(mission.reports);
+            folderData = mission.folders;
+          }
+        });
+
+        _loadedReports.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
+        setLoadedReports(_loadedReports);
+
+        setFolderName(folderData.folderName || "");
+        setFolderDescription(folderData.folderDescription || "");
+        setFolderPicDescription(folderData.folderPicDescription || "");
+        setFolderPicUrl(folderData.folderPicUrl || "");
+        setAvailability(folderData.availability || "");
+
+        const reportAgent = missionsResponse[0].reports.agent;
+        if (reportAgent) {
+          setAgentId(reportAgent.agentId);
+          const exps = [
+            reportAgent.expertise1,
+            reportAgent.expertise2,
+            reportAgent.expertise3,
+          ].filter(Boolean);
+          setExpertises(exps);
+          setSpecializedTraining(reportAgent.specializedTraining || "");
+        }
+
+        const { data: likesData, error: likesError } = await supabase
+          .from("folderLikes")
+          .select()
+          .eq("folderId", folderId);
+
+        if (likesError) console.error(likesError);
+        setFolderLikes(likesData || []);
+      } catch (err) {
+        console.error("Error fetching folder data", err);
+      } finally {
+        setIsInitialLoading(false);
+      }
+    }
+
+    fetchInitialData();
+  }, [folderId, userId, router.query.folderSlug]);
 
   async function fetchUpdatedReports() {
     console.log("FETCH UPDATED REPORTS");
@@ -336,9 +297,9 @@ const ViewReports = ({
     });
   }
 
-  useEffect(() => {
-    fetchUpdatedReports();
-  }, []);
+  // useEffect(() => {
+  //   fetchUpdatedReports();
+  // }, []);
 
   useEffect(() => {
     if (firebaseDraftData) {
@@ -807,7 +768,7 @@ const ViewReports = ({
     );
   };
   const [likes, setLikes] = useState(
-    _folderLikes.map((like) => like.likeValue).reduce((a, b) => a + b, 0)
+    folderLikes.map((like) => like.likeValue).reduce((a, b) => a + b, 0)
   );
   async function handleLike() {
     let _likes = likes;
@@ -832,7 +793,7 @@ const ViewReports = ({
       return;
     }
   }
-  const [availability, setAvailability] = useState(_availability);
+
   async function handleGlobeClick() {
     console.log("handleGlobeClick");
     let _availability = availability;
@@ -1062,7 +1023,7 @@ const ViewReports = ({
       {/* Notifications Area */}
       <IntelliNotificationsArea />
       <div style={{ maxWidth: "90%" }}>
-        {folderPicUrl.length > 0 && (
+        {folderPicUrl && folderPicUrl.length > 0 && (
           <>
             <Breadcrumb>
               <BreadcrumbItem

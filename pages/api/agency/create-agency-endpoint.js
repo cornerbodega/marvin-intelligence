@@ -4,24 +4,29 @@ export default async function handler(req, res) {
   console.log("CREATE AN AGENCY");
 
   if (req.method === "POST") {
+    const { user, agencyName } = req.body;
+
+    // Ensure user object contains the Supabase Auth user
     const createUserModel = {
-      userId: req.body.user.sub,
-      email: req.body.user.email,
-      agencyName: req.body.agencyName,
+      userId: user.id, // ✅ Supabase user ID
+      email: user.email,
+      agencyName,
     };
-    const savedUsersData = await saveToSupabase("users", createUserModel);
 
-    // Add user with user id as sub from auth0
-    // Add agency with agency name
-    // Add agenciesUsers with agency id and user id
+    try {
+      const savedUsersData = await saveToSupabase("users", createUserModel);
+      console.log(`saved user data ${JSON.stringify(savedUsersData)}`);
 
-    if (savedUsersData) {
-      res.send(savedUsersData);
-    } else {
-      res.send(500);
+      if (savedUsersData && !savedUsersData.error) {
+        return res.status(200).json(savedUsersData);
+      } else {
+        return res.status(500).json({ error: savedUsersData.error });
+      }
+    } catch (err) {
+      console.error("Error saving to Supabase:", err);
+      return res.status(500).json({ error: "Unexpected server error" });
     }
   } else {
-    return res.sendStatus(500);
-    // Handle any other HTTP method
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 }

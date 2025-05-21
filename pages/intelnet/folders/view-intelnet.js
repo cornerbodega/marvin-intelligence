@@ -2,115 +2,90 @@ import { Row, Breadcrumb, BreadcrumbItem, Button } from "reactstrap";
 import useRouter from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
-import { getSession } from "@auth0/nextjs-auth0";
-import { getSupabase } from "../../../utils/supabase";
+import { useUser } from "../../../context/UserContext";
+import { supabase } from "../../../utils/supabase";
 import { slugify } from "../../../utils/slugify";
 import IntelliCardGroup from "../../../components/IntelliCardGroup";
 const PAGE_COUNT = 9;
-const supabase = getSupabase();
-export async function getServerSideProps(context) {
-  const session = await getSession(context.req, context.res);
 
-  let userId = session?.user.sub;
-  if (!userId) {
-    userId = "null";
-  }
-  let { data: agency, agencyError } = await supabase
-    .from("users")
-    .select("agencyName")
-    .eq("userId", userId);
-  if (agencyError) {
-    console.log("agencyError");
-  }
-  console.log("agency");
-  console.log(agency);
-  if (!agency || agency.length === 0) {
-    agency = [{ agencyName: "Guest Agency" }];
-  }
-  let { data: folders, error } = await supabase
-    .from("folders")
-    .select("*")
-
-    .filter("folderName", "neq", null)
-    .filter("folderPicUrl", "neq", null)
-    .filter("availability", "eq", "GLOBAL")
-    .limit(PAGE_COUNT)
-    .order("folderId", { ascending: false });
-
-  // Extract folderIds from the obtained folders data
-  const folderIds = folders.map((folder) => folder.folderId);
-
-  let folderLikes = [];
-
-  // Check if there are any folderIds to avoid unnecessary query
-  if (folderIds.length > 0) {
-    let { data, folderLikesError } = await supabase
-      .from("folderLikes")
-      .select()
-      .in("folderId", folderIds); // Filter folderLikes by folderIds from the first query
-
-    if (!folderLikesError) {
-      folderLikes = data;
-    } else {
-      console.error("Error fetching folder likes:", folderLikesError);
-    }
-  } else {
-    console.log("No folders found for the given criteria");
-  }
-
-  const _folderLikesByFolderId = folderLikes.reduce((acc, folderLike) => {
-    if (!acc[folderLike.folderId]) {
-      acc[folderLike.folderId] = 0;
-    }
-
-    acc[folderLike.folderId] += folderLike.likeValue; // Updated to sum the likeValue
-    return acc;
-  }, {});
-
-  console.log("folderLikesByFolderId");
-  console.log(_folderLikesByFolderId);
-
-  // Query the reportFolders table to get the count of reports for each folderId
-  let { data: reportCountsData, error: reportCountsError } = await supabase
-    .from("folders")
-    .select(`folderId, reportFolders(count)`)
-    .in("folderId", folderIds);
-  console.log("reportCountsData");
-  console.log(reportCountsData);
-
-  if (reportCountsError) {
-    console.error("Error fetching report counts:", reportCountsError);
-  }
-
-  const _reportCountsByFolderId = reportCountsData.reduce((acc, item) => {
-    acc[item.folderId] = item.reportFolders[0].count || null;
-    return acc;
-  }, {});
-  return {
-    props: {
-      folders,
-      userId,
-      _folderLikesByFolderId,
-      _reportCountsByFolderId,
-    },
-  };
-}
-
-const ViewReports = ({
-  folders,
-  userId,
-  _folderLikesByFolderId,
-  _reportCountsByFolderId,
-}) => {
-  const [isLast, setIsLast] = useState(false);
+const ViewReports = () => {
   const containerRef = useRef(null);
+
+  const [loadedReports, setLoadedReports] = useState([]);
+  const [folderLikesByFolderId, setFolderLikesByFolderId] = useState({});
+  const [reportCountsByFolderId, setReportCountsByFolderId] = useState({});
   const [offset, setOffset] = useState(1);
+  const [isLast, setIsLast] = useState(false);
   const [isInView, setIsInView] = useState(false);
-  const [loadedReports, setLoadedReports] = useState(folders);
   const [searchInput, setSearchInput] = useState("");
-  const [reportCountsByFolderId, setReportCountsByFolderId] = useState(
-    _reportCountsByFolderId
-  );
+  const [userId, setUserId] = useState();
+  const userContext = useUser();
+
+  useEffect(() => {
+    if (userContext?.id) {
+      setUserId(userContext.id);
+    }
+  }, [userContext]);
+  useEffect(() => {
+    async function fetchInitialData() {
+      const { data: agency } = await supabase
+        .from("users")
+        .select("agencyName")
+        .eq("userId", userId);
+
+      if (!agency || agency.length === 0) {
+        console.warn("No agency found; defaulting");
+      }
+
+      const { data: folders, error } = await supabase
+        .from("folders")
+        .select("*")
+        .filter("folderName", "neq", null)
+        .filter("folderPicUrl", "neq", null)
+        .filter("availability", "eq", "GLOBAL")
+        .limit(PAGE_COUNT)
+        .order("folderId", { ascending: false });
+
+      if (error) {
+        console.error("Error loading folders", error);
+        return;
+      }
+
+      setLoadedReports(folders);
+
+      const folderIds = folders.map((f) => f.folderId);
+
+      // Folder Likes
+      const { data: likes } = await supabase
+        .from("folderLikes")
+        .select()
+        .in("folderId", folderIds);
+
+      const likesMap =
+        likes?.reduce((acc, like) => {
+          acc[like.folderId] = (acc[like.folderId] || 0) + like.likeValue;
+          return acc;
+        }, {}) || {};
+
+      setFolderLikesByFolderId(likesMap);
+
+      // Report Counts
+      const { data: reportCountsData } = await supabase
+        .from("folders")
+        .select("folderId, reportFolders(count)")
+        .in("folderId", folderIds);
+
+      const countsMap =
+        reportCountsData?.reduce((acc, item) => {
+          acc[item.folderId] = item.reportFolders[0]?.count || 0;
+          return acc;
+        }, {}) || {};
+
+      setReportCountsByFolderId(countsMap);
+    }
+
+    fetchInitialData();
+  }, []);
 
   async function loadPagedResults() {
     console.log("Loading paged results");
@@ -199,9 +174,7 @@ const ViewReports = ({
   function goToPage(name) {
     router.push(name);
   }
-  const [folderLikesByFolderId, setFolderLikesByFolderId] = useState(
-    _folderLikesByFolderId
-  );
+
   useEffect(() => {
     if (!isLast && !searchInput) {
       const loadMoreReports = async () => {
