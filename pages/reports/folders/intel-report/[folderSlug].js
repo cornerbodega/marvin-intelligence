@@ -19,6 +19,7 @@ import Head from "next/head";
 
 import IntelliNotificationsArea from "../../../../components/IntelliNotificationsArea/IntelliNotificationsArea";
 import IntelliEditor from "../../../../components/IntelliEditor";
+import { has, set } from "lodash";
 
 const ViewReports = () => {
   const router = useRouter();
@@ -200,6 +201,7 @@ const ViewReports = () => {
           if (mission.reports.availability !== "DELETED") {
             _loadedReports.push(mission.reports);
             folderData = mission.folders;
+            console.log(`mission.reports.agentId ${mission.reports.agentId}`);
           }
         });
 
@@ -225,7 +227,8 @@ const ViewReports = () => {
           setExpertises(exps);
           setSpecializedTraining(reportAgent.specializedTraining || "");
         }
-
+        console.log(`Report Agent ID: ${reportAgent?.agentId}`);
+        setLoadedAgentId(reportAgent?.agentId);
         const { data: likesData, error: likesError } = await supabase
           .from("folderLikes")
           .select()
@@ -333,6 +336,7 @@ const ViewReports = () => {
   useEffect(() => {
     console.log("2firebaseSaveData");
     console.log(firebaseSaveData);
+    if (!hasStartedContinuum) return;
     if (firebaseSaveData) {
       console.log("firebase save data");
 
@@ -352,9 +356,11 @@ const ViewReports = () => {
   useEffect(() => {
     // get agent from supabase by agentId
     // set agent name
+    console.log(`agent ${console.log(agent)}`);
 
+    // if (agent || agent.length > 0) return;
     updateAgent(loadedAgentId);
-  }, [loadedAgentId]);
+  }, [agentId, loadedAgentId]);
   async function updateAgent(loadedAgentId) {
     let { data: agents, error: agentsError } = await supabase
       .from("agents")
@@ -1103,7 +1109,7 @@ const ViewReports = () => {
                     />
                     {likes < 2 ? "" : likes}
                   </span> */}
-                  <span
+                  {/* <span
                     style={{
                       marginRight: "20px",
                       fontFamily: "monospace",
@@ -1118,9 +1124,9 @@ const ViewReports = () => {
                       className="bi bi-globe"
                       style={{}}
                     />
-                  </span>
+                  </span> */}
                   <span style={{ fontFamily: "monospace" }}>
-                    <IntelliPrint loadedReports={loadedReports} />
+                    Print <IntelliPrint loadedReports={loadedReports} />
                   </span>
                 </Col>
 

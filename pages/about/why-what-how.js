@@ -16,7 +16,7 @@ export default function WhyWhatHow() {
       <h1 style={{ marginBottom: "20px" }}>
         About Intelligence.Marvin.Technology
       </h1>
-      <img
+      {/* <img
         src="/Kata.jpg"
         alt="Sunrise at Kata Beach, Phuket, Thailand, where I discovered ChatGPT"
         style={{
@@ -24,12 +24,12 @@ export default function WhyWhatHow() {
           width: "100%",
           height: "auto",
         }}
-      />
-      <div style={{ padding: 10 }}></div>
-      Sunrise at Kata Beach, Phuket, Thailand, where I discovered ChatGPT
+      /> */}
+      {/* <div style={{ padding: 10 }}></div> */}
+      {/* Sunrise at Kata Beach, Phuket, Thailand, where I discovered ChatGPT */}
       {/*     // router.push("/my-computer/access-my-computer");
        */}
-      <div style={{ padding: 20 }}></div>
+      {/* <div style={{ padding: 20 }}></div> */}
       <section style={{ marginBottom: "40px" }}>
         <h2 style={{ marginBottom: "20px" }}>
           I wanted to save the good stuff
@@ -148,16 +148,6 @@ export default function WhyWhatHow() {
         <h2 style={{ marginBottom: "20px" }}>Getting Started</h2>
         <ul>
           <li style={{ marginBottom: "10px" }}>
-            Visit{" "}
-            <Link
-              style={{ color: "lightblue" }}
-              href="/reports/folders/view-folders"
-            >
-              Intel-Net
-            </Link>{" "}
-            to see public reports (No login required)
-          </li>
-          <li style={{ marginBottom: "10px" }}>
             Go to{" "}
             <Link
               style={{ color: "lightblue" }}
@@ -173,8 +163,7 @@ export default function WhyWhatHow() {
             <Link style={{ color: "lightblue" }} href="/agents/view-agents">
               Agents
             </Link>{" "}
-            and write more reports using their memories & context. (Requires
-            free account & login)
+            and write more reports using their memories & context.
           </li>
         </ul>
       </section>

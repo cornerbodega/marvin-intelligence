@@ -2,7 +2,7 @@ import { Button, Row, Breadcrumb, BreadcrumbItem, Col } from "reactstrap";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
-
+import IntelliTextInput from "../../../components/IntelliTextInput/IntelliTextInput";
 import { useUser } from "../../../context/UserContext";
 
 import { supabase } from "../../../utils/supabase";
@@ -63,12 +63,12 @@ const ViewReports = () => {
       const cursorTop = (lines - 1) * lineHeight;
 
       const wrapper = textareaRef.current.parentElement;
-      wrapper.style.setProperty("--cursor-pos-x", `${cursorLeft}px`);
-      wrapper.style.setProperty("--cursor-pos-y", `${cursorTop + 18}px`);
+      wrapper.style.setProperty("--cursor-pos-x", `${cursorLeft + 10}px`);
+      wrapper.style.setProperty("--cursor-pos-y", `${cursorTop + 17}px`);
 
       if (briefingInput.length === 0) {
         wrapper.style.setProperty("--cursor-pos-x", `13px`);
-        wrapper.style.setProperty("--cursor-pos-y", `18px`);
+        wrapper.style.setProperty("--cursor-pos-y", `20px`);
       }
     }
   }, [briefingInput]);
@@ -337,27 +337,10 @@ const ViewReports = () => {
 
       <div id="quickDraftBriefingInput">
         <div className="textareaWrapper">
-          <textarea
-            ref={textareaRef}
-            autoFocus
+          <IntelliTextInput
             value={briefingInput}
-            onChange={(e) => setBriefingInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleQuickDraftClick();
-              }
-            }}
+            onChange={setBriefingInput}
             placeholder="type or paste here."
-            style={{
-              padding: "12px",
-              width: "100%",
-              height: "180px",
-              color: "white",
-              borderRadius: "8px",
-              border: "1px solid white",
-              backgroundColor: "#000",
-            }}
           />
         </div>
         <Row>

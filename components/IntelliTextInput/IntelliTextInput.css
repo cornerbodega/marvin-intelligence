@@ -1,0 +1,26 @@
+.intelli-caret-wrapper {
+  position: relative;
+  background-color: #000;
+  border: 1px solid white;
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 180px;
+  color: white;
+  font-size: 16px;
+  line-height: 1.5;
+  overflow: auto;
+}
+
+.intelli-editor {
+  outline: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 100%;
+  
+  caret-color: #07ff03; 
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

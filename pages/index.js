@@ -1,25 +1,6 @@
-// pages/index.js
-import { useEffect } from "react";
-import { useRouter } from "next/router";
-import { supabase } from "../utils/supabase"; // Adjust the import path as necessary
+import { supabase } from "../utils/supabase";
 
-export default function IndexPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    let isMounted = true;
-
-    supabase.auth.getUser().then(({ data }) => {
-      if (isMounted && data?.user) {
-        router.push("/reports/folders/view-folders");
-      }
-    });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [router]);
-
+export default function LandingPage() {
   async function signInWithGoogle() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -40,34 +21,48 @@ export default function IndexPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "black",
+        background:
+          "radial-gradient(circle at top, #0a0a0a, #000000 60%, #111111)",
         color: "white",
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        flexDirection: "column",
         padding: "2rem",
+        fontFamily: "'JetBrains Mono', monospace",
         textAlign: "center",
       }}
     >
       <img
         src="/logo.png"
-        alt="Gunsmoke3D Logo"
-        style={{ width: "120px", marginBottom: "1.5rem" }}
+        alt="Marvin Intelligence Logo"
+        style={{ width: "100px", marginBottom: "2rem" }}
       />
-      <h1 style={{ fontSize: "3rem", marginBottom: "1rem" }}>
-        Welcome to Marvin Intelligence Agency
-      </h1>
-      <p
+
+      <h1
         style={{
-          maxWidth: "600px",
-          marginBottom: "2rem",
-          fontSize: "1.1rem",
-          lineHeight: "1.5",
+          fontSize: "2.75rem",
+          fontWeight: "700",
+          marginBottom: "1rem",
+          textShadow: "0 0 10px #00fff2",
         }}
       >
-        Recursive AI-driven intelligence agency. Create, manage, and deploy.
+        Marvin Intelligence Agency
+      </h1>
+
+      <p
+        style={{
+          fontSize: "1.2rem",
+          maxWidth: "700px",
+          marginBottom: "2rem",
+          color: "#aaa",
+        }}
+      >
+        AI-driven mission control for recursive intelligence workflows. Generate
+        strategic reports, deploy smart agents, and visualize intelligence like
+        never before.
       </p>
+
       <button
         onClick={signInWithGoogle}
         style={{
@@ -78,10 +73,17 @@ export default function IndexPage() {
           color: "white",
           fontSize: "1.1rem",
           cursor: "pointer",
+          boxShadow: "0 0 10px rgba(255, 255, 255, 0.2)",
+          transition: "all 0.3s ease-in-out",
         }}
       >
+        <i className="bi bi-google" style={{ marginRight: "0.5rem" }} />
         Sign in with Google
       </button>
+
+      <div style={{ marginTop: "4rem", fontSize: "0.9rem", color: "#555" }}>
+        <em>Recursive. Strategic. Intelligent.</em>
+      </div>
     </div>
   );
 }

@@ -35,8 +35,12 @@
   margin: 0 !important;
 
 }
+textarea {
+  caret-color: #3fd000; /* Bright green */
+}
 
-.textareaWrapper {
+
+/* .textareaWrapper {
   position: relative;
   caret-color: transparent;
   overflow: hidden;
@@ -54,7 +58,7 @@
   height: 1em;
   background-color:#3fd000;
   animation: blink 3s infinite;
-}
+} */
 h4{
   color:white !important;
 }
