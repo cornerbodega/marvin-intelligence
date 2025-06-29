@@ -26,7 +26,6 @@ import Link from "next/link";
 
 import { useRouter } from "next/router";
 
-import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { useUser } from "../../../context/UserContext";
 import { supabase } from "../../../utils/supabase";
 import { useState, useRef, useEffect } from "react";
