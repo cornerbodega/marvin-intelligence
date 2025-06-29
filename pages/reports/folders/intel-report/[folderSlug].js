@@ -4,22 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import getEnv from "../../../../utils/getEnv";
 import { useUser } from "../../../../context/UserContext";
 import { supabase } from "../../../../utils/supabase";
-
 import IntelliFab from "../../../../components/IntelliFab";
-
 import LibraryImage from "../../../../components/LibraryImage";
 import { useFirebaseListener } from "../../../../utils/useFirebaseListener";
 import saveTask from "../../../../utils/saveTask";
-
 import Router from "next/router";
-
 import IntelliPrint from "../../../../components/IntelliPrint/IntelliPrint";
-
 import Head from "next/head";
-
 import IntelliNotificationsArea from "../../../../components/IntelliNotificationsArea/IntelliNotificationsArea";
 import IntelliEditor from "../../../../components/IntelliEditor";
-import { has, set } from "lodash";
 
 const ViewReports = () => {
   const router = useRouter();
@@ -351,7 +344,7 @@ const ViewReports = () => {
         setLoadedAgentId(firebaseSaveData.agentId);
       }
     }
-  }, [firebaseSaveData, folderId]); // Added folderId as a dependency
+  }, [firebaseSaveData, folderId]);
 
   useEffect(() => {
     // get agent from supabase by agentId

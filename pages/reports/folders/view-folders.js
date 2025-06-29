@@ -362,7 +362,7 @@ const ViewReports = () => {
           </Col>
         </Row>
       </div>
-      {loadedReports.length > 0 && (
+      {loadedReports.length >= 0 && (
         <div style={{ marginBottom: "20px", width: "100%", display: "flex" }}>
           <input
             type="text"
