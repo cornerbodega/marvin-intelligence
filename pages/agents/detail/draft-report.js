@@ -64,13 +64,17 @@ const CreateMission = () => {
   const [expertiseOutput, setExpertiseOutput] = useState([]);
   const router = useRouter();
   const [userId, setUserId] = useState();
-  const userContext = useUser();
+  const { user, isLoading: isAuthLoading } = useUser();
 
   useEffect(() => {
-    if (userContext?.id) {
-      setUserId(userContext.id);
+    if (!isAuthLoading) {
+      if (!user) {
+        router.push("/");
+      } else if (user?.id) {
+        setUserId(user.id);
+      }
     }
-  }, [userContext]);
+  }, [user, isAuthLoading, router]);
   // Fetch session and required data on client
   useEffect(() => {
     if (!userId) {
@@ -456,6 +460,14 @@ const CreateMission = () => {
       textareaRef.current.focus();
     }
   }, []);
+
+  if (isAuthLoading || !user) {
+    return (
+      <div style={{ color: "white", textAlign: "center", padding: "40px" }}>
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div>

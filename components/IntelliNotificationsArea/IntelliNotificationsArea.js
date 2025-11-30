@@ -19,13 +19,13 @@ export default function IntelliNotificationsArea() {
   const [briefingInput, setBriefingInput] = useState();
 
   const [userId, setUserId] = useState();
-  const userContext = useUser();
+  const { user } = useUser();
 
   useEffect(() => {
-    if (userContext?.id) {
-      setUserId(userContext.id);
+    if (user?.id) {
+      setUserId(user.id);
     }
-  }, [userContext]);
+  }, [user]);
 
   // Firebase listeners - always called
   const firebaseContinuumStatus = useFirebaseListener(

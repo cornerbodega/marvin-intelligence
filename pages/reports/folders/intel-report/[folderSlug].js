@@ -46,13 +46,17 @@ const ViewReports = () => {
   const [editorContent, setEditorContent] = useState("");
 
   const [userId, setUserId] = useState();
-  const userContext = useUser();
+  const { user, isLoading: isAuthLoading } = useUser();
 
   useEffect(() => {
-    if (userContext?.id) {
-      setUserId(userContext.id);
+    if (!isAuthLoading) {
+      if (!user) {
+        router.push("/");
+      } else if (user?.id) {
+        setUserId(user.id);
+      }
     }
-  }, [userContext]);
+  }, [user, isAuthLoading, router]);
 
   function handleContentChange(newContent) {
     setEditorContent(newContent);
@@ -1017,6 +1021,15 @@ const ViewReports = () => {
     const newTaskRef = await saveTask(newTask);
   }
   const [regenImageDisabled, setRegenImageDisabled] = useState(false);
+
+  if (isAuthLoading || !user) {
+    return (
+      <div style={{ color: "white", textAlign: "center", padding: "40px" }}>
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Notifications Area */}

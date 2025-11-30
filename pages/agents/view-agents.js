@@ -26,13 +26,17 @@ const ViewAgents = () => {
   const containerRef = useRef(null);
   const router = useRouter();
   const [userId, setUserId] = useState();
-  const userContext = useUser();
+  const { user, isLoading: isAuthLoading } = useUser();
 
   useEffect(() => {
-    if (userContext?.id) {
-      setUserId(userContext.id);
+    if (!isAuthLoading) {
+      if (!user) {
+        router.push("/");
+      } else if (user?.id) {
+        setUserId(user.id);
+      }
     }
-  }, [userContext]);
+  }, [user, isAuthLoading, router]);
 
   useEffect(() => {
     const initialize = async () => {
@@ -159,6 +163,14 @@ const ViewAgents = () => {
       loadMoreAgents();
     }
   }, [isInView]);
+
+  if (isAuthLoading || !user) {
+    return (
+      <div style={{ color: "white", textAlign: "center", padding: "40px" }}>
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <>

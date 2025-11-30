@@ -19,13 +19,13 @@ const ViewReports = () => {
   const [isInView, setIsInView] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [userId, setUserId] = useState();
-  const userContext = useUser();
+  const { user, isLoading: isAuthLoading } = useUser();
 
   useEffect(() => {
-    if (userContext?.id) {
-      setUserId(userContext.id);
+    if (!isAuthLoading && user?.id) {
+      setUserId(user.id);
     }
-  }, [userContext]);
+  }, [user, isAuthLoading]);
   useEffect(() => {
     async function fetchInitialData() {
       const { data: agency } = await supabase

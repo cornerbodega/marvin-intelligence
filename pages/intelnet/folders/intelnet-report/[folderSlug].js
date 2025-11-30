@@ -160,8 +160,8 @@ const ViewReports = ({
   agentId,
   _folderLikes,
 }) => {
-  const { user } = useUser();
-  const userId = user ? user.sub : null;
+  const { user, isLoading: isAuthLoading } = useUser();
+  const userId = user ? user.id : null;
   const [loadedReports, setLoadedReports] = useState(_loadedReports);
   const router = useRouter();
   const [isStreaming, setIsStreaming] = useState(false);
