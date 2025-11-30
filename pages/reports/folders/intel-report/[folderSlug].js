@@ -365,7 +365,7 @@ const ViewReports = () => {
       .eq("agentId", loadedAgentId);
 
     if (agentsError) {
-      console.log("agentError", agentError);
+      console.log("agentsError", agentsError);
       return;
     }
     console.log("agent");
@@ -455,14 +455,27 @@ const ViewReports = () => {
       return;
     }
 
+    // Find the closest block-level parent element
     let parentNode = range.startContainer.parentNode;
-    while (parentNode && !parentNode.id && parentNode !== document.body) {
+    while (parentNode && parentNode !== document.body) {
+      // Stop at block-level elements (p, div, h1-h6, li, etc.)
+      const tagName = parentNode.tagName?.toLowerCase();
+      if (['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'section'].includes(tagName)) {
+        break;
+      }
       parentNode = parentNode.parentNode;
     }
 
-    const elementId = parentNode ? parentNode.id : null;
+    // Generate a unique id if the element doesn't have one
+    let elementId = parentNode?.id;
+    if (parentNode && !elementId && parentNode !== document.body) {
+      elementId = `highlight-${report.reportId}-${Date.now()}`;
+      parentNode.id = elementId;
+    }
+
     console.log("selection");
     console.log("selection.toString()", selection.toString());
+    console.log("elementId:", elementId);
     setHighlight({
       highlightedText: selection.toString(),
       elementId,
@@ -567,7 +580,6 @@ const ViewReports = () => {
       container.innerHTML = report.reportContent;
 
       links.forEach((link) => {
-        const element = container.querySelector(`[id="${link.elementId}"]`);
         let highlightedText = (() => {
           try {
             return JSON.parse(link.highlightedText);
@@ -576,31 +588,68 @@ const ViewReports = () => {
           }
         })();
 
+        // Try to find the element by id, fallback to searching whole container
+        let element = container.querySelector(`[id="${link.elementId}"]`);
+
+        // If element not found (wrapper id like reportRoot0, or dynamic id not saved to content), search whole container
+        if (!element) {
+          console.log(`Element ${link.elementId} not in content, searching whole container`);
+          element = container;
+        }
+
         if (element) {
           const newLink = `<a href="#${link.childReportId}">${highlightedText}</a>`;
+          const normalizedHighlight = highlightedText.replace(/\s+/g, " ").trim();
 
-          // Try replacing normalized version inside the actual DOM
-          const originalText = element.textContent;
-          const normalizedText = originalText.replace(/\s+/g, " ").trim();
-          const normalizedHighlight = highlightedText
-            .replace(/\s+/g, " ")
-            .trim();
+          // Helper function to try matching in an element
+          const tryMatch = (el) => {
+            const text = el.textContent.replace(/\s+/g, " ").trim();
 
-          console.log("originalText:", originalText);
-          console.log("normalizedText:", normalizedText);
+            // Try exact match first
+            if (text.includes(normalizedHighlight)) {
+              const escaped = highlightedText
+                .trim()
+                .replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")
+                .replace(/\s+/g, "\\s+");
+              const regex = new RegExp(escaped);
+              el.innerHTML = el.innerHTML.replace(regex, newLink);
+              return true;
+            }
+
+            // Try partial match (first 3-5 words)
+            if (normalizedHighlight.length > 20) {
+              const words = normalizedHighlight.split(/\s+/);
+              for (let wordCount = Math.min(5, words.length); wordCount >= 3; wordCount--) {
+                const partialText = words.slice(0, wordCount).join(" ");
+                if (text.includes(partialText)) {
+                  const escaped = partialText
+                    .replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")
+                    .replace(/\s+/g, "\\s+");
+                  const regex = new RegExp(escaped);
+                  const shortLink = `<a href="#${link.childReportId}">${partialText}</a>`;
+                  el.innerHTML = el.innerHTML.replace(regex, shortLink);
+                  console.log(`Matched partial text: "${partialText}"`);
+                  return true;
+                }
+              }
+            }
+            return false;
+          };
+
+          console.log("originalText:", element.textContent.substring(0, 100) + "...");
           console.log("normalizedHighlight:", normalizedHighlight);
 
-          if (normalizedText.includes(normalizedHighlight)) {
-            // Build a regex to allow for whitespace between words
-            const escaped = highlightedText
-              .trim()
-              .replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&") // escape special chars
-              .replace(/\s+/g, "\\s+"); // match any whitespace
+          // Try matching in the found element first
+          let matched = tryMatch(element);
 
-            const regex = new RegExp(escaped);
-            element.innerHTML = element.innerHTML.replace(regex, newLink);
-          } else {
-            console.warn("Could not match normalized highlight in text");
+          // If not found in element and element isn't already the container, try whole container
+          if (!matched && element !== container) {
+            console.log("Text not in element, trying whole container...");
+            matched = tryMatch(container);
+          }
+
+          if (!matched) {
+            console.warn("Could not match highlight in text");
           }
         } else {
           console.log(`Element with id ${link.elementId} not found`);
