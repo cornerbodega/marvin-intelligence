@@ -273,8 +273,7 @@ export default function EagleCommandProgramManager() {
           image: "/programmanager.jpg",
         }}
         position={[20, 20]}
-        onDrag={(x, y) => console.log(`Dragged to ${x}, ${y}`)}
-        onDoubleClick={handleProgramManagerIconClick}
+        onClick={handleProgramManagerIconClick}
         style={{ zIndex: 1 }} // Lower z-index for the icon
       />
     </div>

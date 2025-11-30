@@ -19,21 +19,11 @@ export default function EagleOptixFolder({ icons, windowId }) {
   ]);
 
   const [positions, setPositions] = useState(initialPositions);
-
-  const handleDrag = (index, x, y) => {
-    setPositions((prev) => {
-      const newPositions = [...prev];
-      newPositions[index] = [x, y];
-      return newPositions;
-    });
-  };
-
-  const handleDoubleClick = (icon) => {
+  const handleClick = (icon) => {
     if (icon.onDoubleClick) {
       icon.onDoubleClick();
     } else {
       if (icon.path) {
-        // Open the program in the same tab
         window.open(icon.path, "_blank");
       } else {
         alert(`${icon.name} under construction!`);
@@ -42,14 +32,13 @@ export default function EagleOptixFolder({ icons, windowId }) {
   };
 
   return (
-    <div style={folderContentStyle} onMouseDown={(e) => e.stopPropagation()}>
+    <div style={folderContentStyle}>
       {icons.map((icon, index) => (
         <ProgramIcon
           key={icon.name}
           icon={icon}
           position={positions[index]}
-          onDrag={(x, y) => handleDrag(index, x, y)}
-          onDoubleClick={() => handleDoubleClick(icon)}
+          onClick={() => handleClick(icon)}
         />
       ))}
     </div>

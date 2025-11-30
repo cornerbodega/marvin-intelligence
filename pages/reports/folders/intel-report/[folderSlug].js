@@ -324,7 +324,7 @@ const ViewReports = () => {
         setFolderPicUrl(firebaseFolderData.folderPicUrl);
       }
     }
-  }, [firebaseFolderData, folderId]); // Added folderId as a dependency
+  }, [firebaseFolderData, folderId]);
 
   useEffect(() => {
     console.log("2firebaseSaveData");

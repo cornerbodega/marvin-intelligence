@@ -1,5 +1,4 @@
-import React, { useState, useRef } from "react";
-import { useDrag } from "@use-gesture/react";
+import React from "react";
 
 function programIconStyle(position, customStyle = {}) {
   return {
@@ -14,14 +13,12 @@ function programIconStyle(position, customStyle = {}) {
     position: "absolute",
     top: `${position[1]}px`,
     left: `${position[0]}px`,
-    padding: "5px",
+    padding: "10px",
     fontFamily: "'MS Sans Serif', sans-serif",
     fontSize: "16px",
     textAlign: "center",
-    touchAction: "none",
     backgroundColor: "rgba(255, 255, 255, 0.5)",
-    padding: "10px",
-
+    border: "1px solid transparent",
     ...customStyle,
   };
 }
@@ -29,42 +26,9 @@ function programIconStyle(position, customStyle = {}) {
 export default function ProgramIcon({
   icon,
   position,
-  onDrag,
-  onDoubleClick,
   onClick,
   style,
 }) {
-  const [lastTap, setLastTap] = useState(0);
-  const tapTimeout = useRef(null);
-
-  const bind = useDrag(
-    (params) => {
-      onDrag(params.offset[0], params.offset[1]);
-      params.event.stopPropagation();
-    },
-    {
-      from: () => position,
-    }
-  );
-
-  const handleTouchEnd = (e) => {
-    const now = Date.now();
-    const DOUBLE_TAP_DELAY = 300;
-
-    if (now - lastTap < DOUBLE_TAP_DELAY) {
-      if (tapTimeout.current) {
-        clearTimeout(tapTimeout.current);
-        tapTimeout.current = null;
-      }
-      onDoubleClick();
-    } else {
-      setLastTap(now);
-      tapTimeout.current = setTimeout(() => {
-        onClick && onClick(e);
-      }, DOUBLE_TAP_DELAY);
-    }
-  };
-
   const iconStyle = {
     ...programIconStyle(position, style),
   };
@@ -74,19 +38,11 @@ export default function ProgramIcon({
     height: "75px",
     marginBottom: "13px",
     marginTop: "-5px",
-
-    // disable click
     pointerEvents: "none",
   };
 
   return (
     <div
-      {...bind()}
-      onDoubleClick={(e) => {
-        e.stopPropagation();
-        onDoubleClick();
-      }}
-      onTouchEnd={handleTouchEnd}
       onClick={(e) => {
         e.stopPropagation();
         onClick && onClick(e);
