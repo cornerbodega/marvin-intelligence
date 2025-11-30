@@ -80,11 +80,17 @@ const ViewReports = () => {
     return ctx.measureText(text).width;
   }
 
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
   useEffect(() => {
-    if (userContext?.id) {
+    if (userContext === null) {
+      // User is not logged in, redirect to login
+      router.push("/");
+    } else if (userContext?.id) {
       setUserId(userContext.id);
+      setIsCheckingAuth(false);
     }
-  }, [userContext]);
+  }, [userContext, router]);
 
   useEffect(() => {
     const initData = async () => {
@@ -308,6 +314,14 @@ const ViewReports = () => {
     } else {
       console.error("Failed to save the task");
     }
+  }
+
+  if (isCheckingAuth) {
+    return (
+      <div style={{ color: "white", textAlign: "center", padding: "40px" }}>
+        Loading...
+      </div>
+    );
   }
 
   return (
