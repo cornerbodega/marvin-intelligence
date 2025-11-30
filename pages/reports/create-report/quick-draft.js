@@ -34,17 +34,17 @@ const CreateMission = ({}) => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const [userId, setUserId] = useState();
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const userContext = useUser();
+  const { user, isLoading: isAuthLoading } = useUser();
 
   useEffect(() => {
-    if (userContext === null) {
-      router.push("/");
-    } else if (userContext?.id) {
-      setUserId(userContext.id);
-      setIsCheckingAuth(false);
+    if (!isAuthLoading) {
+      if (!user) {
+        router.push("/");
+      } else if (user?.id) {
+        setUserId(user.id);
+      }
     }
-  }, [userContext, router]);
+  }, [user, isAuthLoading, router]);
 
   if (!router.query.briefingInput || router.query.briefingInput.length == 0) {
     console.log("no briefing input. ");
@@ -177,7 +177,7 @@ const CreateMission = ({}) => {
     await saveTask(newTask);
   }
 
-  if (isCheckingAuth) {
+  if (isAuthLoading || !user) {
     return (
       <div style={{ color: "white", textAlign: "center", padding: "40px" }}>
         Loading...

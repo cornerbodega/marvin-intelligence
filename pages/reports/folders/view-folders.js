@@ -36,7 +36,7 @@ const ViewReports = () => {
   const [reportLength, setReportLength] = useState("short");
   const textareaRef = useRef(null);
 
-  const userContext = useUser();
+  const { user, isLoading: isAuthLoading } = useUser();
   const router = useRouter();
 
   const [folderLikesByFolderId, setFolderLikesByFolderId] = useState(
@@ -80,17 +80,16 @@ const ViewReports = () => {
     return ctx.measureText(text).width;
   }
 
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-
   useEffect(() => {
-    if (userContext === null) {
-      // User is not logged in, redirect to login
-      router.push("/");
-    } else if (userContext?.id) {
-      setUserId(userContext.id);
-      setIsCheckingAuth(false);
+    if (!isAuthLoading) {
+      if (!user) {
+        // User is not logged in, redirect to login
+        router.push("/");
+      } else if (user?.id) {
+        setUserId(user.id);
+      }
     }
-  }, [userContext, router]);
+  }, [user, isAuthLoading, router]);
 
   useEffect(() => {
     const initData = async () => {
@@ -316,7 +315,7 @@ const ViewReports = () => {
     }
   }
 
-  if (isCheckingAuth) {
+  if (isAuthLoading || !user) {
     return (
       <div style={{ color: "white", textAlign: "center", padding: "40px" }}>
         Loading...

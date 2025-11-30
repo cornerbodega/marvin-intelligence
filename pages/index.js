@@ -1,19 +1,28 @@
 import { supabase } from "../utils/supabase";
+import { useRouter } from "next/router";
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { error } = router.query;
   async function signInWithGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const redirectUrl = typeof window !== "undefined"
+      ? `${window.location.origin}/api/auth/callback`
+      : "http://localhost:3000/api/auth/callback";
+
+    console.log("Signing in with redirect to:", redirectUrl);
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo:
-          process.env.NODE_ENV === "development"
-            ? "http://localhost:3000/api/auth/callback"
-            : "https://intelligence.marvin.technology/api/auth/callback",
+        redirectTo: redirectUrl,
       },
     });
 
     if (error) {
       console.error("Login error:", error.message);
+      alert("Login failed: " + error.message);
+    } else {
+      console.log("OAuth initiated:", data);
     }
   }
 
@@ -80,6 +89,12 @@ export default function LandingPage() {
         <i className="bi bi-google" style={{ marginRight: "0.5rem" }} />
         Sign in with Google
       </button>
+
+      {error && (
+        <div style={{ marginTop: "1rem", color: "#ff6b6b", fontSize: "0.9rem" }}>
+          Error: {error}
+        </div>
+      )}
 
       <div style={{ marginTop: "4rem", fontSize: "0.9rem", color: "#555" }}>
         <em>Recursive. Strategic. Intelligent.</em>
