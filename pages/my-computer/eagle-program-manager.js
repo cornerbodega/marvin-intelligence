@@ -118,6 +118,11 @@ export default function EagleCommandProgramManager() {
       path: "https://rhymewith.us",
       image: "/rhyme-with-us.jpg",
     },
+    {
+      name: "Motosai",
+      path: "https://motosai.com",
+      image: "/motosai-logo.png",
+    },
   ];
   // {
   //   name: "Visionary Sheet Complete",

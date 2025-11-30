@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import ProgramIcon from "./ProgramIcon";
 
 const folderContentStyle = {
@@ -13,12 +13,11 @@ export default function EagleOptixFolder({ icons, windowId }) {
   const verticalSpacing = 160; // Adjust vertical spacing between rows
   const horizontalSpacing = 100; // Adjust horizontal spacing between columns
 
-  const initialPositions = icons.map((_, index) => [
-    20 + (index % 3) * horizontalSpacing,
-    20 + Math.floor(index / 3) * verticalSpacing,
-  ]);
-
-  const [positions, setPositions] = useState(initialPositions);
+  const positions = useMemo(() =>
+    icons.map((_, index) => [
+      20 + (index % 3) * horizontalSpacing,
+      20 + Math.floor(index / 3) * verticalSpacing,
+    ]), [icons.length]);
   const handleClick = (icon) => {
     if (icon.onDoubleClick) {
       icon.onDoubleClick();

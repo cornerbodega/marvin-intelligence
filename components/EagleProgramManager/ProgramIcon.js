@@ -1,6 +1,6 @@
 import React from "react";
 
-function programIconStyle(position, customStyle = {}) {
+function programIconStyle(position = [0, 0], customStyle = {}) {
   return {
     width: "90px",
     height: "145px",
@@ -11,8 +11,8 @@ function programIconStyle(position, customStyle = {}) {
     justifyContent: "flex-start",
     cursor: "pointer",
     position: "absolute",
-    top: `${position[1]}px`,
-    left: `${position[0]}px`,
+    top: `${position?.[1] ?? 0}px`,
+    left: `${position?.[0] ?? 0}px`,
     padding: "10px",
     fontFamily: "'MS Sans Serif', sans-serif",
     fontSize: "16px",
