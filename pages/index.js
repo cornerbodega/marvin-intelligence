@@ -7,8 +7,8 @@ export default function LandingPage() {
       options: {
         redirectTo:
           process.env.NODE_ENV === "development"
-            ? "http://localhost:3000/reports/folders/view-folders"
-            : "https://intelligence.marvin.technology/reports/folders/view-folders",
+            ? "http://localhost:3000/api/auth/callback"
+            : "https://intelligence.marvin.technology/api/auth/callback",
       },
     });
 
