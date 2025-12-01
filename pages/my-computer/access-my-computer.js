@@ -246,7 +246,7 @@ export default function Home() {
         <h2>Skills</h2>
         <p>TypeScript, JavaScript, Python, React, Next.js, Three.js, Node.js, PostgreSQL, Supabase, OpenAI API, Claude API, Google Cloud Run, Docker</p>
 
-        <p>Resume: <a href="https://intelligence.marvin.technology/resume.pdf" target="_blank">https://intelligence.marvin.technology/resume.pdf</a></p>
+        <p>Resume: <a href="https://intelligence.marvin.technology/resume.pdf" target="_blank" rel="noreferrer">https://intelligence.marvin.technology/resume.pdf</a></p>
         <p>GitHub: https://github.com/cornerbodega</p>
       </div>
     </>
