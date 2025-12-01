@@ -3,7 +3,7 @@ import React from "react";
 function programIconStyle(position = [0, 0], customStyle = {}) {
   return {
     width: "90px",
-    height: "145px",
+    height: "170px",
     margin: "10px",
     display: "flex",
     flexDirection: "column",
@@ -52,6 +52,11 @@ export default function ProgramIcon({
       <img src={icon.image} alt={icon.name} style={imageStyle} />
       <div style={icon.path ? { color: "black" } : { color: "grey" }}>
         <div style={{ fontSize: "1em" }}>{icon.name}</div>
+        {icon.description && (
+          <div style={{ fontSize: "0.75em", color: "#555", marginTop: "2px" }}>
+            {icon.description}
+          </div>
+        )}
       </div>
     </div>
   );

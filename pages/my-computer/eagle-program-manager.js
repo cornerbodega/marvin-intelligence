@@ -77,24 +77,28 @@ export default function EagleCommandProgramManager() {
   const programManagerFolders = [
     {
       name: "About Me",
+      description: "Resume & Career Journal",
       path: "/eagle-optix",
       image: "/eaglehead.jpg",
       onDoubleClick: handleAboutMarvinClick,
     },
     {
       name: "Claude Tools",
+      description: "Open Source Dev Tools",
       path: "/eagle-optix",
       image: "/llm-tools-logo.png",
       onDoubleClick: handleClaudeToolsClick,
     },
     {
       name: "Research Tools",
+      description: "AI-Powered Wiki",
       path: "/eagle-optix",
       image: "/sheet.jpg",
       onDoubleClick: handleResearchToolsClick,
     },
     {
       name: "Games",
+      description: "Browser & Mobile Games",
       path: "/eagle-optix",
       image: "/nest.jpg",
       onDoubleClick: handleGamesClick,
@@ -104,47 +108,55 @@ export default function EagleCommandProgramManager() {
   const aboutMarvinFolders = [
     {
       name: "Career Journal",
+      description: "Work history & projects",
       path: "/about/journal",
       image: "/talon.jpg",
     },
     {
-      name: "Resume Google Doc",
+      name: "Resume",
+      description: "Google Doc",
       path: "https://docs.google.com/document/d/12ZRriMe62DBUce_ic5A4NkvMULugcnvUBtFpTsQJZdY/edit?tab=t.0",
       image: "/insight.jpg",
     },
   ];
   const researchToolsFolders = [
     {
-      name: "Intelligence GPT Wiki, powered by OpenAI",
+      name: "Intelligence",
+      description: "AI-powered research wiki",
       path: "/about/why-what-how",
       image: "/feather.jpg",
     },
   ];
   const gamesFolders = [
     {
-      name: "Hedge Fund Hero (iOS)",
+      name: "Hedge Fund Hero",
+      description: "iOS stock analysis game",
       path: "https://apps.apple.com/us/app/hedge-fund-hero/id6605920631?ct=Tap33743197",
       image: "/HFH_Logo.png",
     },
     {
       name: "Rhyme With Us",
+      description: "Multiplayer rhyming game",
       path: "https://rhymewith.us",
       image: "/rhyme-with-us.jpg",
     },
     {
       name: "Motosai",
+      description: "Multiplayer motorcycle MMO",
       path: "https://motosai.com",
       image: "/motosai-logo.png",
     },
   ];
   const claudeToolsFolders = [
     {
-      name: "xquery (GitHub)",
+      name: "xquery",
+      description: "Natural language DB queries",
       path: "https://github.com/cornerbodega/xquery",
       image: "/xquery-logo.png",
     },
     {
-      name: "Reporter (GitHub)",
+      name: "Reporter",
+      description: "LaTeX to PDF API",
       path: "https://github.com/cornerbodega/reporter",
       image: "/reporter-logo.png",
     },
@@ -216,8 +228,8 @@ export default function EagleCommandProgramManager() {
         <DraggableWindow
           title="Program Manager"
           defaultPosition={[50, 50]}
-          defaultSize={[400, 400]}
-          initialHeight={450} // Initial height for Program Manager window
+          defaultSize={[450, 520]}
+          initialHeight={520} // Initial height for Program Manager window
           onClose={handleProgramManagerClose}
           zIndex={10} // Higher z-index for the window
         >
@@ -225,7 +237,7 @@ export default function EagleCommandProgramManager() {
             <EagleOptixFolder
               icons={programManagerFolders}
               windowId="programManager"
-              initialHeight={400} // Initial height for folder contents
+              initialHeight={480} // Initial height for folder contents
             />
           </div>
         </DraggableWindow>

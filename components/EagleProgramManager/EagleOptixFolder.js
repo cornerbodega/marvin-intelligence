@@ -10,8 +10,8 @@ const folderContentStyle = {
 };
 
 export default function EagleOptixFolder({ icons, windowId }) {
-  const verticalSpacing = 160; // Adjust vertical spacing between rows
-  const horizontalSpacing = 100; // Adjust horizontal spacing between columns
+  const verticalSpacing = 220; // Adjust vertical spacing between rows
+  const horizontalSpacing = 130; // Adjust horizontal spacing between columns
 
   const positions = useMemo(() =>
     icons.map((_, index) => [
