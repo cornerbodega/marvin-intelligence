@@ -116,7 +116,7 @@ export default function EagleCommandProgramManager() {
       name: "Resume",
       description: "PDF",
       path: "https://intelligence.marvin.technology/resume.pdf",
-      image: "/insight.jpg",
+      image: "/resume-logo.png",
     },
   ];
   const researchToolsFolders = [
