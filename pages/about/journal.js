@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 const Section = ({ title, children }) => (
@@ -49,7 +50,7 @@ export default function Journal() {
         My Career Journal
       </h1>
       <p style={{ marginBottom: "20px" }}>
-        <a href="/my-computer/access-my-computer">← Back to My Computer</a>
+        <Link href="/my-computer/access-my-computer">← Back to My Computer</Link>
       </p>
       <div style={{ lineHeight: "1.8", margin: "20px 0" }}>
         <p>
