@@ -121,7 +121,7 @@ export default function EagleCommandProgramManager() {
   ];
   const researchToolsFolders = [
     {
-      name: "Intelligence",
+      name: "Marvinfo",
       description: "AI-powered research wiki",
       path: "/about/why-what-how",
       image: "/feather.jpg",
