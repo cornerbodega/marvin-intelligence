@@ -216,8 +216,8 @@ export default function EagleCommandProgramManager() {
         <DraggableWindow
           title="Program Manager"
           defaultPosition={[50, 50]}
-          defaultSize={[400, 200]}
-          initialHeight={300} // Initial height for Program Manager window
+          defaultSize={[400, 400]}
+          initialHeight={450} // Initial height for Program Manager window
           onClose={handleProgramManagerClose}
           zIndex={10} // Higher z-index for the window
         >
@@ -225,7 +225,7 @@ export default function EagleCommandProgramManager() {
             <EagleOptixFolder
               icons={programManagerFolders}
               windowId="programManager"
-              initialHeight={150} // Initial height for folder contents
+              initialHeight={400} // Initial height for folder contents
             />
           </div>
         </DraggableWindow>
