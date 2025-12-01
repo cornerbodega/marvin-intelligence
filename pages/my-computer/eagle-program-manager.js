@@ -33,6 +33,7 @@ export default function EagleCommandProgramManager() {
   const [isProgramManagerOpen, setProgramManagerOpen] = useState(true);
   const [isGamesOpen, setGamesOpen] = useState(false);
   const [isJournalOpen, setJournalOpen] = useState(false);
+  const [isClaudeToolsOpen, setClaudeToolsOpen] = useState(false);
 
   function handleProgramManagerClose() {
     setProgramManagerOpen(false);
@@ -49,6 +50,9 @@ export default function EagleCommandProgramManager() {
   }
   function handleJournalClosed() {
     setJournalOpen(false);
+  }
+  function handleClaudeToolsClosed() {
+    setClaudeToolsOpen(false);
   }
 
   const handleProgramManagerIconClick = () => {
@@ -67,12 +71,21 @@ export default function EagleCommandProgramManager() {
   const handleJournalClick = () => {
     setJournalOpen(true);
   };
+  const handleClaudeToolsClick = () => {
+    setClaudeToolsOpen(true);
+  };
   const programManagerFolders = [
     {
       name: "About Me",
       path: "/eagle-optix",
       image: "/eaglehead.jpg",
       onDoubleClick: handleAboutMarvinClick,
+    },
+    {
+      name: "Claude Tools",
+      path: "/eagle-optix",
+      image: "/llm-tools-logo.png",
+      onDoubleClick: handleClaudeToolsClick,
     },
     {
       name: "Research Tools",
@@ -122,6 +135,18 @@ export default function EagleCommandProgramManager() {
       name: "Motosai",
       path: "https://motosai.com",
       image: "/motosai-logo.png",
+    },
+  ];
+  const claudeToolsFolders = [
+    {
+      name: "xquery (GitHub)",
+      path: "https://github.com/cornerbodega/xquery",
+      image: "/xquery-logo.png",
+    },
+    {
+      name: "Reporter (GitHub)",
+      path: "https://github.com/cornerbodega/reporter",
+      image: "/reporter-logo.png",
     },
   ];
   // {
@@ -250,6 +275,22 @@ export default function EagleCommandProgramManager() {
           <EagleOptixFolder
             icons={gamesFolders}
             windowId="researchTools"
+            initialHeight={350}
+          />
+        </DraggableWindow>
+      )}
+      {isClaudeToolsOpen && (
+        <DraggableWindow
+          title="Claude Tools"
+          defaultPosition={[250, 150]}
+          defaultSize={[400, 400]}
+          initialHeight={400}
+          onClose={handleClaudeToolsClosed}
+          zIndex={10}
+        >
+          <EagleOptixFolder
+            icons={claudeToolsFolders}
+            windowId="claudeTools"
             initialHeight={350}
           />
         </DraggableWindow>
