@@ -114,8 +114,8 @@ export default function EagleCommandProgramManager() {
     },
     {
       name: "Resume",
-      description: "Google Doc",
-      path: "https://docs.google.com/document/d/12ZRriMe62DBUce_ic5A4NkvMULugcnvUBtFpTsQJZdY/edit?tab=t.0",
+      description: "PDF",
+      path: "https://intelligence.marvin.technology/resume.pdf",
       image: "/insight.jpg",
     },
   ];

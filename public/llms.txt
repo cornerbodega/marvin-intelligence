@@ -1,0 +1,98 @@
+# Marvin Rhone - Software Engineer
+
+## About
+Marvin Rhone is a software engineer based in Seattle, WA. Economics degree from Brown University, self-taught programmer with 12+ years building software. Currently focused on AI-augmented development workflows and developer tooling.
+
+## Contact
+- Website: https://intelligence.marvin.technology
+- GitHub: https://github.com/cornerbodega
+- Resume: https://intelligence.marvin.technology/resume.pdf
+
+## Open Source Claude Tools
+
+### xquery
+Natural language database queries for PostgreSQL via Claude.
+- GitHub: https://github.com/cornerbodega/xquery
+- Features: Multi-database support, multi-statement queries, automatic backups before DELETEs, CLI client
+- Stack: Node.js, Express, PostgreSQL, Claude API
+
+### Reporter
+LaTeX to PDF conversion API.
+- GitHub: https://github.com/cornerbodega/reporter
+- Features: Syntax highlighting, logo insertion, auto-cleanup of temp files
+- Stack: Node.js, Express, pdflatex
+
+## Projects
+
+### Motosai - Multiplayer Motorcycle MMO
+Browser-based multiplayer motorcycle game built in 5 weeks.
+- Live: https://motosai.com
+- Devlog: https://motosai.com/devlog
+- Features: Realistic counter-steering physics, real-time WebSocket multiplayer at 60fps, dynamic traffic AI, comic book aesthetic
+- Stack: Three.js, Socket.io, Google Cloud Run
+- 20,000+ lines of code
+
+### Gunsmoke4 - AI Video Generation Pipeline
+Transforms courtroom transcripts into cinematic videos using AI.
+- Features: SadTalker for lip-sync, Flux Pro/Midjourney for character portraits, RunPod GPU for rendering
+- Cost: 94% cheaper than commercial video APIs ($18-29 vs $330-720 for a 12-hour video)
+- Currently processing: Scopes Monkey Trial (1925)
+- Stack: Node.js, SadTalker, RunPod, FFmpeg, OpenAI TTS
+
+### Gunsmoke3 - 3D Courtroom Simulation
+Real-time 3D courtroom scenes in the browser.
+- GitHub: https://github.com/cornerbodega/Gunsmoke3
+- Features: GPT-4 for transcript parsing, lip-sync via viseme + amplitude analysis
+- Stack: Next.js, React Three Fiber, WebGL, Supabase
+- 129 commits over 3 months
+
+### Marvinfo (Intelligence.Marvin.Technology)
+AI-powered research wiki - save and organize AI outputs into shareable, interlinked reports.
+- Live: https://intelligence.marvin.technology
+- Features: Choose-your-own-adventure Wikipedia experience, agents that learn over time, text-to-speech, image generation
+- Stack: Next.js, Supabase, OpenAI API, Google Cloud Run
+
+### Hedge Fund Hero
+iOS stock analysis game using AI.
+- App Store: https://apps.apple.com/us/app/hedge-fund-hero/id6605920631
+- Features: Retrieval Augmented Generation for fundamental analysis of S&P 500 stocks
+- Stack: iOS, Swift, Supabase, Node.js
+
+### RhymeWith.Us
+Multiplayer browser rhyming game.
+- Live: https://rhymewith.us
+- Features: 3D graphics with Three.js, global leaderboard, NLP algorithm for rhyme detection
+- Stack: Three.js, Node.js
+
+## Work Experience
+
+### Staff Engineer (Contractor) - Foresight Data
+- Built xquery: system to query 20+ AWS PostgreSQL databases with natural language via Claude
+- Built Reporter: LaTeX to PDF API for professional report generation
+- Top ticket closer on the team
+
+### Senior Software Engineer - Cookies
+- Reduced costs by $1M+ annually
+- Built custom Node.js API with DatoCMS replacing Salsify and Tray.io
+- Dynamic CMS-powered website cutting campaign launch times
+
+### Founder - ABC Traceability
+- Built and sold SaaS platform for Washington State cannabis compliance
+- Self-taught full-stack development
+- Advocated for open API policies at conferences
+
+### Associate - BlackRock
+- Managed analytics for $14T+ in assets on Aladdin platform
+- Automated performance attribution and compliance reporting
+
+## Education
+- Brown University - Economics
+- Stanford/DeepLearning.AI - Machine Learning Specialization
+
+## Skills
+- Languages: TypeScript, JavaScript, Python, Swift, SQL
+- Frontend: React, Next.js, Three.js, React Three Fiber
+- Backend: Node.js, Express, PostgreSQL, Supabase
+- AI/ML: OpenAI API, Claude API, prompt engineering, RAG
+- Infrastructure: Google Cloud Run, RunPod, AWS, Docker
+- Tools: FFmpeg, LaTeX, Git

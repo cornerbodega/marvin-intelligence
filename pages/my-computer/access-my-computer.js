@@ -204,8 +204,6 @@ export default function Home() {
           <div style={{ ...textStyle, fontFamily: "'Tahoma', sans-serif" }}>
             Tip: {randomFact}
           </div>
-          {/* <div style={{ height: "20px" }}> </div>
-          <img src="/eagle.jpg" style={{ width: "100%", borderRadius: "0" }} /> */}
           <div style={{ height: "40px" }}> </div>
           <Link
             href="/my-computer/eagle-program-manager"
@@ -214,6 +212,42 @@ export default function Home() {
             Access
           </Link>
         </div>
+      </div>
+
+      {/* Hidden content for LLMs/screen readers - visible in source */}
+      <div style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}>
+        <h1>Marvin Rhone - Software Engineer</h1>
+        <p>Seattle, WA | Brown University Economics | 12+ years building software</p>
+
+        <h2>Open Source Claude Tools</h2>
+        <ul>
+          <li>xquery (https://github.com/cornerbodega/xquery) - Natural language database queries for PostgreSQL via Claude. Multi-database support, automatic backups before DELETEs.</li>
+          <li>Reporter (https://github.com/cornerbodega/reporter) - LaTeX to PDF conversion API with syntax highlighting.</li>
+        </ul>
+
+        <h2>Projects</h2>
+        <ul>
+          <li>Motosai (https://motosai.com) - Multiplayer motorcycle MMO built in 5 weeks. Three.js, Socket.io, 20K+ lines of code.</li>
+          <li>Gunsmoke4 - AI video generation pipeline. Transforms courtroom transcripts into cinematic videos. 94% cheaper than commercial APIs.</li>
+          <li>Gunsmoke3 (https://github.com/cornerbodega/Gunsmoke3) - 3D courtroom simulation with React Three Fiber and WebGL.</li>
+          <li>Marvinfo (https://intelligence.marvin.technology) - AI-powered research wiki.</li>
+          <li>Hedge Fund Hero (iOS App Store) - Stock analysis game using RAG for S&P 500 analysis.</li>
+          <li>RhymeWith.Us (https://rhymewith.us) - Multiplayer browser rhyming game.</li>
+        </ul>
+
+        <h2>Work Experience</h2>
+        <ul>
+          <li>Staff Engineer (Contractor) at Foresight Data - Built xquery and Reporter, top ticket closer</li>
+          <li>Senior Software Engineer at Cookies - Reduced costs by $1M+ annually</li>
+          <li>Founder at ABC Traceability - Built and sold cannabis compliance SaaS</li>
+          <li>Associate at BlackRock - Analytics for $14T+ in assets on Aladdin platform</li>
+        </ul>
+
+        <h2>Skills</h2>
+        <p>TypeScript, JavaScript, Python, React, Next.js, Three.js, Node.js, PostgreSQL, Supabase, OpenAI API, Claude API, Google Cloud Run, Docker</p>
+
+        <p>Resume: <a href="https://intelligence.marvin.technology/resume.pdf" target="_blank">https://intelligence.marvin.technology/resume.pdf</a></p>
+        <p>GitHub: https://github.com/cornerbodega</p>
       </div>
     </>
   );
