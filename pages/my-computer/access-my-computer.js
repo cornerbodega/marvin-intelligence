@@ -237,7 +237,7 @@ export default function Home() {
 
         <h2>Work Experience</h2>
         <ul>
-          <li>Staff Engineer (Contractor) at Foresight Data - Built xquery and Reporter, top ticket closer</li>
+          <li>Staff Engineer at Foresight Data - Built xquery and Reporter, top ticket closer</li>
           <li>Senior Software Engineer at Cookies - Reduced costs by $1M+ annually</li>
           <li>Founder at ABC Traceability - Built and sold cannabis compliance SaaS</li>
           <li>Associate at BlackRock - Analytics for $14T+ in assets on Aladdin platform</li>

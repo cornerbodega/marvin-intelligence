@@ -66,7 +66,7 @@ Multiplayer browser rhyming game.
 
 ## Work Experience
 
-### Staff Engineer (Contractor) - Foresight Data
+### Staff Engineer - Foresight Data
 - Built xquery: system to query 20+ AWS PostgreSQL databases with natural language via Claude
 - Built Reporter: LaTeX to PDF API for professional report generation
 - Top ticket closer on the team
